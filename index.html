@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile Mechanic Pro</title>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<style>
+body { background:#0a0a0a; color:white; font-family:Arial; padding:15px; }
+.card { background:#111; padding:15px; border-radius:12px; margin-bottom:15px; }
+button { padding:12px; border:none; border-radius:8px; margin:5px; font-weight:bold; }
+.green { background:#22c76a; }
+.blue { background:#3498db; }
+input, textarea, select {
+  width:100%; padding:10px; margin-top:5px; margin-bottom:10px;
+  background:#000; color:white; border:1px solid #333; border-radius:8px;
+}
+.result { white-space:pre-wrap; margin-top:10px; }
+</style>
+</head>
+
+<body>
+
+<h2>🚛 Mobile Mechanic Pro</h2>
+
+<div class="card">
+  <h3>📸 Part Number Camera</h3>
+
+  <input type="file" accept="image/*" capture="environment" onchange="readImage(event)">
+
+  <label>Detected Part Number</label>
+  <input id="part">
+
+  <label>Detected Barcode / SKU</label>
+  <input id="sku">
+
+  <button class="green" onclick="lookup()">Lookup</button>
+
+  <div id="output" class="result"></div>
+</div>
+
+<script>
+function extract(text){
+  text = text.toUpperCase();
+
+  let part = (text.match(/PF\d{3,6}|LF\d+|FF\d+|BD\d+|PA\d+/) || [])[0] || "";
+  let sku = (text.match(/\d{8,14}/) || [])[0] || "";
+
+  return {part, sku};
+}
+
+async function readImage(e){
+  const file = e.target.files[0];
+  if(!file) return;
+
+  document.getElementById("output").innerText = "Reading...";
+
+  const res = await Tesseract.recognize(file, "eng");
+  const text = res.data.text;
+
+  const found = extract(text);
+
+  document.getElementById("part").value = found.part;
+  document.getElementById("sku").value = found.sku;
+
+  if(found.part){
+    lookup();
+  } else {
+    document.getElementById("output").innerText = "No part number found. Try clearer photo.";
+  }
+}
+
+async function lookup(){
+  const part = document.getElementById("part").value;
+
+  document.getElementById("output").innerText = "Looking up...";
+
+  try {
+    const res = await fetch("https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/diesel-doc-ai", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({
+        question:What is part number ${part}? What is it used for? Applications?,
+        engine:"",
+        vin:"",
+        image_note:""
+      })
+    });
+
+    const data = await res.json();
+    document.getElementById("output").innerText = data.answer;
+
+  } catch(e){
+    document.getElementById("output").innerText = "AI failed";
+  }
+}
+</script>
+
+</body>
+</html>
