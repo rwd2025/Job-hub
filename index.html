@@ -179,7 +179,12 @@ Rules:
 `;
 
   try{
-    $("filterAnswer").textContent = await callAI(q, vehicleContext(), note);
+  $("filterAnswer").textContent = await callAI(
+  `Identify this part number first. Do NOT assume it is a filter: ${num}`,
+  vehicleContext(),
+  note,
+  "parts"
+);  
   }catch(e){
     $("filterAnswer").textContent = "AI load failed: " + e.message;
   }
