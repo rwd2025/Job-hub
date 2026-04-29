@@ -3,9 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Mobile Mechanic Pro V34 Full</title>
+<title>Mobile Mechanic Pro V35 Full</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#050505">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mechanic Pro">
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
 :root{--bg:#050505;--line:#3a3a3a;--orange:#ff6500;--blue:#3478f6;--green:#22c76a;--red:#ff4f4f}
@@ -40,7 +42,7 @@ button.dark{background:#222;border:1px solid #444;color:#fff}button.green{backgr
 
 <section id="home" class="section active">
 <header>
-  <div class="brand"><div class="mp"><span class="m">M</span><span class="p">P</span></div><div class="title"><b>MOBILE<br>MECHANIC PRO</b><span>TOOLS. INFO. FIX IT.</span></div></div>
+  <div class="brand"><div class="mp"><span class="m">M</span><span class="p">P</span></div><div class="title"><b>MOBILE<br>MECHANIC PRO</b><span>V35 • PART-FIRST • FIELD READY</span></div></div>
   <button class="settingsBtn" onclick="show('settings')">⚙️<small>SETTINGS</small></button>
 </header>
 <div class="card"><label>Global VIN / Unit</label><div class="row"><input id="vin" placeholder="Enter VIN or unit"><button onclick="decodeVinFixed()">Decode VIN</button></div><div id="vinBox" class="result" style="min-height:auto">Active VIN: none</div></div>
@@ -68,10 +70,8 @@ button.dark{background:#222;border:1px solid #444;color:#fff}button.green{backgr
 <section id="doc" class="section"><div class="card"><div class="pageTitle">Diesel Doc AI</div><div class="warn">Root-cause mode: first test, why it reads that, and what not to replace.</div><div class="grid"><button class="dark" onclick="quick('MX-13 crank no start no smoke')">No Start</button><button class="dark" onclick="quick('Outlet NOx high. Find upstream cause before replacing sensors.')">NOx</button><button class="dark" onclick="quick('EGR malfunction, valve not moving, 2.5 volts at connector')">EGR</button><button class="dark" onclick="quick('Low power under load, boost slow, no smoke')">Low Power</button><button class="dark" onclick="quick('Regen will not complete, soot level stays high')">Regen Fail</button><button class="dark" onclick="quick('Misfire at idle smooths under throttle')">Misfire</button></div><label>Question / Code / Symptom</label><textarea id="question"></textarea><label>Picture / Notes</label><textarea id="image_note"></textarea><div class="row"><button class="green" onclick="diagnose()">Diagnose</button><button class="blue" onclick="autoQuoteFromDiag()">Auto Quote</button></div><div id="answer" class="result">Ask Diesel Doc.</div><div class="row" style="margin-top:9px"><button onclick="sendToWorkOrder()">Add To Work Order</button><button class="blue" onclick="saveBrainFromDoc()">Save Repair Brain</button></div></div></section>
 
 <section id="camera" class="section"><div class="card"><div class="pageTitle">Part Number Camera</div><div class="warn">Take a clear picture of the big printed part/filter number. Barcode/SKU is secondary info only.</div><label>Take Picture Of Part Number / Label / Box</label><input id="barcodePhoto" type="file" accept="image/*" capture="environment" onchange="readPartNumberCamera(event)"><div id="barcodePreview" class="result" style="display:none;min-height:auto"></div><label>Actual Part / Filter Number</label><input id="actualPartNumber" placeholder="PF7748, BD50000, PA30093, LF14000NN"><label>Barcode / SKU If Visible</label><input id="barcodeNumber" placeholder="Optional secondary barcode/SKU"><label>Brand If Known</label><input id="partBrand" placeholder="Baldwin, Fleetguard, Donaldson, WIX, OEM"><label>Notes / Visible Text</label><textarea id="barcodeNote" placeholder="Example: PF7748 on Baldwin filter box"></textarea><div class="row"><button class="green" onclick="partNumberLookup()">Lookup Part</button><button class="blue" onclick="sendCameraToPartFinder()">Open Part Finder</button></div><div id="detectedNumberBox" class="detectedBox" style="display:none"></div><div id="barcodeAnswer" class="result">Take a picture or type the part number.</div><div class="row" style="margin-top:9px"><button onclick="addCameraToWorkOrder()">Add To Work Order</button><button class="dark" onclick="clearPartCamera()">Clear</button></div></div></section>
+<section id="filters" class="section"><div class="card"><div class="pageTitle">VIN Filters / Part Lookup</div><div class="warn">V35 fix: this section no longer assumes every number is a filter. It identifies the part first, then explains filter use only if confirmed.</div><label>Take Photo Of Part / Filter / Box / Label</label><button class="green" onclick="document.getElementById('filterPhoto').click()" style="width:100%">📷 Take Picture</button><input id="filterPhoto" type="file" accept="image/*" capture="environment" onchange="readFilterPhoto(event)" style="display:none;"><div id="filterPhotoBox" class="result" style="display:none;min-height:auto"></div><label>Part / Filter Number</label><input id="filterNumber" placeholder="4965569, PF7748, LF14000NN, A4721800009"><label>Lookup Mode</label><select id="kitType"><option>Identify part first</option><option>Build PM filter kit</option><option>Oil filter</option><option>Fuel filter</option><option>Air filter</option><option>Coolant filter</option><option>Hydraulic filter</option></select><label>Notes / Engine / Unit Info</label><textarea id="filterq" placeholder="Example: Cummins X15, PACCAR MX-13, box label text, customer unit notes"></textarea><div class="row"><button class="green" onclick="lookupFilterNumber()">Lookup</button><button class="blue" onclick="buildFilterKit()">Build Kit</button></div><div id="filterAnswer" class="result">Enter a part number or take a picture.</div><div class="row" style="margin-top:9px"><button onclick="addFilterToWorkOrder()">Add To Work Order</button><button class="dark" onclick="copyText('filterAnswer')">Copy</button></div></div></section>
 
-<label>Take Photo Of Filter / Box / Label</label>
-<button class="green" onclick="document.getElementById('filterPhoto').click()" style="width:100%">📷 Take Filter Picture</button>
-<input id="filterPhoto" type="file" accept="image/*" capture="environment" onchange="readFilterPhoto(event)" style="display:none;">
 
 <section id="parts" class="section"><div class="card"><div class="pageTitle">Part Finder Pro</div><label>Lookup Type</label><select id="lookupType"><option>Part number</option><option>Filter number</option><option>Picture note</option><option>What does this fit?</option></select><label>Part / Filter Number</label><input id="partq" placeholder="BD50000, PA30093, PF7748, LF14000NN"><label>Brand If Known</label><input id="partFinderBrand" placeholder="Baldwin, Fleetguard, Donaldson, WIX, OEM"><label>Question / Notes</label><textarea id="partPhotoNote" placeholder="What is it used for, applications, cross refs, warnings?"></textarea><button class="green" onclick="askPart()" style="width:100%">Lookup Part</button><div id="partAnswer" class="result">Enter a part/filter number.</div><div class="row" style="margin-top:9px"><button onclick="addPartToWorkOrder()">Add To Work Order</button><button class="dark" onclick="copyText('partAnswer')">Copy</button></div></div></section>
 
@@ -232,6 +232,51 @@ async function runDieselDoc() {
 }
 
 </script>
+<div class="card"><div class="row"><button class="dark" onclick="clearAICache()">Clear AI Cache</button><button class="red" onclick="resetApp()">Reset App</button></div></div>
+<script>
+(function(){
+  window.aiFail = function(e){return "AI failed. Check internet, Supabase Edge Function, endpoint URL, and Verify JWT setting. Error: " + (e && e.message ? e.message : e);};
+  const oldCallAI = window.callAI;
+  if(oldCallAI){
+    window.callAI = async function(question, engine, image_note){
+      const text = String(question || "");
+      const cacheKey = "ai_" + String(Math.abs([...text].reduce((a,c)=>((a<<5)-a+c.charCodeAt(0))|0,0)));
+      const cached = localStorage.getItem(cacheKey);
+      if(cached) return cached + "\n\n-- V35 local cached answer";
+      const ans = await oldCallAI(question, engine || "", image_note || "");
+      try{ localStorage.setItem(cacheKey, ans); }catch(e){}
+      return ans;
+    };
+  }
+  window.extractPartNumberFirst = function(text){
+    const raw=(text||"").toUpperCase();
+    const clean=raw.replace(/[^A-Z0-9\-\s]/g," ");
+    const stop=new Set(["PART","NUMBER","FILTER","FLEETGUARD","BALDWIN","DONALDSON","WIX","NAPA","MADE","USA","CHINA","MEXICO","ENGINE","OIL","FUEL","AIR","KIT","THE","AND","FOR"]);
+    const all=[...(clean.match(/\b[A-Z0-9][A-Z0-9\-]{4,17}\b/g)||[])].map(x=>x.replace(/[^A-Z0-9\-]/g,"").trim()).filter(x=>x.length>=5&&!stop.has(x));
+    const oem=all.filter(x=>{ if(/^\d{8,14}$/.test(x)) return false; if(/^(PF|LF|FF|FS|AF|BD|BF|PA|PX|RS|P)\d{3,}/.test(x)) return false; return /\d/.test(x)&&x.length>=6; });
+    const filters=[...(clean.match(/\b(PF|LF|FF|FS|AF|BD|BF|PA|PX|RS|P)\d{3,8}[A-Z]{0,4}\b/g)||[])].map(x=>x.replace(/[^A-Z0-9\-]/g,"").trim());
+    const skus=[...(clean.match(/\b\d{8,14}\b/g)||[])].map(x=>x.trim());
+    const parts=[...new Set([...oem,...filters])];
+    return {part:parts[0]||"",parts:parts,sku:skus[0]||"",skus:skus,raw:raw.slice(0,800)};
+  };
+  window.addFilterToWorkOrder = function(){
+    const line = "PART / FILTER LOOKUP:\n" + ($("filterAnswer") ? $("filterAnswer").textContent : "");
+    $("workdone").value += ($("workdone").value ? "\n\n" : "") + line;
+    show("work");
+  };
+  window.clearAICache = function(){Object.keys(localStorage).filter(k=>k.startsWith("ai_")).forEach(k=>localStorage.removeItem(k));alert("AI cache cleared")};
+  window.resetApp = function(){if(confirm("Reset app data on this phone?")){localStorage.clear();location.reload()}};
+  window.askPart = async function(){
+    let q=$("partq").value.trim(),brand=$("partFinderBrand").value.trim(),note=$("partPhotoNote").value.trim();
+    if(!q&&!note)return alert("Enter part number");
+    $("partAnswer").textContent="Looking up part-first...";
+    let prompt="Part Finder Pro V35. Type: "+$("lookupType").value+". Number entered: "+(q||"none")+". Brand: "+(brand||"unknown")+". Context: "+vehicleContext()+". Notes: "+note+". FIRST identify the part type. Do NOT assume it is a filter. If unknown, say unknown and give supplier/VIN/engine serial verification steps. Answer with: Part Number, Brand, Part Type, Description, Likely Use, Fitment Possibilities, Cross References, Warnings, Verify Steps.";
+    try{$("partAnswer").textContent=await callAI(prompt,vehicleContext(),note)}catch(e){$("partAnswer").textContent=aiFail(e)}
+  };
+  if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("service-worker.js").catch(e=>logError("serviceWorker",e.message)))}
+})();
+</script>
+
 </body>
 </html>
     
