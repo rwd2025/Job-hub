@@ -117,7 +117,47 @@ function sendCameraToPartFinder(){$("partq").value=$("actualPartNumber").value||
 function addCameraToWorkOrder(){$("workdone").value+=($("workdone").value?"\n\n":"")+`PART NUMBER CAMERA LOOKUP:\nActual Part Number: ${$("actualPartNumber").value||"not found"}\nBarcode/SKU: ${$("barcodeNumber").value||"secondary/not found"}\n${$("barcodeAnswer").textContent}`;show("work")}
 function clearPartCamera(){["actualPartNumber","barcodeNumber","partBrand","barcodeNote","barcodePhoto"].forEach(id=>{if($(id))$(id).value=""});$("detectedNumberBox").style.display="none";$("barcodePreview").style.display="none";$("barcodeAnswer").textContent="Take a picture or type the part number."}
 async function readFilterPhoto(event){const file=event.target.files?.[0];if(!file)return;let box=$("filterPhotoBox");box.style.display="block";let url=URL.createObjectURL(file);box.innerHTML=`<img src="${url}" style="width:100%;border-radius:12px;border:1px solid #444;margin-bottom:8px">Reading filter label...`;try{let res=await Tesseract.recognize(file,"eng");let found=extractPartNumberFirst(res?.data?.text||"");if(found.part)$("filterNumber").value=found.part;box.innerHTML=`<img src="${url}" style="width:100%;border-radius:12px;border:1px solid #444;margin-bottom:8px">Detected: ${found.part||"not found"}`;if(found.part)await lookupFilterNumber();else $("filterAnswer").textContent="Could not read filter number. Type it manually."}catch(e){$("filterAnswer").textContent="OCR failed: "+e.message}}
-async function lookupFilterNumber(){let num=$("filterNumber").value.trim(),note=$("filterq").value.trim();if(!num&&!note)return alert("Enter filter number");$("filterAnswer").textContent="Looking up filter use and applications...";let q=`Filter Finder lookup. Filter/part number: ${num||"none"}. Context: ${vehicleContext()}. Notes: ${note||"none"}. Answer with Filter, Filter type, What it is used for, Common applications it could be used on, Common engines/trucks it may fit, Cross references/options, Warnings, Verify before ordering.`;try{$("filterAnswer").textContent=await callAI(q,vehicleContext(),note)}catch(e){$("filterAnswer").textContent="AI load failed: "+e.message}}
+async function lookupFilterNumber(){
+  let num = $("filterNumber").value.trim(),
+      note = $("filterq").value.trim();
+
+  if(!num && !note) return alert("Enter part number");
+
+  $("filterAnswer").textContent = "Looking up part / filter...";
+
+  let q = `Part / Filter lookup. Identify the part FIRST. Do NOT assume it is a filter.
+
+Part Number: ${num || "none"}
+Context: ${vehicleContext()}
+Notes: ${note || "none"}
+
+Answer with:
+
+Part Number:
+Brand:
+Part Type:
+Description:
+Likely Use:
+Engine Fitment:
+Cross References:
+Verify By:
+Shop Warning:
+
+Rules:
+- Do NOT assume every number is a filter.
+- First classify the part type.
+- If label or notes say KIT, classify as kit, not filter.
+- If confirmed filter, then explain filter use, engine fitment, cross references, and warnings.
+- If unknown, say "Unknown part — requires supplier catalog, VIN, or engine serial lookup."
+- Never say "used in various applications."
+`;
+
+  try{
+    $("filterAnswer").textContent = await callAI(q, vehicleContext(), note);
+  }catch(e){
+    $("filterAnswer").textContent = "AI load failed: " + e.message;
+  }
+}
 async function buildFilterKit(){let kit=$("kitType").value,num=$("filterNumber").value;let q=`Build ${kit} for ${vehicleContext()}. Known filter number: ${num||"none"}. Include filters needed, use of each filter, applications, brand options, quantities if known, warnings, verify steps.`;$("filterAnswer").textContent="Building kit...";try{$("filterAnswer").textContent=await callAI(q,vehicleContext(),"")}catch(e){$("filterAnswer").textContent="AI load failed: "+e.message}}
 async function askPart(){let q=$("partq").value.trim(),brand=$("partFinderBrand").value.trim(),note=$("partPhotoNote").value.trim();if(!q&&!note)return alert("Enter part number");$("partAnswer").textContent="Looking up...";let prompt=`Part Finder Pro. Type: ${$("lookupType").value}. Part/filter: ${q||"none"}. Brand: ${brand||"unknown"}. Context: ${vehicleContext()}. Notes: ${note}. Answer with what it is, what used for, common applications, fit, cross refs/options, warnings, verify steps.`;try{$("partAnswer").textContent=await callAI(prompt,vehicleContext(),note)}catch(e){$("partAnswer").textContent="AI load failed: "+e.message}}
 function addPartToWorkOrder(){$("workdone").value+=($("workdone").value?"\n\n":"")+`PART LOOKUP:\n${$("partAnswer").textContent}`;show("work")}
