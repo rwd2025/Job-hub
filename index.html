@@ -125,7 +125,12 @@ async function lookupFilterNumber(){
 
   $("filterAnswer").textContent = "Looking up part / filter...";
 
-  let q = `Part / Filter lookup. Identify the part FIRST. Do NOT assume it is a filter.
+ let q = `PART LOOKUP ONLY (FILTER LOGIC DISABLED). Identify the part FIRST.
+
+- DO NOT treat this as a filter lookup
+- DO NOT diagnose fuel systems
+- DO NOT assume anything is a filter
+- Only identify the part
 
 Part Number: ${num || "none"}
 Context: ${vehicleContext()}
