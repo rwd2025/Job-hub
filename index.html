@@ -166,7 +166,38 @@ Rules:
 async function buildFilterKit(){let kit=$("kitType").value,num=$("filterNumber").value;let q=`Build ${kit} for ${vehicleContext()}. Known filter number: ${num||"none"}. Include filters needed, use of each filter, applications, brand options, quantities if known, warnings, verify steps.`;$("filterAnswer").textContent="Building kit...";try{$("filterAnswer").textContent=await callAI(q,vehicleContext(),"")}catch(e){$("filterAnswer").textContent="AI load failed: "+e.message}}
 async function askPart(){let q=$("partq").value.trim(),brand=$("partFinderBrand").value.trim(),note=$("partPhotoNote").value.trim();if(!q&&!note)return alert("Enter part number");$("partAnswer").textContent="Looking up...";let prompt=`Part Finder Pro. Type: ${$("lookupType").value}. Part/filter: ${q||"none"}. Brand: ${brand||"unknown"}. Context: ${vehicleContext()}. Notes: ${note}. Answer with what it is, what used for, common applications, fit, cross refs/options, warnings, verify steps.`;try{$("partAnswer").textContent=await callAI(prompt,vehicleContext(),note)}catch(e){$("partAnswer").textContent="AI load failed: "+e.message}}
 function addPartToWorkOrder(){$("workdone").value+=($("workdone").value?"\n\n":"")+`PART LOOKUP:\n${$("partAnswer").textContent}`;show("work")}
-async function askBrake(){let q=`Brake setup. Context: ${vehicleContext()}. Brake type: ${$("brakeType").value}. Position: ${$("brakePos").value}. Axles: ${$("axles").value}. Job: ${$("brakeJob").value}. Notes: ${$("brakeNotes").value}. Explain known from picture, what to verify, likely setup, parts categories, labor range, warnings. Do not give exact parts without VIN/current stamp/catalog.`;$("brakeAnswer").textContent="Thinking...";try{$("brakeAnswer").textContent=await callAI(q,vehicleContext(),$("brakeNotes").value)}catch(e){$("brakeAnswer").textContent="AI load failed: "+e.message}}
+async function askBrake(){
+  try{
+    const q = `Brake setup for heavy truck.
+
+Context: ${vehicleContext()}
+Brake type: ${$("brakeType")?.value || "Not selected"}
+Position: ${$("brakePos")?.value || "Not selected"}
+Axles: ${$("axles")?.value || "Not selected"}
+Job: ${$("brakeJob")?.value || "Not selected"}
+Notes: ${$("brakeNotes")?.value || "None"}
+
+Answer with:
+1. What to verify first
+2. Likely brake setup
+3. Parts categories needed
+4. Labor range
+5. Safety warnings
+6. What NOT to assume
+
+Do not give exact part numbers without VIN/current stamp/catalog verification.`;
+
+    $("brakeAnswer").textContent = "Analyzing brake setup...";
+
+    const answer = await callAI(q, vehicleContext(), $("brakeNotes")?.value || "");
+
+    $("brakeAnswer").textContent = answer || "No brake answer returned.";
+
+  }catch(e){
+    $("brakeAnswer").textContent =
+      "Brake AI failed.\n\nError: " + e.message + "\n\nCheck internet, AI endpoint, or missing brake fields.";
+  }
+}
 function brakeToQuote(){$("jobType").value=$("brakeJob").value.includes("Inspection")?"Diagnostic":"Brake Job";quotePreset();show("quote")}
 function brakeToWorkOrder(){$("complaint").value="Brake setup / quote";$("diagnosis").value=$("brakeAnswer").textContent;show("work")}
 function quotePreset(){let t=$("jobType").value;if(t==="Brake Job"){$("hours").value=5;$("partsCost").value=850}else if(t==="PM Service"){$("hours").value=2.5;$("partsCost").value=650}else if(t.includes("Diagnosis")){$("hours").value=2;$("partsCost").value=0}calcQuote()}
