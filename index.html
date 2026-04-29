@@ -102,7 +102,28 @@ function vehicleContext(){const vin=$("vin")?.value.trim()||"";const make=$("mak
 function logError(where,msg){errorLog.unshift({where,msg,date:new Date().toLocaleString()});localStorage.setItem("mmp_error_log",JSON.stringify(errorLog.slice(0,50)))}
 window.onerror=function(message,source,lineno,colno,error){logError("window",`${message} at ${lineno}:${colno}`)};
 window.addEventListener("unhandledrejection",e=>logError("promise",String(e.reason)));
-async function callAI(question,engine="",image_note=""){try{let res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question,engine:engine||vehicleContext(),vin:$("vin")?.value||"",image_note:image_note||""})});let data=await res.json();if(!res.ok)throw new Error(data.error||"AI failed");return data.answer||"No answer returned"}catch(e){logError("AI call",e.message);throw e}}
+async function callAI(question, vehicleContext = "", notes = "", mode = "diagnostic") {
+  const res = await fetch("https://qoibzqbadhjvktonyujd.supabase.co/functions/v1/ask-ai", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      mode,
+      question,
+      vehicleContext,
+      notes
+    })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "AI server failed");
+  }
+
+  return data.answer;
+}
 async function decodeVinFixed(){const vin=$("vin")?.value.trim().toUpperCase()||"";if(!vin)return alert("Enter VIN first.");$("vinBox").textContent="Decoding VIN...";try{let res=await fetch("https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValuesExtended/"+encodeURIComponent(vin)+"?format=json");let data=await res.json();let d=data.Results?.[0]||{};let year=d.ModelYear||"",make=d.Make||"",model=d.Model||"",engineMake=d.EngineManufacturer||"",engineModel=d.EngineModel||d.EngineConfiguration||"";if(make&&$("makeSelect")){let m=make.toLowerCase();[...$("makeSelect").options].forEach(o=>{let t=o.text.toLowerCase();if(t&&(m.includes(t.split(" ")[0])||t.includes(m.split(" ")[0])))$("makeSelect").value=o.value})}$("vinBox").textContent=`Active VIN: ${vin}\n\nDecoded:\nYear: ${year||"not returned"}\nMake: ${make||"not returned"}\nModel: ${model||"not returned"}\nEngine make: ${engineMake||"not returned"}\nEngine model: ${engineModel||"not returned"}\n\nIf engine is not returned, choose Make + Engine manually.`}catch(e){$("vinBox").textContent="VIN decode failed. Choose Make + Engine manually.\n"+e.message;logError("VIN",e.message)}}
 function decodeVin(){decodeVinFixed()}
 function quick(t){$("question").value=t}
