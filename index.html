@@ -143,6 +143,48 @@ function copyText(id){navigator.clipboard.writeText($(id)?.textContent||"");aler
 function saveSettings(){API_URL=$("apiUrl").value.trim();localStorage.setItem("mmp_api_url",API_URL);localStorage.setItem("mmp_anon_key",$("anonKey").value.trim());alert("Saved")}
 async function runFullSystemTest(){let out=$("systemOut");out.textContent="Running tests...";let tests=[["AI","MX-13 crank no start no smoke"],["Filter","PF7748 what is it used for and applications"],["Brake","Rear drum brake tandem drive setup what verify"],["Manual","MX-13 fuel filter priming procedure"]];let log="";for(const [name,q] of tests){try{let a=await callAI(q,vehicleContext(),"");log+=`✅ ${name} PASS\n${a.slice(0,220)}...\n\n`}catch(e){log+=`❌ ${name} FAIL: ${e.message}\n\n`}out.textContent=log}}
 async function askRepairAI(){let logs=JSON.stringify(errorLog,null,2);$("systemOut").textContent="Asking AI to diagnose app errors...";try{$("systemOut").textContent=await callAI("Diagnose these app errors and give fix instructions. Errors: "+logs, "App Repair AI", "")}catch(e){$("systemOut").textContent="Repair AI failed: "+e.message+"\n\nErrors:\n"+logs}}
+  async function askDieselDoc(question) {
+  const endpoint = "https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/diesel-doc-ai";
+
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ question })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Diesel Doc failed");
+  }
+
+  return data.answer || "No answer returned.";
+}
+
+async function runDieselDoc() {
+  const input = document.getElementById("dieselDocQuestion");
+  const output = document.getElementById("dieselDocAnswer");
+
+  const question = input.value.trim();
+
+  if (!question) {
+    output.innerText = "Type a question first.";
+    return;
+  }
+
+  output.innerText = "Diesel Doc is thinking...";
+
+  try {
+    const answer = await askDieselDoc(question);
+    output.innerText = answer;
+  } catch (err) {
+    output.innerText = "Error: " + err.message;
+  }
+}
+
 </script>
 </body>
 </html>
+    
