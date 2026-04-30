@@ -117,53 +117,7 @@ async function callAI(question, vehicleContext = "", notes = "", mode = "diagnos
     })
   });
 
-  const data = await res.json();
 
-  if (!res.ok) {
-    throw new Error(data.error || "AI server failed");
-  }
-
-  return data.answer;
-}
-      const data = await res.json();
-
-      if (data.length > 0) {
-        const p = data[0];
-
-        return `
-✅ DATABASE MATCH
-
-Part Number: ${p.filter_id}
-Brand: ${p.brand}
-Engine: ${p.engine}
-Type: ${p.filter_type}
-
-Description:
-${p.description}
-`;
-      }
-    } catch (err) {
-      console.log("DB error", err);
-    }
-  }
-
-  // 🤖 AI fallback
-  const res = await fetch("https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/diesel-doc-ai", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      mode,
-      question,
-      vehicleContext,
-      notes
-    })
-  });
-
-  const data = await res.json();
-  return data.answer;
-}
 
   if (!res.ok) {
     throw new Error(data.error || "AI server failed");
