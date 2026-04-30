@@ -224,31 +224,39 @@ async function askPart(){
   let q = $("partq").value.trim();
   let brand = $("partFinderBrand").value.trim();
   let note = $("partPhotoNote").value.trim();
+  let type = $("lookupType").value;
+  let system = $("partSystem").value;
 
-  if(!q && !note) return alert("Enter part number");
+  if(!q && !note) return alert("Enter part name, part number, VIN, ESN, or notes");
 
-  $("partAnswer").textContent = "Looking up part...";
+  $("partAnswer").textContent = "Looking up OEM part options...";
 
-  let prompt = `Identify this part number: ${q}
+  let prompt = `OEM PART LOOKUP.
 
+Lookup Type: ${type}
+Engine/System: ${system}
+Part Name or Number: ${q || "none"}
 Brand: ${brand || "unknown"}
-Context: ${vehicleContext()}
-Notes: ${note || "none"}
+Vehicle Context: ${vehicleContext()}
+VIN / ESN / CPL / Notes: ${note || "none"}
 
 Rules:
-- DO NOT assume it is a filter.
-- Identify the part type first.
-- Do NOT use the word FIRST as the part number.
+- Do NOT treat this as only a filter lookup.
+- This is an OEM part lookup.
+- If asking by component name, give common OEM options.
+- If exact fitment is not verified, clearly say NOT VERIFIED.
+- Do NOT give one exact part number unless database, VIN, ESN, CPL, OEM catalog, or supplier confirms it.
+- For Cummins ISX15/X15 water pump, include common options: 3683651, 4309418, 2882142, 2882143, 4955705, 5579023.
 
 Return:
-Part Number:
-Brand:
-Part Type:
-Description:
-Applications:
-Cross References:
-Warnings:
-Verify Steps:`;
+Part / Component:
+Common OEM Part Number Options:
+Engine/System Fitment:
+What changes by VIN / ESN / CPL:
+Cross References / Aftermarket Options:
+Verification Needed:
+Shop Warning:
+`;
 
   try{
     $("partAnswer").textContent = await callAI(prompt, vehicleContext(), note, "parts");
