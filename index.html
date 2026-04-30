@@ -69,11 +69,74 @@ button.dark{background:#222;border:1px solid #444;color:#fff}button.green{backgr
 
 <section id="doc" class="section"><div class="card"><div class="pageTitle">Diesel Doc AI</div><div class="warn">Root-cause mode: first test, why it reads that, and what not to replace.</div><div class="grid"><button class="dark" onclick="quick('MX-13 crank no start no smoke')">No Start</button><button class="dark" onclick="quick('Outlet NOx high. Find upstream cause before replacing sensors.')">NOx</button><button class="dark" onclick="quick('EGR malfunction, valve not moving, 2.5 volts at connector')">EGR</button><button class="dark" onclick="quick('Low power under load, boost slow, no smoke')">Low Power</button><button class="dark" onclick="quick('Regen will not complete, soot level stays high')">Regen Fail</button><button class="dark" onclick="quick('Misfire at idle smooths under throttle')">Misfire</button></div><label>Question / Code / Symptom</label><textarea id="question"></textarea><label>Picture / Notes</label><textarea id="image_note"></textarea><div class="row"><button class="green" onclick="diagnose()">Diagnose</button><button class="blue" onclick="autoQuoteFromDiag()">Auto Quote</button></div><div id="answer" class="result">Ask Diesel Doc.</div><div class="row" style="margin-top:9px"><button onclick="sendToWorkOrder()">Add To Work Order</button><button class="blue" onclick="saveBrainFromDoc()">Save Repair Brain</button></div></div></section>
 
-<section id="camera" class="section"><div class="card"><div class="pageTitle">Part Number Camera</div><div class="warn">Take a clear picture of the big printed part/filter number. Barcode/SKU is secondary info only.</div><label>Take Picture Of Part Number / Label / Box</label><input id="barcodePhoto" type="file" accept="image/*" capture="environment" onchange="readPartNumberCamera(event)"><div id="barcodePreview" class="result" style="display:none;min-height:auto"></div><label>Actual Part / Filter Number</label><input id="actualPartNumber" placeholder="PF7748, BD50000, PA30093, LF14000NN"><label>Barcode / SKU If Visible</label><input id="barcodeNumber" placeholder="Optional secondary barcode/SKU"><label>Brand If Known</label><input id="partBrand" placeholder="Baldwin, Fleetguard, Donaldson, WIX, OEM"><label>Notes / Visible Text</label><textarea id="barcodeNote" placeholder="Example: PF7748 on Baldwin filter box"></textarea><div class="row"><button class="green" onclick="partNumberLookup()">Lookup Part</button><button class="blue" onclick="sendCameraToPartFinder()">Open Part Finder</button></div><div id="detectedNumberBox" class="detectedBox" style="display:none"></div><div id="barcodeAnswer" class="result">Take a picture or type the part number.</div><div class="row" style="margin-top:9px"><button onclick="addCameraToWorkOrder()">Add To Work Order</button><button class="dark" onclick="clearPartCamera()">Clear</button></div></div></section>
+<section id="camera" class="section"><div class="card">
 
-<section id="filters" class="section"><div class="card"><div class="pageTitle">VIN Filters / Part Lookup</div><div class="warn">Restored: identifies the part first, then explains filter use only if confirmed.</div><label>Take Photo Of Part / Filter / Box / Label</label><button class="green" onclick="document.getElementById('filterPhoto').click()" style="width:100%">📷 Take Picture</button><input id="filterPhoto" type="file" accept="image/*" capture="environment" onchange="readFilterPhoto(event)" style="display:none;"><div id="filterPhotoBox" class="result" style="display:none;min-height:auto"></div><label>Part / Filter Number</label><input id="filterNumber" placeholder="4965569, PF7748, LF14000NN, A4721803309"><label>Lookup Mode</label><select id="kitType"><option>Identify part first</option><option>Build PM filter kit</option><option>Oil filter</option><option>Fuel filter</option><option>Air filter</option><option>Coolant filter</option><option>Hydraulic filter</option></select><label>Notes / Engine / Unit Info</label><textarea id="filterq" placeholder="Example: Cummins X15, PACCAR MX-13, box label text, customer unit notes"></textarea><div class="row"><button class="green" onclick="lookupFilterNumber()">Lookup</button><button class="blue" onclick="buildFilterKit()">Build Kit</button></div><div id="filterAnswer" class="result">Enter a part number or take a picture.</div><div class="row" style="margin-top:9px"><button onclick="addFilterToWorkOrder()">Add To Work Order</button><button class="dark" onclick="copyText('filterAnswer')">Copy</button></div></div></section>
+<section id="parts" class="section">
+  <div class="card">
+    <div class="pageTitle">OEM Part Finder Pro</div>
 
-<section id="parts" class="section"><div class="card"><div class="pageTitle">Part Finder Pro</div><label>Lookup Type</label><select id="lookupType"><option>Part number</option><option>Filter number</option><option>Picture note</option><option>What does this fit?</option></select><label>Part / Filter Number</label><input id="partq" placeholder="BD50000, PA30093, PF7748, LF14000NN"><label>Brand If Known</label><input id="partFinderBrand" placeholder="Baldwin, Fleetguard, Donaldson, WIX, OEM"><label>Question / Notes</label><textarea id="partPhotoNote" placeholder="What is it used for, applications, cross refs, warnings?"></textarea><button class="green" onclick="askPart()" style="width:100%">Lookup Part</button><div id="partAnswer" class="result">Enter a part/filter number.</div><div class="row" style="margin-top:9px"><button onclick="addPartToWorkOrder()">Add To Work Order</button><button class="dark" onclick="copyText('partAnswer')">Copy</button></div></div></section>
+    <label>Lookup Type</label>
+    <select id="lookupType">
+      <option>Engine Part</option>
+      <option>Aftertreatment Part</option>
+      <option>Transmission Part</option>
+      <option>Brake / Wheel End Part</option>
+      <option>Suspension Part</option>
+      <option>Hydraulic Part</option>
+      <option>Electrical / Sensor Part</option>
+      <option>Filter / Maintenance Part</option>
+      <option>Unknown Part Number</option>
+    </select>
+
+    <label>Engine / System</label>
+    <select id="partSystem">
+      <option>Auto Detect</option>
+      <option>Cummins ISX15 / X15</option>
+      <option>PACCAR MX-13</option>
+      <option>Detroit DD13 / DD15</option>
+      <option>Allison Transmission</option>
+      <option>Eaton Transmission</option>
+      <option>DPF / SCR / DEF</option>
+      <option>Air Brake System</option>
+      <option>Wheel End / Hub</option>
+    </select>
+
+    <label>Start Typing Part Name Or Number</label>
+    <input id="partq" list="partSuggestions" placeholder="water pump, NOx sensor, EGR valve, 3683651">
+    <datalist id="partSuggestions">
+      <option value="ISX15 water pump">
+      <option value="X15 water pump">
+      <option value="PACCAR MX-13 fuel filter">
+      <option value="Detroit DD15 oil coolant module">
+      <option value="NOx sensor inlet">
+      <option value="NOx sensor outlet">
+      <option value="EGR valve">
+      <option value="EGR cooler">
+      <option value="Turbo actuator">
+      <option value="Fuel pump actuator">
+      <option value="High pressure fuel pump">
+      <option value="DEF doser">
+      <option value="DPF differential pressure sensor">
+      <option value="Allison TCM">
+      <option value="Eaton clutch actuator">
+    </datalist>
+
+    <label>Brand If Known</label>
+    <input id="partFinderBrand" placeholder="Cummins, PACCAR, Detroit, Allison, Eaton, OEM">
+
+    <label>VIN / ESN / CPL / Notes</label>
+    <textarea id="partPhotoNote" placeholder="Enter VIN, engine serial, CPL, old part number, truck year/make/model, or notes"></textarea>
+
+    <button class="green" onclick="askPart()" style="width:100%">LOOKUP OEM PART</button>
+
+    <div id="partAnswer" class="result">Start typing a part name, part number, or system.</div>
+
+    <div class="row" style="margin-top:9px">
+      <button onclick="addPartToWorkOrder()">Add To Work Order</button>
+      <button class="dark" onclick="copyText('partAnswer')">Copy</button>
+    </div>
+  </div>
+</section>
 
 <section id="brakes" class="section"><div class="card"><div class="pageTitle">Brake Setup Wizard</div><div class="warn">Picture/inspection identifies drum vs air disc. VIN/data/current stamp confirms exact part numbers.</div><label>Brake Type</label><select id="brakeType"><option>Drum</option><option>Air Disc</option><option>Not Sure</option></select><label>Axle Position</label><select id="brakePos"><option>Drive axle</option><option>Steer axle</option><option>Trailer axle</option><option>Not sure</option></select><label>Axles Being Serviced</label><select id="axles"><option>1</option><option selected>2</option><option>3</option></select><label>Job</label><select id="brakeJob"><option>Drums + shoes</option><option>Shoes only</option><option>Pads / rotors</option><option>Full brake job + hardware</option><option>Inspection only</option></select><label>Current Markings / Notes</label><textarea id="brakeNotes" placeholder="16.5 x 7, 4707, tandem drive drum brakes, etc."></textarea><div class="row"><button class="green" onclick="askBrake()">Brake AI</button><button class="blue" onclick="brakeToQuote()">Auto Quote</button></div><div id="brakeAnswer" class="result">Choose brake type and job.</div><div class="row" style="margin-top:9px"><button onclick="brakeToWorkOrder()">Add To Work Order</button><button class="dark" onclick="copyText('brakeAnswer')">Copy</button></div></div></section>
 
