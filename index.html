@@ -157,7 +157,42 @@ Tell me:
   }
 }
 async function buildFilterKit(){let kit=$("kitType").value,num=$("filterNumber").value;let q=`Build ${kit} for ${vehicleContext()}. Known filter number: ${num||"none"}. Include filters needed, use of each filter, applications, brand options, quantities if known, warnings, verify steps.`;$("filterAnswer").textContent="Building kit...";try{$("filterAnswer").textContent=await callAI(q,vehicleContext(),"","parts")}catch(e){$("filterAnswer").textContent="AI load failed: "+e.message}}
-async function askPart(){let q=$("partq").value.trim(),brand=$("partFinderBrand").value.trim(),note=$("partPhotoNote").value.trim();if(!q&&!note)return alert("Enter part number");$("partAnswer").textContent="Looking up...";let prompt=`Part Finder Pro. Type: ${$("lookupType").value}. Part/filter: ${q||"none"}. Brand: ${brand||"unknown"}. Context: ${vehicleContext()}. Notes: ${note}. FIRST identify the part type. Do NOT assume it is a filter. If unknown, say unknown and give supplier/VIN/engine serial verification steps. Answer with: Part Number, Brand, Part Type, Description, Likely Use, Fitment Possibilities, Cross References, Warnings, Verify Steps.`;try{$("partAnswer").textContent=await callAI(prompt,vehicleContext(),note,"parts")}catch(e){$("partAnswer").textContent="AI load failed: "+e.message}}
+async function askPart(){
+  let q = $("partq").value.trim();
+  let brand = $("partFinderBrand").value.trim();
+  let note = $("partPhotoNote").value.trim();
+
+  if(!q && !note) return alert("Enter part number");
+
+  $("partAnswer").textContent = "Looking up part...";
+
+  let prompt = `Identify this part number: ${q}
+
+Brand: ${brand || "unknown"}
+Context: ${vehicleContext()}
+Notes: ${note || "none"}
+
+Rules:
+- DO NOT assume it is a filter.
+- Identify the part type first.
+- Do NOT use the word FIRST as the part number.
+
+Return:
+Part Number:
+Brand:
+Part Type:
+Description:
+Applications:
+Cross References:
+Warnings:
+Verify Steps:`;
+
+  try{
+    $("partAnswer").textContent = await callAI(prompt, vehicleContext(), note, "parts");
+  }catch(e){
+    $("partAnswer").textContent = "AI failed: " + e.message;
+  }
+}
 function addPartToWorkOrder(){$("workdone").value+=($("workdone").value?"\n\n":"")+`PART LOOKUP:\n${$("partAnswer").textContent}`;show("work")}
 async function askBrake(){try{const q=`Brake setup for heavy truck.\n\nContext: ${vehicleContext()}\nBrake type: ${$("brakeType")?.value||"Not selected"}\nPosition: ${$("brakePos")?.value||"Not selected"}\nAxles: ${$("axles")?.value||"Not selected"}\nJob: ${$("brakeJob")?.value||"Not selected"}\nNotes: ${$("brakeNotes")?.value||"None"}\n\nAnswer with:\n1. What to verify first\n2. Likely brake setup\n3. Parts categories needed\n4. Labor range\n5. Safety warnings\n6. What NOT to assume\n\nDo not give exact part numbers without VIN/current stamp/catalog verification.`;$("brakeAnswer").textContent="Analyzing brake setup...";const answer=await callAI(q,vehicleContext(),$("brakeNotes")?.value||"","diagnose");$("brakeAnswer").textContent=answer||"No brake answer returned."}catch(e){$("brakeAnswer").textContent="Brake AI failed.\n\nError: "+e.message+"\n\nCheck internet, AI endpoint, or missing brake fields."}}
 function brakeToQuote(){$("jobType").value=$("brakeJob").value.includes("Inspection")?"Diagnostic":"Brake Job";quotePreset();show("quote")}
