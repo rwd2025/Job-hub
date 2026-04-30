@@ -122,7 +122,7 @@ async function callAI(question, vehicleContext = "", notes = "", mode = "diagnos
     throw new Error(data.error || "AI server failed");
   }
 
-  return data.answer;
+  return data.answer;}
   
 async function decodeVinFixed(){const vin=$("vin")?.value.trim().toUpperCase()||"";if(!vin)return alert("Enter VIN first.");$("vinBox").textContent="Decoding VIN...";try{let res=await fetch("https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValuesExtended/"+encodeURIComponent(vin)+"?format=json");let data=await res.json();let d=data.Results?.[0]||{};let year=d.ModelYear||"",make=d.Make||"",model=d.Model||"",engineMake=d.EngineManufacturer||"",engineModel=d.EngineModel||d.EngineConfiguration||"";if(make&&$("makeSelect")){let m=make.toLowerCase();[...$("makeSelect").options].forEach(o=>{let t=o.text.toLowerCase();if(t&&(m.includes(t.split(" ")[0])||t.includes(m.split(" ")[0])))$("makeSelect").value=o.value})}$("vinBox").textContent=`Active VIN: ${vin}\n\nDecoded:\nYear: ${year||"not returned"}\nMake: ${make||"not returned"}\nModel: ${model||"not returned"}\nEngine make: ${engineMake||"not returned"}\nEngine model: ${engineModel||"not returned"}\n\nIf engine is not returned, choose Make + Engine manually.`}catch(e){$("vinBox").textContent="VIN decode failed. Choose Make + Engine manually.\n"+e.message;logError("VIN",e.message)}}
 function decodeVin(){decodeVinFixed()}
