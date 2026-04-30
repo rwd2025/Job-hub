@@ -103,25 +103,35 @@ function logError(where,msg){errorLog.unshift({where,msg,date:new Date().toLocal
 window.onerror=function(message,source,lineno,colno,error){logError("window",`${message} at ${lineno}:${colno}`)};
 window.addEventListener("unhandledrejection",e=>logError("promise",String(e.reason)));
 async 
- async function callAI(question, vehicleContext = "", notes = "", mode = "diagnose") {
-
-  // 🔍 Extract part number
-  const match = question.toUpperCase().match(/[A-Z0-9\-]{5,}/);
-  const part = match ? match[0] : null;
-
-  // 🔥 DATABASE FIRST
-  if (part) {
-    try {
-    const res = await fetch(
-  "https://uxpkqwcmvtqvubibbrek.supabase.co/rest/v1/filters?filter_id=eq." + part,
-  {
+ 
     headers: {
       "apikey": "sb_publishable_YOURREALKEY",
       "Authorization": "Bearer sb_publishable_YOURREALKEY"
     }
   }
 );
+async function callAI(question, vehicleContext = "", notes = "", mode = "diagnose") {
+  const res = await fetch("https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/diesel-doc-ai", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      mode,
+      question,
+      vehicleContext,
+      notes
+    })
+  });
 
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "AI server failed");
+  }
+
+  return data.answer;
+}
       const data = await res.json();
 
       if (data.length > 0) {
