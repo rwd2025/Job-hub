@@ -103,7 +103,27 @@ function logError(where,msg){errorLog.unshift({where,msg,date:new Date().toLocal
 window.onerror=function(message,source,lineno,colno,error){logError("window",`${message} at ${lineno}:${colno}`)};
 window.addEventListener("unhandledrejection",e=>logError("promise",String(e.reason)));
 async function callAI(question, vehicleContext = "", notes = "", mode = "diagnostic") {
-https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/diesel-doc-ai
+  const res = await fetch("https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/diesel-doc-ai", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      mode,
+      question,
+      vehicleContext,
+      notes
+    })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "AI server failed");
+  }
+
+  return data.answer;
+}
     method: "POST",
     headers: {
       "Content-Type": "application/json"
