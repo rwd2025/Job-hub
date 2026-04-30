@@ -103,7 +103,7 @@ function logError(where,msg){errorLog.unshift({where,msg,date:new Date().toLocal
 window.onerror=function(message,source,lineno,colno,error){logError("window",`${message} at ${lineno}:${colno}`)};
 window.addEventListener("unhandledrejection",e=>logError("promise",String(e.reason)));
 async function callAI(question, vehicleContext = "", notes = "", mode = "diagnostic") {
-  const res = await fetch("https://qoibzqbadhjvktonyujd.supabase.co/functions/v1/ask-ai", {
+https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/diesel-doc-ai
     method: "POST",
     headers: {
       "Content-Type": "application/json"
