@@ -102,7 +102,55 @@ function vehicleContext(){const vin=$("vin")?.value.trim()||"";const make=$("mak
 function logError(where,msg){errorLog.unshift({where,msg,date:new Date().toLocaleString()});localStorage.setItem("mmp_error_log",JSON.stringify(errorLog.slice(0,50)))}
 window.onerror=function(message,source,lineno,colno,error){logError("window",`${message} at ${lineno}:${colno}`)};
 window.addEventListener("unhandledrejection",e=>logError("promise",String(e.reason)));
-async function callAI(question, vehicleContext = "", notes = "", mode = "diagnostic") {
+async 
+  async function callAI(question, vehicleContext = "", notes = "", mode = "diagnose") {
+
+  // 🔍 STEP 1: Extract part number
+  const partMatch = question.toUpperCase().match(/[A-Z0-9\-]{5,}/);
+  const part = partMatch ? partMatch[0] : null;
+
+  // 🔍 STEP 2: DATABASE LOOKUP FIRST
+  if (part) {
+    try {
+      const res = await fetch(
+        "https://uxpkqwcmvtqvubibbrek.supabase.co/rest/v1/filters?filter_id=eq." + part,
+        {
+          headers: {
+            "apikey": "PASTE_YOUR_ANON_KEY_HERE",
+            "Authorization": "Bearer PASTE_YOUR_ANON_KEY_HERE"
+          }
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.length > 0) {
+        const p = data[0];
+
+        return `
+✅ DATABASE MATCH
+
+Part Number: ${p.filter_id}
+Brand: ${p.brand}
+Engine: ${p.engine}
+Type: ${p.filter_type}
+
+Description:
+${p.description}
+
+Cross References:
+${p.cross_ref}
+
+Notes:
+${p.notes}
+`;
+      }
+    } catch (e) {
+      console.log("DB lookup failed:", e);
+    }
+  }
+
+  // 🤖 STEP 3: FALLBACK TO AI
   const res = await fetch("https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/diesel-doc-ai", {
     method: "POST",
     headers: {
@@ -123,8 +171,7 @@ async function callAI(question, vehicleContext = "", notes = "", mode = "diagnos
   }
 
   return data.answer;
-  }
-  
+}
 async function decodeVinFixed(){const vin=$("vin")?.value.trim().toUpperCase()||"";if(!vin)return alert("Enter VIN first.");$("vinBox").textContent="Decoding VIN...";try{let res=await fetch("https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValuesExtended/"+encodeURIComponent(vin)+"?format=json");let data=await res.json();let d=data.Results?.[0]||{};let year=d.ModelYear||"",make=d.Make||"",model=d.Model||"",engineMake=d.EngineManufacturer||"",engineModel=d.EngineModel||d.EngineConfiguration||"";if(make&&$("makeSelect")){let m=make.toLowerCase();[...$("makeSelect").options].forEach(o=>{let t=o.text.toLowerCase();if(t&&(m.includes(t.split(" ")[0])||t.includes(m.split(" ")[0])))$("makeSelect").value=o.value})}$("vinBox").textContent=`Active VIN: ${vin}\n\nDecoded:\nYear: ${year||"not returned"}\nMake: ${make||"not returned"}\nModel: ${model||"not returned"}\nEngine make: ${engineMake||"not returned"}\nEngine model: ${engineModel||"not returned"}\n\nIf engine is not returned, choose Make + Engine manually.`}catch(e){$("vinBox").textContent="VIN decode failed. Choose Make + Engine manually.\n"+e.message;logError("VIN",e.message)}}
 function decodeVin(){decodeVinFixed()}
 function quick(t){$("question").value=t}
