@@ -103,21 +103,21 @@ function logError(where,msg){errorLog.unshift({where,msg,date:new Date().toLocal
 window.onerror=function(message,source,lineno,colno,error){logError("window",`${message} at ${lineno}:${colno}`)};
 window.addEventListener("unhandledrejection",e=>logError("promise",String(e.reason)));
 async 
-  async function callAI(question, vehicleContext = "", notes = "", mode = "diagnose") {
+ async function callAI(question, vehicleContext = "", notes = "", mode = "diagnose") {
 
-  // 🔍 STEP 1: Extract part number
-  const partMatch = question.toUpperCase().match(/[A-Z0-9\-]{5,}/);
-  const part = partMatch ? partMatch[0] : null;
+  // 🔍 Extract part number
+  const match = question.toUpperCase().match(/[A-Z0-9\-]{5,}/);
+  const part = match ? match[0] : null;
 
-  // 🔍 STEP 2: DATABASE LOOKUP FIRST
+  // 🔥 DATABASE FIRST
   if (part) {
     try {
       const res = await fetch(
         "https://uxpkqwcmvtqvubibbrek.supabase.co/rest/v1/filters?filter_id=eq." + part,
         {
           headers: {
-            "apikey": "PASTE_YOUR_ANON_KEY_HERE",
-            "Authorization": "Bearer PASTE_YOUR_ANON_KEY_HERE"
+            "apikey": "PASTE_KEY",
+            "Authorization": "Bearer PASTE_KEY"
           }
         }
       );
@@ -137,20 +137,14 @@ Type: ${p.filter_type}
 
 Description:
 ${p.description}
-
-Cross References:
-${p.cross_ref}
-
-Notes:
-${p.notes}
 `;
       }
-    } catch (e) {
-      console.log("DB lookup failed:", e);
+    } catch (err) {
+      console.log("DB error", err);
     }
   }
 
-  // 🤖 STEP 3: FALLBACK TO AI
+  // 🤖 AI fallback
   const res = await fetch("https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/diesel-doc-ai", {
     method: "POST",
     headers: {
@@ -165,6 +159,8 @@ ${p.notes}
   });
 
   const data = await res.json();
+  return data.answer;
+}
 
   if (!res.ok) {
     throw new Error(data.error || "AI server failed");
