@@ -69,7 +69,13 @@ button.dark{background:#222;border:1px solid #444;color:#fff}button.green{backgr
 
 <section id="doc" class="section"><div class="card"><div class="pageTitle">Diesel Doc AI</div><div class="warn">Root-cause mode: first test, why it reads that, and what not to replace.</div><div class="grid"><button class="dark" onclick="quick('MX-13 crank no start no smoke')">No Start</button><button class="dark" onclick="quick('Outlet NOx high. Find upstream cause before replacing sensors.')">NOx</button><button class="dark" onclick="quick('EGR malfunction, valve not moving, 2.5 volts at connector')">EGR</button><button class="dark" onclick="quick('Low power under load, boost slow, no smoke')">Low Power</button><button class="dark" onclick="quick('Regen will not complete, soot level stays high')">Regen Fail</button><button class="dark" onclick="quick('Misfire at idle smooths under throttle')">Misfire</button></div><label>Question / Code / Symptom</label><textarea id="question"></textarea><label>Picture / Notes</label><textarea id="image_note"></textarea><div class="row"><button class="green" onclick="diagnose()">Diagnose</button><button class="blue" onclick="autoQuoteFromDiag()">Auto Quote</button></div><div id="answer" class="result">Ask Diesel Doc.</div><div class="row" style="margin-top:9px"><button onclick="sendToWorkOrder()">Add To Work Order</button><button class="blue" onclick="saveBrainFromDoc()">Save Repair Brain</button></div></div></section>
 
-<section id="camera" class="section"><div class="card">
+<section id="camera" class="section">
+  <div class="card">
+    <div class="pageTitle">Part Number Camera</div>
+    <div class="warn">Camera section temporarily disabled while rebuilding OEM lookup.</div>
+    <div id="barcodeAnswer" class="result">Camera ready.</div>
+  </div>
+</section>
 
 <section id="parts" class="section">
   <div class="card">
