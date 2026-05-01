@@ -446,6 +446,11 @@ STRICT RULES:
 - Always return at least 2 options if VIN is not provided.
 - Confidence must reflect certainty, not guessing.
 Return:
+- If no valid part number is provided, DO NOT guess.
+- If input is only a vague note or unknown number, respond: PART NUMBER UNKNOWN — NEED PART DESCRIPTION OR NAME.
+- Ask for part name, part description, location on vehicle, or symptom.
+- Determine if result is a SINGLE PART or a KIT.
+- If kit, list the included components.
 
 Part / Component:
 Most Likely System:
