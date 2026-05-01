@@ -308,6 +308,23 @@ async function diagnose(){let q=$("question").value.trim();if(!q)return alert("E
 function sendToWorkOrder(){$("complaint").value=$("question").value;$("diagnosis").value=$("answer").textContent;show("work")}
 function saveBrainFromDoc(){saveBrainItem($("question").value,$("answer").textContent);alert("Saved to Repair Brain")}
 function normalizePartCam(s){return (s||"").toUpperCase().replace(/[^A-Z0-9\\-]/g,"").trim()}
+function validatePartAnswer(num, answer){
+  const lower = (answer || "").toLowerCase();
+
+  if (!lower.includes(num.toLowerCase())) {
+    return `UNKNOWN — exact part number ${num} was not confirmed. Verify with VIN/ESN/OEM catalog.`;
+  }
+
+  const bannedGuessWords = ["probably", "likely injector", "common injector", "fuel injector"];
+
+  for (const bad of bannedGuessWords) {
+    if (lower.includes(bad)) {
+      return `UNKNOWN — AI guess blocked. Verify exact part number ${num} with VIN/ESN/OEM catalog.`;
+    }
+  }
+
+  return answer;
+}
 function extractPartNumberFirst(text){const clean=(text||"").toUpperCase().replace(/[^A-Z0-9\\-\\s]/g," ");const patterns=[/\\bPF\\d{3,6}[A-Z]{0,3}\\b/g,/\\bLF\\d{3,6}[A-Z]{0,3}\\b/g,/\\bFF\\d{3,6}[A-Z]{0,3}\\b/g,/\\bFS\\d{3,6}[A-Z]{0,3}\\b/g,/\\bAF\\d{3,6}[A-Z]{0,3}\\b/g,/\\bBD\\d{3,6}\\b/g,/\\bBF\\d{3,6}[A-Z]{0,3}\\b/g,/\\bPA\\d{3,6}[A-Z]{0,3}\\b/g,/\\bPX\\d{3,6}[A-Z]{0,3}\\b/g,/\\bRS\\d{3,6}\\b/g,/\\bP\\d{5,7}\\b/g];let parts=[];for(const re of patterns){const m=clean.match(re);if(m)parts.push(...m.map(normalizePartCam))}parts=[...new Set(parts)];const skus=[...new Set((clean.match(/\\b[0-9]{8,14}\\b/g)||[]).map(normalizePartCam))];return {part:parts[0]||"",parts,sku:skus[0]||"",skus}}
 async function readPartNumberCamera(event){const file=event.target.files?.[0];if(!file)return;let box=$("barcodePreview");box.style.display="block";let url=URL.createObjectURL(file);box.innerHTML=`<img src="${url}" style="width:100%;border-radius:12px;border:1px solid #444;margin-bottom:8px"><b>Photo loaded.</b>\nAuto-reading actual part number...`;try{if(!window.Tesseract)throw new Error("OCR library not loaded");$("barcodeAnswer").textContent="Reading part number from image...";let res=await Tesseract.recognize(file,"eng");let found=extractPartNumberFirst(res?.data?.text||"");if(found.part)$("actualPartNumber").value=found.part;if(found.sku)$("barcodeNumber").value=found.sku;$("barcodeNote").value=`Detected part candidates: ${found.parts.join(", ")||"none"}\nDetected barcode/SKU: ${found.skus.join(", ")||"none"}`;box.innerHTML=`<img src="${url}" style="width:100%;border-radius:12px;border:1px solid #444;margin-bottom:8px"><b>Detected Actual Part Number:</b> ${found.part||"not found"}\n<b>Barcode / SKU:</b> ${found.sku||"not found"}\n\n<b>Other part candidates:</b>\n${found.parts.join("\\n")||"none"}`;$("detectedNumberBox").style.display="block";$("detectedNumberBox").textContent=`Actual Part Number: ${found.part||"not found"}\nBarcode/SKU: ${found.sku||"not found"}`;if(found.part)await partNumberLookup();else $("barcodeAnswer").textContent="Could not read actual part number. Take a closer picture or type it manually."}catch(e){$("barcodeAnswer").textContent="Camera read failed: "+e.message;logError("camera",e.message)}}
 async function partNumberLookup(){let actual=$("actualPartNumber").value.trim(),sku=$("barcodeNumber").value.trim(),brand=$("partBrand").value.trim(),note=$("barcodeNote").value.trim();if(!actual&&!sku&&!note)return alert("Take a picture or enter part number");$("barcodeAnswer").textContent="Looking up actual part number...";let q=`Part Number Camera Lookup. Actual part/filter number: ${actual||"none"}. Secondary barcode/SKU: ${sku||"none"}. Brand: ${brand||"unknown"}. Context: ${vehicleContext()}. Answer with Actual Part Number, what it is, what it is used for, common applications, common fit, cross references/options, warnings, verify steps. Prioritize actual part number over barcode/SKU.`;try{$("barcodeAnswer").textContent=await callAI(q,vehicleContext(),note,"parts")}catch(e){$("barcodeAnswer").textContent="AI load failed: "+e.message}}
