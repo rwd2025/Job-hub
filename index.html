@@ -426,7 +426,7 @@ Year: ${partYear || year || "unknown"}
 Make: ${partMake || "unknown"}
 Model: ${partModel || "unknown"}
 Part Type: ${partType || "Unknown"}
-
+Engine: ${isChassis ? "NOT APPLICABLE" : $("engine")?.value || "unknown"}
 Year: ${year || "unknown"}
 Context: ${ctx()}
 Notes: ${note || "none"}
