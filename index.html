@@ -338,7 +338,26 @@ async function lookupFilterNumber(){
 
   if(!num) return alert("Enter part number");
 
-  $("filterAnswer").textContent = "Looking up part...";
+  let answer = await callAI(
+  `Exact OEM part lookup ONLY.
+
+Part number: ${num}
+
+Rules:
+- Match the exact number only
+- Do not guess from engine
+- Do not assume injector/filter/sensor
+- If exact match is not found, say UNKNOWN
+- Include confidence level
+`,
+  vehicleContext(),
+  note,
+  "parts"
+);
+
+answer = validatePartAnswer(num, answer);
+
+$("filterAnswer").textContent = answer;
 
   try{
     $("filterAnswer").textContent = await callAI(
