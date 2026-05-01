@@ -352,6 +352,18 @@ async function askPart(){
   let type = $("lookupType").value;
   let system = $("partSystem").value;
   let year = $("partYear")?.value.trim() || "";
+  let autoEngine = "";
+
+if (year) {
+  let y = parseInt(year);
+
+  if (y <= 2002) autoEngine = "Mechanical / N14 / Series 60";
+  else if (y <= 2006) autoEngine = "Cummins ISX / CAT C15 / Series 60";
+  else if (y <= 2009) autoEngine = "DPF Era ISX / CAT C15 ACERT";
+  else if (y <= 2016) autoEngine = "ISX15 / DD15 / MX13";
+  else if (y <= 2020) autoEngine = "X15 / DD15 Gen 5 / MX13";
+  else if (y >= 2021) autoEngine = "Newest Platform X15 Efficiency / A26 / DD15 Gen 5";
+}
   if(!q && !note) return alert("Enter part name, part number, VIN, ESN, or notes");
 
   $("partAnswer").textContent = "Looking up OEM part options...";
