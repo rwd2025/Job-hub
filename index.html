@@ -345,6 +345,7 @@ Tell me:
 }
 async function buildFilterKit(){let kit=$("kitType").value,num=$("filterNumber").value;let q=`Build ${kit} for ${vehicleContext()}. Known filter number: ${num||"none"}. Include filters needed, use of each filter, applications, brand options, quantities if known, warnings, verify steps.`;$("filterAnswer").textContent="Building kit...";try{$("filterAnswer").textContent=await callAI(q,vehicleContext(),"","parts")}catch(e){$("filterAnswer").textContent="AI load failed: "+e.message}}
 async function askPart(){
+  let engineYearGuess = $("engineYearGuess")?.value || "Auto Detect From Year";
   let q = $("partq").value.trim();
   let brand = $("partFinderBrand").value.trim();
   let note = $("partPhotoNote").value.trim();
