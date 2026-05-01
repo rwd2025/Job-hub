@@ -340,7 +340,7 @@ async function askPart(){
   let note = $("partPhotoNote").value.trim();
   let type = $("lookupType").value;
   let system = $("partSystem").value;
-
+235   let year = $("partYear")?.value.trim() || "";
   if(!q && !note) return alert("Enter part name, part number, VIN, ESN, or notes");
 
   $("partAnswer").textContent = "Looking up OEM part options...";
