@@ -95,17 +95,62 @@ button.dark{background:#222;border:1px solid #444;color:#fff}button.green{backgr
     </select>
 
     <label>Engine / System</label>
-    <select id="partSystem">
-      <option>Auto Detect</option>
-      <option>Cummins ISX15 / X15</option>
-      <option>PACCAR MX-13</option>
-      <option>Detroit DD13 / DD15</option>
-      <option>Allison Transmission</option>
-      <option>Eaton Transmission</option>
-      <option>DPF / SCR / DEF</option>
-      <option>Air Brake System</option>
-      <option>Wheel End / Hub</option>
-    </select>
+  <select id="partSystem">
+  <option>Auto Detect</option>
+
+  <optgroup label="Cummins">
+    <option>Cummins ISX</option>
+    <option>Cummins ISX15</option>
+    <option>Cummins X15</option>
+    <option>Cummins ISB</option>
+    <option>Cummins ISC</option>
+    <option>Cummins ISL</option>
+  </optgroup>
+
+  <optgroup label="PACCAR">
+    <option>PACCAR MX-11</option>
+    <option>PACCAR MX-13</option>
+  </optgroup>
+
+  <optgroup label="Detroit">
+    <option>Detroit Series 60</option>
+    <option>Detroit DD13</option>
+    <option>Detroit DD15</option>
+    <option>Detroit DD16</option>
+  </optgroup>
+
+  <optgroup label="MaxxForce">
+    <option>MaxxForce 7</option>
+    <option>MaxxForce 9</option>
+    <option>MaxxForce 10</option>
+    <option>MaxxForce 11</option>
+    <option>MaxxForce 13</option>
+  </optgroup>
+
+  <optgroup label="Caterpillar">
+    <option>CAT C7</option>
+    <option>CAT C9</option>
+    <option>CAT C13</option>
+    <option>CAT C15</option>
+  </optgroup>
+
+  <optgroup label="Volvo / Mack">
+    <option>Volvo D11</option>
+    <option>Volvo D13</option>
+    <option>Volvo D16</option>
+    <option>Mack MP7</option>
+    <option>Mack MP8</option>
+  </optgroup>
+
+  <optgroup label="Aftertreatment">
+    <option>DPF / SCR / DEF</option>
+  </optgroup>
+
+  <optgroup label="Transmission">
+    <option>Allison</option>
+    <option>Eaton</option>
+  </optgroup>
+</select>
 
     <label>Start Typing Part Name Or Number</label>
     <input id="partq" list="partSuggestions" placeholder="water pump, NOx sensor, EGR valve, 3683651">
