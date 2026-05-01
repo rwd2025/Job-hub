@@ -261,7 +261,15 @@ function show(id){
  $("nav-"+key).classList.add("active");
  window.scrollTo(0,0);
 }
-function ctx(){return `VIN/Unit: ${$("vin").value||"none"} | Engine: ${$("engine").value||"unknown"}`}
+function ctx(){
+  return `
+Year: ${$("yearGlobal")?.value || "unknown"}
+Make: ${$("makeGlobal")?.value || "unknown"}
+Model: ${$("modelGlobal")?.value || "unknown"}
+VIN/Unit: ${$("vin")?.value || "none"}
+Engine: ${$("engine")?.value || "unknown"}
+`;
+}
 async function callAI(question,mode="diagnose",notes=""){
  const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode,question,vehicleContext:ctx(),notes})});
  const data=await res.json();
