@@ -343,7 +343,41 @@ function validatePart(q,ans){
  if(clean==="23539639"&&lower.includes("injector"))return verifiedPartsDB["23539639"];
  return ans;
 }
+function lockPartAnswer(input, answer){
+  const a = (answer || "").toLowerCase();
 
+  if((input || "").includes("23539639") && a.includes("injector")){
+    return verifiedPartsDB["23539639"];
+  }
+
+  const badWords = ["probably","might be","maybe","guess","assuming","fuel injector"];
+
+  for(const bad of badWords){
+    if(a.includes(bad)){
+      return `⚠️ LOCKED DOWN — ANSWER BLOCKED
+
+Reason:
+AI used guessing language or risky part identification.
+
+Input:
+${input}
+
+Required next step:
+- Verify exact part with VIN / ESN / CPL
+- Use OEM catalog or trusted supplier
+- Do not order from this result alone.`;
+    }
+  }
+
+  if(!a.includes("vin") && !a.includes("esn")){
+    return answer + `
+
+⚠️ LOCKDOWN WARNING:
+VIN / ESN verification is required before ordering.`;
+  }
+
+  return answer;
+}
 async function askPart(){ 
  const partYear = $("partYear")?.value.trim() || $("yearGlobal")?.value || "";
 const partMake = $("partMake")?.value === "Use Home Vehicle"
