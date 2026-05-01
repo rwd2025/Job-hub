@@ -1,95 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Mobile Mechanic Pro V36 Beast</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beast Mode</title>
 <style>
-body{margin:0;background:#050505;color:#fff;font-family:Arial,Helvetica,sans-serif;padding:14px 12px}
+body{background:#050505;color:white;font-family:Arial;padding:14px}
 .card{background:#111;border:1px solid #333;border-radius:14px;padding:16px;margin-bottom:12px}
-input,select,textarea{width:100%;box-sizing:border-box;background:#070707;color:#fff;border:1px solid #444;border-radius:10px;padding:13px;font-size:16px;margin:8px 0}
-textarea{min-height:110px}
-button{border:0;border-radius:10px;padding:13px 14px;font-weight:900;margin:5px 4px 5px 0}
-.green{background:#22c76a;color:#061408}
-.blue{background:#3478f6;color:#fff}
+input,select,textarea{width:100%;box-sizing:border-box;margin:8px 0;padding:14px;border-radius:10px;border:1px solid #444}
+button{padding:14px;border-radius:10px;border:0;font-weight:900;margin:6px 4px 6px 0}
+.green{background:#22c76a;color:#000}.blue{background:#3478f6;color:#fff}
 .back{background:#222;color:#fff;border:1px solid #444;width:100%}
-.result{white-space:pre-wrap;background:#0d1a22;border:1px solid #315b78;border-radius:12px;padding:13px;min-height:90px;margin-top:10px;line-height:1.35}
-.section{display:none}
-.section.active{display:block}
+.result{white-space:pre-wrap;background:#0d1a22;border:1px solid #315b78;border-radius:12px;padding:13px;min-height:90px;margin-top:10px}
+.section{display:none}.section.active{display:block}
 </style>
 </head>
 <body>
 
 <section id="home" class="section active">
-  <div class="card">
-    <h1>🔧 Mobile Mechanic Pro BEAST</h1>
-    <input id="vin" placeholder="VIN / Unit">
-    <select id="engine">
-      <option>Detroit DD15</option>
-      <option>Detroit DD13</option>
-      <option>Cummins ISX</option>
-      <option>Cummins X15</option>
-      <option>PACCAR MX-13</option>
-      <option>CAT C15</option>
-      <option>Other</option>
-    </select>
-    <button class="green" onclick="show('parts')">PARTS BEAST</button>
-    <button class="blue" onclick="show('describe')">DESCRIBE PART</button>
-  </div>
+<div class="card">
+<h1>🔧 BEAST MODE</h1>
+<input id="vin" placeholder="VIN / Unit">
+<select id="engine">
+<option>Detroit DD15</option><option>Cummins ISX</option><option>PACCAR MX-13</option><option>CAT C15</option>
+</select>
+<button class="green" onclick="show('parts')">PARTS</button>
+<button class="blue" onclick="show('describe')">DESCRIBE</button>
+</div>
 </section>
 
 <section id="parts" class="section">
-  <button class="back" onclick="show('home')">← BACK TO HOME</button>
-  <div class="card">
-    <h2>Parts Beast Mode</h2>
-
-    <input id="partq" placeholder="Part number or part name">
-    <input id="year" placeholder="Year">
-    <textarea id="note" placeholder="VIN / ESN / CPL / notes"></textarea>
-
-    <button class="green" onclick="askPart()">LOOKUP OPTIONS</button>
-    <button class="blue" onclick="verifiedSearch()">VERIFY WITH WEB</button>
-
-    <div id="out" class="result">Enter a part number or name.</div>
-  </div>
+<button class="back" onclick="show('home')">← BACK</button>
+<div class="card">
+<h2>Parts Beast Mode</h2>
+<input id="partq" placeholder="Part number or name">
+<input id="year" placeholder="Year">
+<textarea id="note" placeholder="VIN / ESN / CPL / notes"></textarea>
+<button class="green" onclick="askPart()">LOOKUP OPTIONS</button>
+<button class="blue" onclick="verifiedSearch()">VERIFY WITH WEB</button>
+<div id="out" class="result">Enter part number or name.</div>
+</div>
 </section>
 
 <section id="describe" class="section">
-  <button class="back" onclick="show('home')">← BACK TO HOME</button>
-  <div class="card">
-    <h2>Describe The Part</h2>
-    <textarea id="desc" placeholder="Example: tube under turbo on ISX leaking oil"></textarea>
-    <button class="green" onclick="describePart()">IDENTIFY</button>
-    <button class="blue" onclick="sendDescribeToParts()">SEND TO PARTS</button>
-    <div id="descOut" class="result">Describe the part.</div>
-  </div>
+<button class="back" onclick="show('home')">← BACK</button>
+<div class="card">
+<h2>Describe The Part</h2>
+<textarea id="desc" placeholder="Example: tube under turbo on ISX leaking oil"></textarea>
+<button class="green" onclick="describePart()">IDENTIFY</button>
+<button class="blue" onclick="sendDescribeToParts()">SEND TO PARTS</button>
+<div id="descOut" class="result">Describe the part.</div>
+</div>
 </section>
 
 <script>
-const API_URL = "https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/diesel-doc-ai";
-let lastDescribe = "";
+const API_URL="https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/diesel-doc-ai";
+let lastDescribe="";
 
 function $(id){return document.getElementById(id)}
 
 function show(id){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  const el = $(id);
-  if(el) el.classList.add("active");
+  const target=$(id);
+  if(target) target.classList.add("active");
 }
 
 function ctx(){
-  return `VIN/Unit: ${$("vin").value || "none"} | Engine: ${$("engine").value || "unknown"}`;
+  return `VIN/Unit: ${$("vin").value||"none"} | Engine: ${$("engine").value||"unknown"}`;
 }
 
-const verifiedPartsDB = {
-  "23539639": `✅ VERIFIED LOCAL MATCH
+const verifiedPartsDB={
+"23539639":`✅ VERIFIED LOCAL MATCH
 
 Part Number: 23539639
 Part / Component: EGR Delta Pressure Sensor Kit / Differential Pressure Sensor Kit
 System: EGR / DPF pressure monitoring
 Engine Fitment: Detroit DD13 / DD15 / DD16 style applications
 Common Year Range: 2008–2018 listings shown online — VERIFY by VIN/ESN
-Cross References: DDE23539639, DDE 23539639, aftermarket examples may include PAI 650683
+Cross References: DDE23539639, DDE 23539639, PAI 650683
 
 Shop Warning:
 23539639 is NOT a fuel injector.
@@ -99,47 +86,36 @@ Confirm with VIN / ESN / OEM catalog before ordering.`
 };
 
 function localHit(q){
-  const clean = (q || "").replace(/\s/g,"").toUpperCase();
-  return verifiedPartsDB[clean] || "";
+  const clean=(q||"").replace(/\s/g,"").toUpperCase();
+  return verifiedPartsDB[clean]||"";
 }
 
-function validate(num, ans){
-  const lower = (ans || "").toLowerCase();
-  const clean = (num || "").replace(/\s/g,"");
-
-  if(clean === "23539639" && lower.includes("injector")){
-    return verifiedPartsDB["23539639"];
-  }
-
+function validate(num,ans){
+  const lower=(ans||"").toLowerCase();
+  const clean=(num||"").replace(/\s/g,"");
+  if(clean==="23539639" && lower.includes("injector")) return verifiedPartsDB["23539639"];
   if(clean && !lower.includes(clean.toLowerCase())){
     return `UNKNOWN — exact part number ${num} was not confirmed. Verify with VIN/ESN/OEM catalog.`;
   }
-
   return ans;
 }
 
 async function askPart(){
-  const q = $("partq").value.trim();
-  const year = $("year").value.trim();
-  const note = $("note").value.trim();
+  const q=$("partq").value.trim();
+  const year=$("year").value.trim();
+  const note=$("note").value.trim();
+  if(!q&&!note)return alert("Enter part number, part name, or notes.");
+  $("out").textContent="Looking up options...";
 
-  if(!q && !note) return alert("Enter part number, part name, or notes.");
+  const hit=localHit(q);
+  if(hit){$("out").textContent=hit;return;}
 
-  $("out").textContent = "Looking up options...";
-
-  const hit = localHit(q);
-  if(hit){
-    $("out").textContent = hit;
-    return;
-  }
-
-  const prompt = `
-BEAST MODE HEAVY DIESEL PARTS LOOKUP
+  const prompt=`BEAST MODE HEAVY DIESEL PARTS LOOKUP
 
 Input: ${q}
-Year: ${year || "unknown"}
+Year: ${year||"unknown"}
 Context: ${ctx()}
-Notes: ${note || "none"}
+Notes: ${note||"none"}
 
 STRICT RULES:
 - Do NOT guess one final part unless VIN/ESN/CPL/OEM catalog confirms it.
@@ -167,50 +143,36 @@ Option 2:
 
 Cross References:
 Verification Needed:
-Shop Warning:
-`;
+Shop Warning:`;
 
   try{
-    const res = await fetch(API_URL,{
+    const res=await fetch(API_URL,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        mode:"parts",
-        question:prompt,
-        vehicleContext:ctx(),
-        notes:note
-      })
+      body:JSON.stringify({mode:"parts",question:prompt,vehicleContext:ctx(),notes:note})
     });
-
-    const data = await res.json();
-    let ans = data.answer || "No answer returned.";
-
-    const num = (q.match(/[A-Za-z0-9-]{5,}/)||[""])[0];
-    if(num) ans = validate(num, ans);
-
-    $("out").textContent = ans;
+    const data=await res.json();
+    let ans=data.answer||"No answer returned.";
+    const num=(q.match(/[A-Za-z0-9-]{5,}/)||[""])[0];
+    if(num)ans=validate(num,ans);
+    $("out").textContent=ans;
   }catch(e){
-    $("out").textContent = "AI failed: " + e.message;
+    $("out").textContent="AI failed: "+e.message;
   }
 }
 
 async function verifiedSearch(){
-  const q = $("partq").value.trim();
-  const year = $("year").value.trim();
-  const note = $("note").value.trim();
+  const q=$("partq").value.trim();
+  const year=$("year").value.trim();
+  const note=$("note").value.trim();
+  if(!q)return alert("Enter part number or name.");
+  $("out").textContent="Searching real web sources...";
 
-  if(!q) return alert("Enter part number or part name.");
-
-  $("out").textContent = "Searching real web sources...";
-
-  const hit = localHit(q);
-  if(hit){
-    $("out").textContent = hit;
-    return;
-  }
+  const hit=localHit(q);
+  if(hit){$("out").textContent=hit;return;}
 
   try{
-    const res = await fetch(API_URL,{
+    const res=await fetch(API_URL,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
@@ -220,14 +182,11 @@ async function verifiedSearch(){
         notes:`Year: ${year}\nNotes: ${note}`
       })
     });
-
-    const data = await res.json();
-    if(!res.ok) throw new Error(data.error || "Search failed");
-
-    $("out").textContent = data.answer || "No verified answer returned.";
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error||"Search failed");
+    $("out").textContent=data.answer||"No verified answer returned.";
   }catch(e){
-    $("out").textContent =
-`Web verification is not active on Supabase yet.
+    $("out").textContent=`Web verification is not active on Supabase yet.
 
 To activate it:
 1. Add TAVILY_API_KEY to Supabase secrets
@@ -239,16 +198,15 @@ ${e.message}`;
 }
 
 function describePart(){
-  const t = $("desc").value.toLowerCase().trim();
-  if(!t) return alert("Describe the part first.");
+  const t=$("desc").value.toLowerCase().trim();
+  if(!t)return alert("Describe the part first.");
+  let options=[];
 
-  let options = [];
-
-  if(t.includes("turbo") && (t.includes("tube") || t.includes("line") || t.includes("pipe"))){
+  if(t.includes("turbo")&&(t.includes("tube")||t.includes("line")||t.includes("pipe"))){
     if(t.includes("oil")){
       options.push("1. Turbo oil drain line / turbo oil return tube — most likely if under turbo and leaking oil.");
       options.push("2. Turbo oil feed line — smaller line feeding oil into turbo.");
-    }else if(t.includes("air") || t.includes("boost")){
+    }else if(t.includes("air")||t.includes("boost")){
       options.push("1. Charge air cooler pipe / turbo outlet pipe.");
       options.push("2. Intake boot / coupler.");
     }else if(t.includes("exhaust")){
@@ -260,7 +218,7 @@ function describePart(){
       options.push("3. Charge air cooler pipe / turbo outlet pipe.");
       options.push("4. Turbo exhaust outlet / intermediate pipe.");
     }
-  }else if(t.includes("delta") || t.includes("pressure")){
+  }else if(t.includes("delta")||t.includes("pressure")){
     options.push("1. Delta pressure sensor / differential pressure sensor.");
     options.push("2. EGR delta pressure sensor tube.");
     options.push("3. DPF differential pressure sensor tube.");
@@ -268,8 +226,7 @@ function describePart(){
     options.push("No exact local match. Send to Parts Beast for AI options.");
   }
 
-  lastDescribe =
-`Describe Part Result
+  lastDescribe=`Describe Part Result
 
 Engine: ${$("engine").value}
 Description: ${$("desc").value}
@@ -282,19 +239,17 @@ Next Verification:
 - Engine year
 - Exact location
 - Leak type
-- Photo or old part number
-`;
+- Photo or old part number`;
 
-  $("descOut").textContent = lastDescribe;
+  $("descOut").textContent=lastDescribe;
 }
 
 function sendDescribeToParts(){
-  if(!lastDescribe) describePart();
-  $("partq").value = $("desc").value;
-  $("note").value = lastDescribe;
+  if(!lastDescribe)describePart();
+  $("partq").value=$("desc").value;
+  $("note").value=lastDescribe;
   show("parts");
 }
 </script>
-
 </body>
 </html>
