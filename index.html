@@ -436,20 +436,23 @@ Context: ${ctx()}
 Notes: ${note || "none"}
 
 STRICT RULES:
-- Do NOT guess one final part unless VIN/ESN/CPL/OEM catalog confirms it.
-- If exact part number is entered, match that exact number only.
-- If component name is entered, return multiple possible options.
-- Include year ranges when known.
-- Do not default to injector/filter/sensor.
-- Always include VIN/ESN verification warning.
-- Always return at least 2 options if VIN is not provided.
-- Confidence must reflect certainty, not guessing.
-Return:
 - If no valid part number is provided, DO NOT guess.
-- If input is only a vague note or unknown number, respond: PART NUMBER UNKNOWN — NEED PART DESCRIPTION OR NAME.
-- Ask for part name, part description, location on vehicle, or symptom.
-- Determine if result is a SINGLE PART or a KIT.
-- If kit, list the included components.
+- Respond: PART NUMBER UNKNOWN — NEED PART DESCRIPTION OR NAME
+- Ask for:
+  - Part name
+  - Function
+  - Location
+  - Symptom
+- Determine if result is a SINGLE PART or a KIT
+- If kit, list the included components
+- Do NOT guess one final part unless VIN/ESN/CPL/OEM match
+- If exact part number is entered, match that exact number
+- If component name is entered, return multiple possibilities
+- Include year ranges when known
+- Do not default to injector/filter/sensor
+- Do not connect chassis parts to engine
+- Always include VIN/ESN verification warning
+- Confidence must reflect certainty, not guessing
 
 Part / Component:
 Most Likely System:
