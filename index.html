@@ -415,7 +415,7 @@ async function askPart(){
     $("partOut").textContent=hit;
     return;
   }
-
+const isChassis = /king pin|brake|hub|drum|axle|suspension|steer/i.test(q);
   const prompt=`BEAST MODE HEAVY DIESEL PARTS LOOKUP
 
 Mode: ${$("partsMode")?.value || "Options Mode"}
