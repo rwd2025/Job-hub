@@ -322,7 +322,25 @@ Engine: ${$("engine")?.value || "unknown"}
 }
 
 async function callAI(question,mode="diagnose",notes=""){
- 
+ async function verifyPartWeb(){
+  const q = $("partq")?.value.trim() || "";
+  const note = $("partNote")?.value.trim() || "";
+
+  if(!q && !note){
+    $("partOut").textContent =
+      "PART NUMBER UNKNOWN — NEED PART DESCRIPTION OR NAME";
+    return;
+  }
+
+  $("partOut").textContent = "Verifying with web + AI...";
+
+  try{
+    const answer = await callAI(q, "parts", note);
+    $("partOut").textContent = answer;
+  }catch(e){
+    $("partOut").textContent = "Error: " + e.message;
+  }
+}
   const res=await fetch(API_URL,{
     method:"POST",
     headers:{"Content-Type":"application/json"},
