@@ -406,7 +406,11 @@ async function askPart(){
   const year=$("year")?.value.trim() || partYear;
   const note=$("partNote").value.trim();
 
-  if(!q&&!note) return alert("Enter part number, part name, or notes.");
+  if(!q && !note){
+  $("partOut").textContent =
+    "PART NUMBER UNKNOWN — NEED PART DESCRIPTION OR NAME\n\nEnter one of these:\n- Part number\n- Part name\n- What it does\n- Location on vehicle\n- Symptom";
+  return;
+}
 
   $("partOut").textContent="Looking up options...";
 
