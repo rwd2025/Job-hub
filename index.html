@@ -297,14 +297,20 @@ const API_URL="https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/diesel-doc-
 let startTime=0,lastDescribe="";
 
 function $(id){return document.getElementById(id)}
+
 function show(id){
- document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
- $(id).classList.add("active");
- document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
- let key=id==="home"?"home":id==="diag"?"diag":id==="parts"||id==="describe"?"parts":id==="work"?"work":"more";
- $("nav-"+key).classList.add("active");
- window.scrollTo(0,0);
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  const target=$(id);
+  if(target) target.classList.add("active");
+
+  document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
+  const key=id==="home"?"home":id==="diag"?"diag":id==="parts"||id==="describe"?"parts":id==="work"?"work":"more";
+  const nav=$("nav-"+key);
+  if(nav) nav.classList.add("active");
+
+  window.scrollTo(0,0);
 }
+
 function ctx(){
   return `
 Year: ${$("yearGlobal")?.value || "unknown"}
@@ -314,11 +320,16 @@ VIN/Unit: ${$("vin")?.value || "none"}
 Engine: ${$("engine")?.value || "unknown"}
 `;
 }
+
 async function callAI(question,mode="diagnose",notes=""){
- const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode,question,vehicleContext:ctx(),notes})});
- const data=await res.json();
- if(!res.ok)throw new Error(data.error||"AI server failed");
- return data.answer||"No answer returned.";
+  const res=await fetch(API_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({mode,question,vehicleContext:ctx(),notes})
+  });
+  const data=await res.json();
+  if(!res.ok) throw new Error(data.error||"AI server failed");
+  return data.answer||"No answer returned.";
 }
 
 const verifiedPartsDB={
@@ -337,20 +348,26 @@ Shop Warning:
 Verification Needed:
 Confirm with VIN / ESN / OEM catalog before ordering.`
 };
-function localHit(q){return verifiedPartsDB[(q||"").replace(/\s/g,"").toUpperCase()]||""}
-function validatePart(q,ans){
- const clean=(q||"").replace(/\s/g,"").toUpperCase(),lower=(ans||"").toLowerCase();
- if(clean==="23539639"&&lower.includes("injector"))return verifiedPartsDB["23539639"];
- return ans;
-}
-function lockPartAnswer(input, answer){
-  const a = (answer || "").toLowerCase();
 
-  if((input || "").includes("23539639") && a.includes("injector")){
+function localHit(q){
+  return verifiedPartsDB[(q||"").replace(/\s/g,"").toUpperCase()]||"";
+}
+
+function validatePart(q,ans){
+  const clean=(q||"").replace(/\s/g,"").toUpperCase();
+  const lower=(ans||"").toLowerCase();
+  if(clean==="23539639" && lower.includes("injector")) return verifiedPartsDB["23539639"];
+  return ans;
+}
+
+function lockPartAnswer(input,answer){
+  const a=(answer||"").toLowerCase();
+
+  if((input||"").includes("23539639") && a.includes("injector")){
     return verifiedPartsDB["23539639"];
   }
 
-  const badWords = ["probably","might be","maybe","guess","assuming","fuel injector"];
+  const badWords=["probably","might be","maybe","guess","assuming","fuel injector"];
 
   for(const bad of badWords){
     if(a.includes(bad)){
@@ -378,31 +395,41 @@ VIN / ESN verification is required before ordering.`;
 
   return answer;
 }
-async function askPart(){ 
- const partYear = $("partYear")?.value.trim() || $("yearGlobal")?.value || "";
-const partMake = $("partMake")?.value === "Use Home Vehicle"
-  ? $("makeGlobal")?.value
-  : $("partMake")?.value;
 
-const partModel = $("partModel")?.value.trim() || $("modelGlobal")?.value || "";
-const partType = $("partType")?.value || "Unknown";
- const q=$("partq").value.trim(),year=$("year").value.trim(),note=$("partNote").value.trim();
- if(!q&&!note)return alert("Enter part number, part name, or notes.");
- $("partOut").textContent="Looking up options...";
- const hit=localHit(q); if(hit){$("partOut").textContent=hit;return;}
- const prompt=`BEAST MODE HEAVY DIESEL PARTS LOOKUP
+async function askPart(){
+  const partYear=$("partYear")?.value.trim() || $("yearGlobal")?.value || "";
+  const partMake=$("partMake")?.value==="Use Home Vehicle" ? $("makeGlobal")?.value : $("partMake")?.value;
+  const partModel=$("partModel")?.value.trim() || $("modelGlobal")?.value || "";
+  const partType=$("partType")?.value || "Unknown";
 
-Mode: ${$("partsMode").value}
+  const q=$("partq").value.trim();
+  const year=$("year")?.value.trim() || partYear;
+  const note=$("partNote").value.trim();
+
+  if(!q&&!note) return alert("Enter part number, part name, or notes.");
+
+  $("partOut").textContent="Looking up options...";
+
+  const hit=localHit(q);
+  if(hit){
+    $("partOut").textContent=hit;
+    return;
+  }
+
+  const prompt=`BEAST MODE HEAVY DIESEL PARTS LOOKUP
+
+Mode: ${$("partsMode")?.value || "Options Mode"}
 Input: ${q}
 
 Part Lookup Vehicle:
-Year: ${partYear || "unknown"}
+Year: ${partYear || year || "unknown"}
 Make: ${partMake || "unknown"}
 Model: ${partModel || "unknown"}
 Part Type: ${partType || "Unknown"}
-Year: ${year||"unknown"}
+
+Year: ${year || "unknown"}
 Context: ${ctx()}
-Notes: ${note||"none"}
+Notes: ${note || "none"}
 
 STRICT RULES:
 - Do NOT guess one final part unless VIN/ESN/CPL/OEM catalog confirms it.
@@ -432,28 +459,39 @@ Cross References:
 Verification Needed:
 Shop Warning:
 `;
-try{
-  let ans = await callAI(prompt,"parts",note);
 
-  ans = validatePart(q, ans);
-  ans = lockPartAnswer(q, ans);
-
-  $("partOut").textContent = ans;
-
-}catch(e){
-  $("partOut").textContent = "AI failed: " + e.message;
+  try{
+    let ans=await callAI(prompt,"parts",note);
+    ans=validatePart(q,ans);
+    ans=lockPartAnswer(q,ans);
+    $("partOut").textContent=ans;
+  }catch(e){
+    $("partOut").textContent="AI failed: "+e.message;
+  }
 }
-}
+
 async function verifiedSearch(){
- const q=$("partq").value.trim(),year=$("year").value.trim(),note=$("partNote").value.trim();
- if(!q)return alert("Enter part number or part name.");
- $("partOut").textContent="Searching web verification...";
- const hit=localHit(q); if(hit){$("partOut").textContent=hit;return;}
- try{
-  let ans=await callAI(q,"verified_parts_web",`Year:${year}\nNotes:${note}`);
-  $("partOut").textContent=ans;
- }catch(e){
-  $("partOut").textContent=`Web verification backend is not active yet.
+  const q=$("partq").value.trim();
+  const year=$("year")?.value.trim() || $("partYear")?.value || "";
+  const note=$("partNote")?.value.trim() || "";
+
+  if(!q) return alert("Enter part number or part name.");
+
+  $("partOut").textContent="Searching web verification...";
+
+  const hit=localHit(q);
+  if(hit){
+    $("partOut").textContent=hit;
+    return;
+  }
+
+  try{
+    let ans=await callAI(q,"verified_parts_web",`Year:${year}\nNotes:${note}`);
+    ans=validatePart(q,ans);
+    ans=lockPartAnswer(q,ans);
+    $("partOut").textContent=ans;
+  }catch(e){
+    $("partOut").textContent=`Web verification backend is not active yet.
 
 Needed:
 - Add TAVILY_API_KEY to Supabase secrets
@@ -461,23 +499,43 @@ Needed:
 
 Error:
 ${e.message}`;
- }
+  }
 }
 
 function describePart(){
- const t=$("desc").value.toLowerCase().trim(),sym=$("descSymptom").value;
- if(!t)return alert("Describe the part first.");
- let o=[];
- if(t.includes("turbo")&&(t.includes("tube")||t.includes("line")||t.includes("pipe"))){
-  if(t.includes("oil")||sym==="Oil leak"){o.push("1. Turbo oil drain line / turbo oil return tube — most likely if under turbo and leaking oil.");o.push("2. Turbo oil feed line — smaller line feeding oil into turbo.")}
-  else if(t.includes("boost")||t.includes("air")||sym==="Boost / air leak"){o.push("1. Charge air cooler pipe / turbo outlet pipe.");o.push("2. Intake boot / coupler.")}
-  else if(t.includes("exhaust")||sym==="Exhaust leak"){o.push("1. Turbo exhaust outlet pipe / intermediate pipe.");o.push("2. Exhaust bellows / flex pipe near turbo.")}
-  else{o.push("1. Turbo oil drain line / return tube.");o.push("2. Turbo oil feed line.");o.push("3. Charge air cooler pipe / turbo outlet pipe.");o.push("4. Turbo exhaust outlet / intermediate pipe.")}
- }else if(t.includes("delta")||t.includes("pressure")){o.push("1. Delta pressure sensor / differential pressure sensor.");o.push("2. EGR delta pressure sensor tube.");o.push("3. DPF differential pressure sensor tube.")}
- else{o.push("No exact local match. Send to Parts Beast for AI options.")}
- lastDescribe=`Describe Part Result
+  const t=$("desc").value.toLowerCase().trim();
+  const sym=$("descSymptom")?.value || "Unknown";
+  if(!t) return alert("Describe the part first.");
 
-Engine: ${$("engine").value}
+  let o=[];
+
+  if(t.includes("turbo")&&(t.includes("tube")||t.includes("line")||t.includes("pipe"))){
+    if(t.includes("oil")||sym==="Oil leak"){
+      o.push("1. Turbo oil drain line / turbo oil return tube.");
+      o.push("2. Turbo oil feed line.");
+    }else if(t.includes("boost")||t.includes("air")||sym==="Boost / air leak"){
+      o.push("1. Charge air cooler pipe / turbo outlet pipe.");
+      o.push("2. Intake boot / coupler.");
+    }else if(t.includes("exhaust")||sym==="Exhaust leak"){
+      o.push("1. Turbo exhaust outlet pipe / intermediate pipe.");
+      o.push("2. Exhaust bellows / flex pipe near turbo.");
+    }else{
+      o.push("1. Turbo oil drain line / return tube.");
+      o.push("2. Turbo oil feed line.");
+      o.push("3. Charge air cooler pipe.");
+      o.push("4. Turbo exhaust outlet pipe.");
+    }
+  }else if(t.includes("delta")||t.includes("pressure")){
+    o.push("1. Delta pressure sensor / differential pressure sensor.");
+    o.push("2. EGR delta pressure sensor tube.");
+    o.push("3. DPF differential pressure sensor tube.");
+  }else{
+    o.push("No exact local match. Send to Parts Beast for AI options.");
+  }
+
+  lastDescribe=`Describe Part Result
+
+Engine: ${$("engine")?.value}
 Description: ${$("desc").value}
 Symptom: ${sym}
 
@@ -490,25 +548,150 @@ Next Verification:
 - Exact location
 - Leak type
 - Photo or old part number`;
- $("descOut").textContent=lastDescribe;
+
+  $("descOut").textContent=lastDescribe;
 }
-function sendDescribeToParts(){if(!lastDescribe)describePart();$("partq").value=$("desc").value;$("partNote").value=lastDescribe;show("parts")}
-async function runDiag(){const q=$("diagq").value.trim();if(!q)return alert("Enter diagnostic question.");$("diagOut").textContent="Thinking...";try{$("diagOut").textContent=await callAI(q,"diagnose",$("diagNote").value)}catch(e){$("diagOut").textContent="AI failed: "+e.message}}
-async function runManual(){const q=$("manualq").value.trim();if(!q)return alert("Enter procedure question.");$("manualOut").textContent="Searching...";try{$("manualOut").textContent=await callAI("Service manual style procedure: "+q,"diagnose","")}catch(e){$("manualOut").textContent="AI failed: "+e.message}}
-async function runBrake(){const q=`Brake setup. Type:${$("brakeType").value}. Position:${$("brakePos").value}. Notes:${$("brakeNote").value}. Give verify steps, likely setup, parts categories, labor range, warnings. No exact parts without VIN/current stamp.`;$("brakeOut").textContent="Analyzing...";try{$("brakeOut").textContent=await callAI(q,"diagnose","")}catch(e){$("brakeOut").textContent="AI failed: "+e.message}}
+
+function sendDescribeToParts(){
+  if(!lastDescribe) describePart();
+  $("partq").value=$("desc").value;
+  $("partNote").value=lastDescribe;
+  show("parts");
+}
+
+async function runDiag(){
+  const q=$("diagq").value.trim();
+  if(!q) return alert("Enter diagnostic question.");
+  $("diagOut").textContent="Thinking...";
+  try{
+    $("diagOut").textContent=await callAI(q,"diagnose",$("diagNote")?.value||"");
+  }catch(e){
+    $("diagOut").textContent="AI failed: "+e.message;
+  }
+}
+
+async function runManual(){
+  const q=$("manualq").value.trim();
+  if(!q) return alert("Enter procedure question.");
+  $("manualOut").textContent="Searching...";
+  try{
+    $("manualOut").textContent=await callAI("Service manual style procedure: "+q,"diagnose","");
+  }catch(e){
+    $("manualOut").textContent="AI failed: "+e.message;
+  }
+}
+
+async function runBrake(){
+  const q=`Brake setup. Type:${$("brakeType")?.value}. Position:${$("brakePos")?.value}. Notes:${$("brakeNote")?.value}. Give verify steps, likely setup, parts categories, labor range, warnings. No exact parts without VIN/current stamp.`;
+  $("brakeOut").textContent="Analyzing...";
+  try{
+    $("brakeOut").textContent=await callAI(q,"diagnose","");
+  }catch(e){
+    $("brakeOut").textContent="AI failed: "+e.message;
+  }
+}
+
 function money(n){return "$"+Number(n||0).toFixed(2)}
-function calcQuote(){const h=+$("hours").value,r=+$("rate").value,p=+$("partsCost").value,c=+$("callOut").value,n=h*r+p+c;$("quoteOut").textContent=`Job: ${$("jobName").value||"Custom"}\nLabor: ${h} x ${money(r)} = ${money(h*r)}\nParts: ${money(p)}\nCall Out: ${money(c)}\n\nLow: ${money(n*.9)}\nNormal: ${money(n)}\nHigh: ${money(n*1.2)}\n\nParts not included unless listed.`}
-function addPartToWork(){$("workText").value+=($("workText").value?"\n\n":"")+`PART LOOKUP:\n${$("partOut").textContent}`;show("work")}
-function addDiagToWork(){$("workText").value+=($("workText").value?"\n\n":"")+`DIAGNOSTIC:\n${$("diagOut").textContent}`;show("work")}
-function addQuoteToWork(){$("workText").value+=($("workText").value?"\n\n":"")+`QUOTE:\n${$("quoteOut").textContent}`;show("work")}
-function copyWO(){const txt=`ROLLING WRENCH DIESEL WORK ORDER\n\nCustomer: ${$("customer").value}\nContext: ${ctx()}\n\nComplaint:\n${$("complaint").value}\n\nWork / Diagnosis / Parts:\n${$("workText").value}`;navigator.clipboard.writeText(txt);$("workOut").textContent="Copied:\n\n"+txt}
-function saveJob(){let arr=JSON.parse(localStorage.getItem("mmp_jobs")||"[]");arr.unshift({date:new Date().toLocaleString(),customer:$("customer").value,context:ctx(),complaint:$("complaint").value,work:$("workText").value});localStorage.setItem("mmp_jobs",JSON.stringify(arr));$("workOut").textContent="Saved job."}
-function showSaved(){let arr=JSON.parse(localStorage.getItem("mmp_jobs")||"[]");$("savedOut").textContent=arr.length?arr.map(j=>`${j.date}\nCustomer: ${j.customer}\n${j.context}\nComplaint: ${j.complaint}\nWork:\n${j.work}`).join("\n\n---\n\n"):"No saved jobs."}
-function clearSaved(){if(confirm("Clear saved jobs?")){localStorage.removeItem("mmp_jobs");showSaved()}}
-function supplier(site){const p=($("supplierPart").value||$("partq").value).trim();if(!p)return alert("Enter part number.");let q=encodeURIComponent(p+" heavy truck part");let urls={google:`https://www.google.com/search?q=${q}`,napa:`https://www.napaonline.com/en/search?text=${q}`,oreilly:`https://www.oreillyauto.com/search?q=${q}`,fleetpride:`https://www.fleetpride.com/search?text=${q}`};$("supplierOut").textContent="Opening "+site+" search for "+p;window.open(urls[site],"_blank")}
-function clockIn(){startTime=Date.now();$("clockOutBox").textContent="Clocked in: "+new Date().toLocaleTimeString()}
-function clockOut(){if(!startTime)return alert("Clock in first.");let h=(Date.now()-startTime)/3600000;$("clockOutBox").textContent=`Billable Hours: ${h.toFixed(2)}\nLabor @ $135/hr: ${money(h*135)}`}
-function copyText(id){navigator.clipboard.writeText($(id).textContent||"");alert("Copied")}
+
+function calcQuote(){
+  const h=+$("hours").value,r=+$("rate").value,p=+$("partsCost").value,c=+$("callOut").value;
+  const n=h*r+p+c;
+  $("quoteOut").textContent=`Job: ${$("jobName").value||"Custom"}
+Labor: ${h} x ${money(r)} = ${money(h*r)}
+Parts: ${money(p)}
+Call Out: ${money(c)}
+
+Low: ${money(n*.9)}
+Normal: ${money(n)}
+High: ${money(n*1.2)}
+
+Parts not included unless listed.`;
+}
+
+function addPartToWork(){
+  $("workText").value+=($("workText").value?"\n\n":"")+`PART LOOKUP:\n${$("partOut").textContent}`;
+  show("work");
+}
+
+function addDiagToWork(){
+  $("workText").value+=($("workText").value?"\n\n":"")+`DIAGNOSTIC:\n${$("diagOut").textContent}`;
+  show("work");
+}
+
+function addQuoteToWork(){
+  $("workText").value+=($("workText").value?"\n\n":"")+`QUOTE:\n${$("quoteOut").textContent}`;
+  show("work");
+}
+
+function copyWO(){
+  const txt=`ROLLING WRENCH DIESEL WORK ORDER
+
+Customer: ${$("customer").value}
+Context: ${ctx()}
+
+Complaint:
+${$("complaint").value}
+
+Work / Diagnosis / Parts:
+${$("workText").value}`;
+  navigator.clipboard.writeText(txt);
+  $("workOut").textContent="Copied:\n\n"+txt;
+}
+
+function saveJob(){
+  let arr=JSON.parse(localStorage.getItem("mmp_jobs")||"[]");
+  arr.unshift({date:new Date().toLocaleString(),customer:$("customer").value,context:ctx(),complaint:$("complaint").value,work:$("workText").value});
+  localStorage.setItem("mmp_jobs",JSON.stringify(arr));
+  $("workOut").textContent="Saved job.";
+}
+
+function showSaved(){
+  let arr=JSON.parse(localStorage.getItem("mmp_jobs")||"[]");
+  $("savedOut").textContent=arr.length?arr.map(j=>`${j.date}
+Customer: ${j.customer}
+${j.context}
+Complaint: ${j.complaint}
+Work:
+${j.work}`).join("\n\n---\n\n"):"No saved jobs.";
+}
+
+function clearSaved(){
+  if(confirm("Clear saved jobs?")){
+    localStorage.removeItem("mmp_jobs");
+    showSaved();
+  }
+}
+
+function supplier(site){
+  const p=($("supplierPart").value||$("partq").value).trim();
+  if(!p) return alert("Enter part number.");
+  let q=encodeURIComponent(p+" heavy truck part");
+  let urls={
+    google:`https://www.google.com/search?q=${q}`,
+    napa:`https://www.napaonline.com/en/search?text=${q}`,
+    oreilly:`https://www.oreillyauto.com/search?q=${q}`,
+    fleetpride:`https://www.fleetpride.com/search?text=${q}`
+  };
+  $("supplierOut").textContent="Opening "+site+" search for "+p;
+  window.open(urls[site],"_blank");
+}
+
+function clockIn(){
+  startTime=Date.now();
+  $("clockOutBox").textContent="Clocked in: "+new Date().toLocaleTimeString();
+}
+
+function clockOut(){
+  if(!startTime) return alert("Clock in first.");
+  let h=(Date.now()-startTime)/3600000;
+  $("clockOutBox").textContent=`Billable Hours: ${h.toFixed(2)}
+Labor @ $135/hr: ${money(h*135)}`;
+}
+
+function copyText(id){
+  navigator.clipboard.writeText($(id).textContent||"");
+  alert("Copied");
+}
 </script>
 </body>
 </html>
