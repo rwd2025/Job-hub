@@ -344,7 +344,14 @@ function validatePart(q,ans){
  return ans;
 }
 
-async function askPart(){
+async function askPart(){ 
+ const partYear = $("partYear")?.value.trim() || $("yearGlobal")?.value || "";
+const partMake = $("partMake")?.value === "Use Home Vehicle"
+  ? $("makeGlobal")?.value
+  : $("partMake")?.value;
+
+const partModel = $("partModel")?.value.trim() || $("modelGlobal")?.value || "";
+const partType = $("partType")?.value || "Unknown";
  const q=$("partq").value.trim(),year=$("year").value.trim(),note=$("partNote").value.trim();
  if(!q&&!note)return alert("Enter part number, part name, or notes.");
  $("partOut").textContent="Looking up options...";
