@@ -93,8 +93,50 @@ button{border:0;border-radius:10px;padding:13px 10px;font-weight:1000;text-trans
 <button class="back dark" onclick="show('home')">← Back</button>
 <div class="card">
 <h2>Parts Beast</h2>
-<div class="warn">Gives options, year ranges, and warnings. Exact ordering still requires VIN / ESN / CPL / OEM catalog verification.</div>
 
+<!-- 🔧 ADD THIS BLOCK -->
+<label>Year</label>
+<input id="partYear" placeholder="2015">
+
+<label>Make</label>
+<select id="partMake">
+<option>Use Home Vehicle</option>
+<option>Freightliner</option>
+<option>Kenworth</option>
+<option>Peterbilt</option>
+<option>International</option>
+<option>Volvo</option>
+<option>Mack</option>
+<option>Western Star</option>
+<option>Ford</option>
+<option>Chevy / GMC</option>
+<option>Dodge / RAM</option>
+<option>Other</option>
+</select>
+
+<label>Model</label>
+<input id="partModel" placeholder="Cascadia, T680, 389, ProStar">
+
+<label>Part Type</label>
+<select id="partType">
+<option>Unknown / Auto Detect</option>
+<option>Engine Part</option>
+<option>Sensor / Electrical</option>
+<option>EGR System</option>
+<option>DPF / SCR / DEF</option>
+<option>Fuel System</option>
+<option>Cooling System</option>
+<option>Turbo / Air System</option>
+<option>Oil System</option>
+<option>Brake / Wheel End</option>
+<option>Suspension</option>
+<option>Transmission</option>
+<option>Hydraulic</option>
+<option>Filter / Maintenance</option>
+</select>
+<!-- 🔧 END BLOCK -->
+
+<div class="warn">Gives options, year ranges...
 <label>Lookup Mode</label>
 <select id="partsMode">
 <option>Options Mode</option>
