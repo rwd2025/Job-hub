@@ -443,7 +443,7 @@ try{
 }catch(e){
   $("partOut").textContent = "AI failed: " + e.message;
 }
-
+}
 async function verifiedSearch(){
  const q=$("partq").value.trim(),year=$("year").value.trim(),note=$("partNote").value.trim();
  if(!q)return alert("Enter part number or part name.");
