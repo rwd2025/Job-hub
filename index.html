@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Mobile Mechanic Pro V36</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mechanic Pro BEAST</title>
 
 <style>
-body{margin:0;background:#050505;color:#fff;font-family:Arial;padding:14px}
-.card{background:#111;border:1px solid #333;border-radius:12px;padding:12px;margin-bottom:12px}
-button{padding:12px;border-radius:8px;border:0;font-weight:bold}
-.backBtn{background:#222;border:1px solid #444;color:#fff;width:100%;margin-bottom:10px}
+body{background:#050505;color:#fff;font-family:Arial;padding:12px}
+.card{background:#111;border:1px solid #333;padding:12px;border-radius:10px;margin-bottom:10px}
+button{padding:12px;border-radius:8px;border:0;font-weight:bold;margin-top:6px}
 .green{background:#22c76a;color:#000}
-.result{background:#0d1a22;border:1px solid #315b78;padding:12px;border-radius:10px;white-space:pre-wrap}
+.blue{background:#3478f6}
+.back{background:#222;border:1px solid #444;color:#fff;width:100%}
+.result{white-space:pre-wrap;background:#0d1a22;padding:10px;border-radius:8px}
 .section{display:none}
 .section.active{display:block}
 </style>
@@ -19,96 +19,154 @@ button{padding:12px;border-radius:8px;border:0;font-weight:bold}
 <body>
 
 <!-- HOME -->
-<section id="home" class="section active">
+<div id="home" class="section active">
 <div class="card">
-<h2>Mobile Mechanic Pro</h2>
-<button onclick="show('parts')">Parts</button>
+<h2>🔧 BEAST MODE</h2>
+<input id="vin" placeholder="VIN / Unit">
+<select id="engine">
+<option>Detroit DD15</option>
+<option>Cummins ISX</option>
+<option>PACCAR MX-13</option>
+</select>
+
+<button onclick="show('parts')">PARTS</button>
+<button onclick="show('describe')">DESCRIBE</button>
 </div>
-</section>
+</div>
 
 <!-- PARTS -->
-<section id="parts" class="section">
-<button class="backBtn" onclick="show('home')">← BACK</button>
+<div id="parts" class="section">
+<button class="back" onclick="show('home')">← BACK</button>
 
 <div class="card">
-<h3>Part Lookup</h3>
+<h3>Parts Beast</h3>
 
-<input id="filterNumber" placeholder="Enter part number">
-<textarea id="filterq" placeholder="Notes"></textarea>
+<input id="partq" placeholder="Part number or name">
+<input id="year" placeholder="Year">
+<textarea id="note" placeholder="Notes"></textarea>
 
-<button class="green" onclick="lookupFilterNumber()">LOOKUP</button>
+<button class="green" onclick="askPart()">LOOKUP</button>
+<button class="blue" onclick="verifiedSearch()">VERIFY WITH WEB</button>
 
-<div id="filterAnswer" class="result"></div>
-
+<div id="out" class="result"></div>
 </div>
-</section>
+</div>
+
+<!-- DESCRIBE -->
+<div id="describe" class="section">
+<button class="back" onclick="show('home')">← BACK</button>
+
+<div class="card">
+<textarea id="desc" placeholder="tube under turbo leaking oil"></textarea>
+<button class="green" onclick="describe()">IDENTIFY</button>
+<div id="descOut" class="result"></div>
+</div>
+</div>
 
 <script>
 
-// NAV
+const API_URL = "https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/diesel-doc-ai";
+
+function $(id){return document.getElementById(id)}
 function show(id){
-  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+ document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+ $(id).classList.add("active");
 }
 
-// API
-async function callAI(question){
-  const res = await fetch("https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/diesel-doc-ai",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({question})
-  });
-  const data = await res.json();
-  return data.answer || "No answer";
+function ctx(){
+ return `VIN:${$("vin").value} Engine:${$("engine").value}`;
 }
 
-// VALIDATION
-function validatePartAnswer(num, answer){
-  const lower = (answer || "").toLowerCase();
+/* VALIDATION */
+function validate(num,ans){
+ let l=ans.toLowerCase();
 
-  if (!lower.includes(num.toLowerCase())) {
-    return `UNKNOWN — exact part number ${num} not confirmed.`;
-  }
+ if(num==="23539639" && l.includes("injector")){
+   return "❌ BLOCKED\n\n23539639 = EGR Delta Pressure Sensor\nNOT injector";
+ }
 
-  const bad = ["probably","likely","injector","filter"];
-
-  for (const b of bad){
-    if(lower.includes(b)){
-      return `UNKNOWN — AI guess blocked. Verify ${num}`;
-    }
-  }
-
-  return answer;
+ return ans;
 }
 
-// FIXED LOOKUP
-async function lookupFilterNumber(){
-  let num = document.getElementById("filterNumber").value.trim();
-  let note = document.getElementById("filterq").value.trim();
+/* PARTS */
+async function askPart(){
+ let q=$("partq").value;
+ if(!q)return alert("enter part");
 
-  if(!num) return alert("Enter part number");
+ $("out").textContent="Loading...";
 
-  document.getElementById("filterAnswer").textContent = "Looking up...";
+ let prompt=`Diesel part lookup
 
-  try{
-    let answer = await callAI(`
-Exact OEM part lookup ONLY.
-
-Part number: ${num}
+Part:${q}
+Context:${ctx()}
 
 Rules:
-- Match exact number only
-- Do not guess
-- If not found say UNKNOWN
-`);
+Give multiple options
+No guessing
+Include years`;
 
-    answer = validatePartAnswer(num, answer);
+ let res=await fetch(API_URL,{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({mode:"parts",question:prompt})
+ });
 
-    document.getElementById("filterAnswer").textContent = answer;
+ let data=await res.json();
+ let ans=data.answer||"no answer";
 
-  }catch(e){
-    document.getElementById("filterAnswer").textContent = "Error: "+e.message;
-  }
+ let num=(q.match(/[0-9]{5,}/)||[""])[0];
+ if(num) ans=validate(num,ans);
+
+ $("out").textContent=ans;
+}
+
+/* 🔥 VERIFIED SEARCH (READY FOR SUPABASE) */
+async function verifiedSearch(){
+ let q=$("partq").value;
+ if(!q)return alert("enter part");
+
+ $("out").textContent="Searching real sources...";
+
+ try{
+ let res=await fetch(API_URL,{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+     mode:"verified_parts_web",
+     question:q,
+     vehicleContext:ctx()
+   })
+ });
+
+ let data=await res.json();
+
+ if(data.answer){
+   $("out").textContent=data.answer;
+ }else{
+   $("out").textContent="⚠️ Web verification not active yet.\n\nStill using AI only.\n\nAdd Supabase search to unlock full power.";
+ }
+
+ }catch(e){
+   $("out").textContent="Web search not active yet.";
+ }
+}
+
+/* DESCRIBE */
+function describe(){
+ let t=$("desc").value.toLowerCase();
+
+ if(t.includes("turbo") && t.includes("oil")){
+   $("descOut").textContent=
+`Most likely:
+- Turbo oil drain line
+- Turbo oil feed line`;
+ }else{
+   $("descOut").textContent=
+`Possible:
+- Charge air pipe
+- Exhaust pipe
+- Sensor line`;
+ }
 }
 
 </script>
