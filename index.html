@@ -431,8 +431,16 @@ Option 2:
 Cross References:
 Verification Needed:
 Shop Warning:`;
- try{let ans=await callAI(prompt,"parts",note);$("partOut").textContent=validatePart(q,ans)}
- catch(e){$("partOut").textContent="AI failed: "+e.message}
+try{
+  let ans = await callAI(prompt,"parts",note);
+
+  ans = validatePart(q, ans);
+  ans = lockPartAnswer(q, ans);
+
+  $("partOut").textContent = ans;
+
+}catch(e){
+  $("partOut").textContent = "AI failed: " + e.message;
 }
 
 async function verifiedSearch(){
