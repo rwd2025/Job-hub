@@ -322,6 +322,8 @@ Engine: ${$("engine")?.value || "unknown"}
 }
 
 async function callAI(question,mode="diagnose",notes=""){
+ return data.answer||"No answer returned.";
+}
   const res=await fetch(API_URL,{
     method:"POST",
     headers:{"Content-Type":"application/json"},
