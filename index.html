@@ -1395,6 +1395,34 @@ ${txt}`;
 
   show("work");
 }
+  function addManualTime(){
+  const hrs = +$("manualHours")?.value || 0;
+  const rate = +$("laborRate")?.value || +$("defaultRate")?.value || 135;
+  const note = $("manualTimeNote")?.value || "Manual labor time";
+
+  if(!hrs){
+    alert("Enter manual hours first.");
+    return;
+  }
+
+  const labor = hrs * rate;
+
+  const bill =
+`MANUAL LABOR ENTRY
+
+Note: ${note}
+Hours: ${hrs.toFixed(2)}
+Rate: ${money(rate)}/hr
+Labor Total: ${money(labor)}`;
+
+  $("workText").value += ($("workText").value ? "\n\n" : "") + bill;
+  $("clockOutBox").textContent = bill;
+  lastClockBill = bill;
+
+  localStorage.setItem("lastInvoice", bill);
+
+  show("work");
+}
 
 function setInHouse(){
   if($("includeServiceCall")) $("includeServiceCall").checked=false;
