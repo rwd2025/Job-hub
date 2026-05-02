@@ -1272,13 +1272,31 @@ function clockOut(){
     alert("Start job first.");
     return;
   }
-function addClockToWork(){
-  const txt = $("clockOutBox")?.textContent || "";
 
-  if(!txt.trim()){
-    alert("No job data to send.");
-    return;
-  }
+  clearInterval(clockInterval);
+
+  const hours=(Date.now()-startTime)/3600000;
+  const rate=+$("laborRate")?.value || +$("defaultRate")?.value || 135;
+  const call=+$("serviceCall")?.value || +$("defaultServiceCall")?.value || 250;
+  const includeService = $("includeServiceCall")?.checked || false;
+
+  const labor=hours*rate;
+  const total = labor + (includeService ? call : 0);
+
+  lastClockBill =
+`JOB COMPLETE
+
+Total Hours: ${hours.toFixed(2)}
+Labor: ${money(labor)}
+Service Call: ${includeService ? money(call) : "$0.00 (In-house)"}
+
+FINAL TOTAL:
+${money(total)}`;
+
+  $("clockOutBox").textContent = lastClockBill;
+
+  startTime=0;
+}
 
   $("workText").value += ($("workText").value ? "\n\n" : "") +
 `LABOR / BILLING:
