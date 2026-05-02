@@ -1089,8 +1089,6 @@ function addQuoteToWork(){
   $("workText").value+=($("workText").value?"\n\n":"")+`QUOTE:\n${$("quoteOut").textContent}`;
   show("work");
 }
-Parts / Materials:
-${$("partsUsed")?.value || ""}
 function copyWO(){
   const txt=
 `${$("shopName")?.value || "Rolling Wrench Diesel"} WORK ORDER
@@ -1104,13 +1102,15 @@ ${ctx()}
 Complaint:
 ${$("complaint")?.value || ""}
 
+Parts / Materials:
+${$("partsUsed")?.value || ""}
+
 Work / Diagnosis / Parts:
 ${$("workText")?.value || ""}`;
 
   navigator.clipboard.writeText(txt);
   $("workOut").textContent="Copied work order:\n\n"+txt;
 }
-
 function saveJob(){
   let arr=JSON.parse(localStorage.getItem("mmp_jobs")||"[]");
 
