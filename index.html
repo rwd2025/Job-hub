@@ -1338,7 +1338,17 @@ ${lastClockBill}`;
 
   startTime=0;
 }
+function clearClock(){
+  if(clockInterval) clearInterval(clockInterval);
 
+  startTime = 0;
+  lastClockBill = "";
+
+  localStorage.removeItem("lastInvoice");
+
+  $("clockOutBox").textContent =
+`Timer ready. Start a job to begin tracking.`;
+}
 function addClockToWork(){
   const txt=lastClockBill || $("clockOutBox")?.textContent || "";
 
