@@ -1046,6 +1046,8 @@ function money(n){return "$"+Number(n||0).toFixed(2)}
 
 function calcQuote(){
   const job=$("jobName")?.value || "Custom Job";
+  const invoiceNo = getNextInvoiceNumber();
+const invoiceDate = new Date().toLocaleString();
   const h=+$("hours").value || 0;
   const r=+$("rate").value || 0;
   const p=+$("partsCost").value || 0;
