@@ -1254,7 +1254,18 @@ function clockIn(){
   clockInterval=setInterval(updateClockLive,1000);
   updateClockLive();
 }
+function sendToSquare(){
+  const settings=JSON.parse(localStorage.getItem("mmp_settings")||"{}");
+  const link=settings.squareLink || $("squareLink")?.value || "";
 
+  if(!link){
+    alert("Add your Square payment link in Settings first.");
+    show("settings");
+    return;
+  }
+
+  window.open(link,"_blank");
+}
 function updateClockLive(){
   if(!startTime) return;
 
