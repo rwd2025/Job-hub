@@ -627,7 +627,112 @@ Timer ready. Start a job to begin tracking.
   </div>
 </section>
 
+<section id="diag" class="section">
+  <button class="back dark" onclick="show('home')">← Back</button>
+  <div class="card">
+    <div class="cardTitle">
+      <h2>Diesel Diagnostics</h2>
+      <div class="badge">AI Assist</div>
+    </div>
 
+    <label>Symptom / Code / Question</label>
+    <textarea id="diagq" placeholder="MX-13 crank no start, SPN/FMI, regen issue"></textarea>
+
+    <label>Notes</label>
+    <textarea id="diagNote" placeholder="Codes, pressures, recent repairs"></textarea>
+
+    <button class="success" style="width:100%" onclick="runDiag()">Run Diagnostic</button>
+
+    <div id="diagOut" class="result">Enter diagnostic question.</div>
+
+    <div class="row" style="margin-top:10px">
+      <button class="primary" onclick="addDiagToWork()">Add To Work Order</button>
+      <button class="dark" onclick="copyText('diagOut')">Copy Result</button>
+    </div>
+  </div>
+</section>
+
+<section id="quote" class="section">
+  <button class="back dark" onclick="show('home')">← Back</button>
+  <div class="card">
+    <div class="cardTitle">
+      <h2>Quote Builder</h2>
+      <div class="badge">Pricing</div>
+    </div>
+
+    <label>Job Name</label>
+    <input id="jobName" placeholder="Diagnostic, brakes, water pump">
+
+    <div class="row">
+      <div>
+        <label>Labor Hours</label>
+        <input id="hours" type="number" step=".25" value="1">
+      </div>
+      <div>
+        <label>Labor Rate</label>
+        <input id="rate" type="number" value="135">
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Parts $</label>
+        <input id="partsCost" type="number" value="0">
+      </div>
+      <div>
+        <label>Service Call</label>
+        <input id="callOut" type="number" value="250">
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Tax %</label>
+        <input id="taxRate" type="number" value="0">
+      </div>
+      <div>
+        <label>Card Fee %</label>
+        <input id="cardFee" type="number" value="0">
+      </div>
+    </div>
+
+    <button class="success" style="width:100%" onclick="calcQuote()">Calculate Quote</button>
+
+    <div id="quoteOut" class="result">Build quote.</div>
+
+    <div class="row" style="margin-top:10px">
+      <button class="primary" onclick="addQuoteToWork()">Add To Work Order</button>
+      <button class="dark" onclick="copyText('quoteOut')">Copy Quote</button>
+    </div>
+  </div>
+</section>
+
+<section id="settings" class="section">
+  <button class="back dark" onclick="show('home')">← Back</button>
+  <div class="card">
+    <div class="cardTitle">
+      <h2>Settings / App Test</h2>
+      <div class="badge">System</div>
+    </div>
+
+    <label>Default Labor Rate</label>
+    <input id="defaultRate" type="number" value="135">
+
+    <label>Default Service Call</label>
+    <input id="defaultServiceCall" type="number" value="250">
+
+    <label>Shop Name</label>
+    <input id="shopName" value="Rolling Wrench Diesel">
+
+    <div class="row">
+      <button class="success" onclick="saveSettings()">Save Settings</button>
+      <button class="secondary" onclick="testApp()">Test App</button>
+    </div>
+
+    <div id="settingsOut" class="result">Settings ready.</div>
+  </div>
+</section>
+  
 <<!-- MAIN SCRIPT -->
 <script>
 const API_URL="https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/verify-part-web";
