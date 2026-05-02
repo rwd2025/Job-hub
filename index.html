@@ -1228,9 +1228,10 @@ function clearPin(){
 let startTime=0;
 let clockInterval=null;
 let lastClockBill="";
-  
+
 function clockIn(){
   startTime=Date.now();
+  lastClockBill="";
 
   if(clockInterval) clearInterval(clockInterval);
 
@@ -1246,9 +1247,10 @@ function updateClockLive(){
 
   const rate=+$("laborRate")?.value || +$("defaultRate")?.value || 135;
   const call=+$("serviceCall")?.value || +$("defaultServiceCall")?.value || 250;
-const includeService = $("includeServiceCall")?.checked || false;
+  const includeService=$("includeServiceCall")?.checked || false;
+
   const labor=hours*rate;
-  const total=labor+call;
+  const total=labor+(includeService ? call : 0);
 
   $("clockOutBox").textContent=
 `LIVE JOB RUNNING
@@ -1261,7 +1263,8 @@ Hours: ${hours.toFixed(2)}
 Labor @ ${money(rate)}/hr:
 ${money(labor)}
 
-Service Call: ${includeService ? money(call) : "$0.00 (In-house)"}
+Service Call:
+${includeService ? money(call) : "$0.00 (In-house)"}
 
 RUNNING TOTAL:
 ${money(total)}`;
@@ -1278,12 +1281,12 @@ function clockOut(){
   const hours=(Date.now()-startTime)/3600000;
   const rate=+$("laborRate")?.value || +$("defaultRate")?.value || 135;
   const call=+$("serviceCall")?.value || +$("defaultServiceCall")?.value || 250;
-  const includeService = $("includeServiceCall")?.checked || false;
+  const includeService=$("includeServiceCall")?.checked || false;
 
   const labor=hours*rate;
-  const total = labor + (includeService ? call : 0);
+  const total=labor+(includeService ? call : 0);
 
-  lastClockBill =
+  lastClockBill=
 `JOB COMPLETE
 
 Total Hours: ${hours.toFixed(2)}
@@ -1293,27 +1296,33 @@ Service Call: ${includeService ? money(call) : "$0.00 (In-house)"}
 FINAL TOTAL:
 ${money(total)}`;
 
-  $("clockOutBox").textContent = lastClockBill;
-
+  $("clockOutBox").textContent=lastClockBill;
   startTime=0;
 }
 
-$("workText").value += ($("workText").value ? "\n\n" : "") +
+function addClockToWork(){
+  const txt=lastClockBill || $("clockOutBox")?.textContent || "";
+
+  if(!txt.trim()){
+    alert("No job data to send.");
+    return;
+  }
+
+  $("workText").value+=($("workText").value ? "\n\n" : "")+
 `LABOR / BILLING:
-${lastClockBill}`;
+${txt}`;
 
   show("work");
 }
-  
 
-Total Hours: ${hours.toFixed(2)}
-Labor: ${money(labor)}
-Service Call: ${includeService ? money(call) : "$0.00 (In-house)"}
+function setInHouse(){
+  if($("includeServiceCall")) $("includeServiceCall").checked=false;
+  updateClockLive();
+}
 
-FINAL TOTAL:
-${money(total)}`;
-
-  startTime=0;
+function setServiceCall(){
+  if($("includeServiceCall")) $("includeServiceCall").checked=true;
+  updateClockLive();
 }
 
 
