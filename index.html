@@ -732,6 +732,32 @@ Timer ready. Start a job to begin tracking.
     <div id="settingsOut" class="result">Settings ready.</div>
   </div>
 </section>
+
+  <section id="work" class="section">
+  <button class="back dark" onclick="show('home')">← Back</button>
+  <div class="card">
+    <div class="cardTitle">
+      <h2>Work Order</h2>
+      <div class="badge">Customer Record</div>
+    </div>
+
+    <label>Customer</label>
+    <input id="customer" placeholder="Customer name">
+
+    <label>Complaint</label>
+    <textarea id="complaint" placeholder="Customer complaint / reason for call"></textarea>
+
+    <label>Diagnosis / Parts / Work Performed</label>
+    <textarea id="workText" placeholder="Add parts, diagnostics, quotes, and work performed here"></textarea>
+
+    <div class="row">
+      <button class="success" onclick="copyWO()">Copy Work Order</button>
+      <button class="secondary" onclick="saveJob()">Save Job</button>
+    </div>
+
+    <div id="workOut" class="result">Work order ready.</div>
+  </div>
+</section>
   
 <<!-- MAIN SCRIPT -->
 <script>
