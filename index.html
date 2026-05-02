@@ -594,42 +594,52 @@ button:active{
   </div>
 </section>
 
-
 <!-- LIVE LABOR CLOCK -->
 <section id="clock" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
 
-  <div class="card">
-    <div class="cardTitle">
-      <h2>Live Labor Clock</h2>
-      <div class="badge">Billing</div>
-    </div>
+<button class="back dark" onclick="show('home')">← Back</button>
 
-    <label>Labor Rate ($/hr)</label>
-    <input id="laborRate" type="number" value="135">
+<div class="card">
 
-    <label>Service Call ($)</label>
-    <input id="serviceCall" type="number" value="250">
+<div class="cardTitle">
+<h2>Live Labor Clock</h2>
+<div class="badge">Billing</div>
+</div>
+
+<label>Labor Rate ($/hr)</label>
+<input id="laborRate" type="number" value="135">
+
+<label>Service Call ($)</label>
+<input id="serviceCall" type="number" value="250">
+
+<!-- 🔥 SERVICE CALL SWITCH -->
+<label style="margin-top:8px;">
+<input type="checkbox" id="includeServiceCall" checked>
+Include Service Call
+</label>
 
 <div class="row">
-  <button class="success" onclick="clockIn()">Start Job</button>
-  <button class="primary" onclick="clockOut()">End Job</button>
+<button class="success" onclick="clockIn()">Start Job</button>
+<button class="primary" onclick="clockOut()">End Job</button>
 </div>
 
 <div id="clockOutBox" class="result">
-  Timer ready. Start a job to begin tracking.
+Timer ready. Start a job to begin tracking.
 </div>
 
-<button class="primary" style="width:100%;margin-top:10px" onclick="addClockToWork()">
-  SEND TO WORK ORDER / INVOICE
+<!-- 🔥 SEND BUTTON -->
+<button class="primary" style="width:100%;margin-top:10px;"
+onclick="addClockToWork()">
+SEND TO WORK ORDER / INVOICE
 </button>
 
 <div class="small">
-  Live tracking updates every second.
-  Includes labor rate and service call in real-time total.
+Live tracking updates every second. Includes labor and service call in real time.
 </div>
-  </div>
+
+</div>
 </section>
+
 
 <section id="diag" class="section">
   <button class="back dark" onclick="show('home')">← Back</button>
