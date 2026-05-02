@@ -1256,8 +1256,7 @@ Hours: ${hours.toFixed(2)}
 Labor @ ${money(rate)}/hr:
 ${money(labor)}
 
-Service Call:
-${money(call)}
+Service Call: ${includeService ? money(call) : "$0.00 (In-house)"}
 
 RUNNING TOTAL:
 ${money(total)}`;
