@@ -1080,7 +1080,30 @@ Notes:
 Parts not included unless listed.
 Final invoice may change after inspection.`;
 }
+function addManualTimeToInvoice(){
+  const hrs = +$("manualHours")?.value || 0;
+  const rate = +$("rate")?.value || +$("defaultRate")?.value || 135;
+  const note = $("manualTimeNote")?.value || "Manual labor";
 
+  if(!hrs){
+    alert("Enter manual hours first.");
+    return;
+  }
+
+  $("hours").value = hrs;
+
+  const labor = hrs * rate;
+
+  $("quoteOut").textContent =
+`INVOICE MANUAL LABOR
+
+Note: ${note}
+Hours: ${hrs.toFixed(2)}
+Rate: ${money(rate)}/hr
+Labor Total: ${money(labor)}
+
+Now hit Calculate Quote to finalize total.`;
+}
 
 /* WORK ORDER */
 function addPartToWork(){
