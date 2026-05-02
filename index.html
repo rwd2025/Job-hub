@@ -1247,7 +1247,7 @@ function updateClockLive(){
 
   const rate=+$("laborRate")?.value || +$("defaultRate")?.value || 135;
   const call=+$("serviceCall")?.value || +$("defaultServiceCall")?.value || 250;
-  const includeService=$("includeServiceCall")?.checked || false;
+  const includeService = $("includeServiceCall")?.checked || false;
 
   const labor=hours*rate;
   const total=labor+(includeService ? call : 0);
