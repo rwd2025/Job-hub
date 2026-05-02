@@ -1227,7 +1227,8 @@ function clearPin(){
 /* LIVE LABOR CLOCK */
 let startTime=0;
 let clockInterval=null;
-
+let lastClockBill="";
+  
 function clockIn(){
   startTime=Date.now();
 
