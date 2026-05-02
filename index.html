@@ -1304,16 +1304,7 @@ ${txt}`;
 
   show("work");
 }
-  clearInterval(clockInterval);
-
-  const hours=(Date.now()-startTime)/3600000;
-  const call=+$("serviceCall")?.value || +$("defaultServiceCall")?.value || 250;
-const includeService = $("includeServiceCall")?.checked || false;
-
-const labor=hours*rate;
-const total = labor + (includeService ? call : 0);
-  $("clockOutBox").textContent=
-`JOB COMPLETE
+  
 
 Total Hours: ${hours.toFixed(2)}
 Labor: ${money(labor)}
