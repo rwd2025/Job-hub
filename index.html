@@ -3,30 +3,69 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Mobile Mechanic Pro - Shop Level</title>
+<title>Rolling Wrench Diesel | Mobile Mechanic Pro V36</title>
 
 <style>
 :root{
   --bg:#050505;
-  --card:#111;
-  --card2:#181818;
-  --line:#333;
-  --green:#22c76a;
-  --blue:#3478f6;
+  --panel:#0d0d0d;
+  --card:#141414;
+  --card2:#1b1b1b;
+  --line:#343434;
+  --line2:#4a4a4a;
+  --text:#f5f5f5;
+  --muted:#b8b8b8;
   --orange:#ff6500;
-  --red:#ff4f4f;
-  --text:#fff;
-  --muted:#bdbdbd;
+  --orange2:#c94f00;
+  --blue:#2f73e8;
+  --green:#20b765;
+  --red:#e14b4b;
+  --result:#0b1820;
 }
 
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
-  background:radial-gradient(circle at top,#1b1100,#050505 45%);
+  background:
+    radial-gradient(circle at top,#241300 0%,#080808 40%,#030303 100%);
   color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
   padding:14px 12px 115px;
+}
+
+.header{
+  background:linear-gradient(180deg,#191919,#090909);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 10px 28px rgba(0,0,0,.45);
+}
+
+.brand{
+  font-size:13px;
+  color:var(--orange);
+  font-weight:900;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  margin-bottom:6px;
+}
+
+h1{
+  margin:0;
+  font-size:25px;
+  line-height:1.12;
+  letter-spacing:.3px;
+}
+
+.subhead{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.35;
+  margin-top:8px;
 }
 
 .card{
@@ -38,25 +77,45 @@ body{
   box-shadow:0 8px 22px rgba(0,0,0,.35);
 }
 
-h1,h2{
-  margin:0 0 12px;
-  letter-spacing:.3px;
+.cardTitle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.cardTitle h2{
+  margin:0;
+  font-size:20px;
+}
+
+.badge{
+  background:#241300;
+  color:#ffd6a0;
+  border:1px solid #7d4d00;
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:11px;
+  font-weight:900;
+  text-transform:uppercase;
 }
 
 label{
   display:block;
   font-weight:900;
   text-transform:uppercase;
-  font-size:13px;
+  font-size:12px;
   margin:11px 0 6px;
   color:#ddd;
+  letter-spacing:.4px;
 }
 
 input,select,textarea{
   width:100%;
-  background:#070707;
+  background:#050505;
   color:#fff;
-  border:1px solid #444;
+  border:1px solid #464646;
   border-radius:14px;
   padding:15px;
   font-size:17px;
@@ -80,8 +139,8 @@ button{
   padding:16px 12px;
   font-weight:1000;
   text-transform:uppercase;
-  font-size:15px;
-  letter-spacing:.3px;
+  font-size:14px;
+  letter-spacing:.4px;
   min-height:54px;
 }
 
@@ -89,19 +148,19 @@ button:active{
   transform:scale(.98);
 }
 
-.green{
-  background:linear-gradient(180deg,#32e483,#17a957);
+.primary{
+  background:linear-gradient(180deg,var(--orange),var(--orange2));
+  color:#fff;
+}
+
+.secondary{
+  background:linear-gradient(180deg,#2f73e8,#1e56bd);
+  color:#fff;
+}
+
+.success{
+  background:linear-gradient(180deg,#30d77a,#15994f);
   color:#061408;
-}
-
-.blue{
-  background:linear-gradient(180deg,#4e91ff,#1e62d9);
-  color:#fff;
-}
-
-.orange{
-  background:linear-gradient(180deg,#ff7d1a,#df5300);
-  color:#fff;
 }
 
 .dark{
@@ -110,7 +169,7 @@ button:active{
   border:1px solid #484848;
 }
 
-.red{
+.danger{
   background:var(--red);
   color:#fff;
 }
@@ -127,23 +186,46 @@ button:active{
   gap:10px;
 }
 
-.tile{
-  min-height:96px;
+.toolBtn{
+  min-height:98px;
+  background:linear-gradient(180deg,#171717,#0b0b0b);
+  border:1px solid var(--line);
+  color:#fff;
   display:flex;
   flex-direction:column;
-  align-items:center;
+  align-items:flex-start;
   justify-content:center;
   gap:6px;
-  text-align:center;
+  text-align:left;
+  padding:15px;
+  border-radius:18px;
+  box-shadow:0 8px 20px rgba(0,0,0,.35);
 }
 
-.ico{
-  font-size:30px;
+.toolBtn strong{
+  font-size:15px;
+  line-height:1.15;
+}
+
+.toolBtn span{
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.25;
+  text-transform:none;
+  font-weight:700;
+}
+
+.toolBtn.orange{
+  border-color:#7d4d00;
+}
+
+.toolBtn.blue{
+  border-color:#244f9d;
 }
 
 .result{
   white-space:pre-wrap;
-  background:#0d1a22;
+  background:var(--result);
   border:1px solid #315b78;
   border-radius:18px;
   padding:15px;
@@ -154,8 +236,8 @@ button:active{
   color:#ffd6a0;
 }
 
-.warn{
-  background:#2a1700;
+.notice{
+  background:#241300;
   border:1px solid #7d4d00;
   color:#ffd6a0;
   border-radius:16px;
@@ -164,7 +246,7 @@ button:active{
   margin:10px 0;
 }
 
-.ok{
+.good{
   background:#0d2517;
   border:1px solid var(--green);
   color:#ddffe9;
@@ -220,7 +302,13 @@ button:active{
 }
 
 .navI{
-  font-size:22px;
+  font-size:20px;
+}
+
+.small{
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.35;
 }
 </style>
 </head>
@@ -228,11 +316,19 @@ button:active{
 <body>
 
 <section id="home" class="section active">
-  <div class="card">
-    <h1>🔧 Mobile Mechanic Pro<br>SHOP LEVEL</h1>
 
-    <div class="ok">
-      <b>Ready:</b> Parts Lookup • Web + AI Verify • Diesel Diagnostics • Quotes • Work Orders • Suppliers
+  <div class="header">
+    <div class="brand">Rolling Wrench Diesel</div>
+    <h1>Mobile Mechanic Pro V36</h1>
+    <div class="subhead">
+      Professional shop tool for mobile diesel repair, parts lookup, quotes, work orders, GPS pin drops, and live labor tracking.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardTitle">
+      <h2>Vehicle Profile</h2>
+      <div class="badge">Shop Mode</div>
     </div>
 
     <label>Year</label>
@@ -257,10 +353,8 @@ button:active{
     <label>Model</label>
     <input id="modelGlobal" placeholder="Cascadia, T680, 389, ProStar">
 
-    <label>VIN / Unit</label>
+    <label>VIN / Unit Number</label>
     <input id="vin" placeholder="VIN / Unit / Truck #">
-
-    <button class="blue" style="width:100%" onclick="decodeVin()">Decode VIN / Unit</button>
 
     <label>Engine</label>
     <select id="engine">
@@ -281,51 +375,54 @@ button:active{
       <option>Other</option>
     </select>
 
+    <div class="row">
+      <button class="secondary" onclick="decodeVin()">Decode VIN / Unit</button>
+      <button class="primary" onclick="dropPin()">GPS Pin Drop</button>
+    </div>
+
     <div id="vinDecodeOut" class="result">Vehicle data ready.</div>
   </div>
 
   <div class="grid">
-    <button class="tile card green" onclick="show('parts')">
-      <span class="ico">🔧</span>
-      Parts Lookup<br>(OEM / Aftermarket)
+    <button class="toolBtn orange" onclick="show('parts')">
+      <strong>Parts Lookup</strong>
+      <span>OEM / aftermarket verification</span>
     </button>
 
-    <button class="tile card blue" onclick="show('describe')">
-      <span class="ico">🧠</span>
-      Describe Part
+    <button class="toolBtn blue" onclick="show('filters')">
+      <strong>Filter & Fluid Lookup</strong>
+      <span>Oil, fuel, coolant, air, hydraulic</span>
     </button>
 
-    <button class="tile card dark" onclick="show('diag')">
-      <span class="ico">⚡</span>
-      Diesel Doc
+    <button class="toolBtn" onclick="show('diag')">
+      <strong>Diesel Diagnostics</strong>
+      <span>Codes, symptoms, test paths</span>
     </button>
 
-    <button class="tile card dark" onclick="show('quote')">
-      <span class="ico">🏷</span>
-      Quote Builder
+    <button class="toolBtn" onclick="show('pin')">
+      <strong>GPS Pin Drop</strong>
+      <span>Save truck or job location</span>
     </button>
 
-    <button class="tile card dark" onclick="show('work')">
-      <span class="ico">📋</span>
-      Work Order
+    <button class="toolBtn" onclick="show('clock')">
+      <strong>Live Labor Clock</strong>
+      <span>Running time and dollars</span>
     </button>
 
-    <button class="tile card dark" onclick="show('suppliers')">
-      <span class="ico">🏪</span>
-      Suppliers
+    <button class="toolBtn" onclick="show('quote')">
+      <strong>Quote Builder</strong>
+      <span>Labor, call-out, parts, totals</span>
     </button>
 
-    <button class="tile card dark" onclick="show('brakes')">
-      <span class="ico">🛞</span>
-      Brake / Wheel End
+    <button class="toolBtn" onclick="show('work')">
+      <strong>Work Order</strong>
+      <span>Complaint, cause, correction</span>
     </button>
 
-    <button class="tile card dark" onclick="show('clock')">
-      <span class="ico">⏱</span>
-      Labor Clock
+    <button class="toolBtn" onclick="show('settings')">
+      <strong>Settings / App Test</strong>
+      <span>Rates, fees, system checks</span>
     </button>
-  
-
   </div>
 
 </section>
@@ -334,7 +431,10 @@ button:active{
   <button class="back dark" onclick="show('home')">← Back</button>
 
   <div class="card">
-    <h2>Parts Lookup (OEM / Aftermarket)</h2>
+    <div class="cardTitle">
+      <h2>Parts Lookup</h2>
+      <div class="badge">OEM / Aftermarket</div>
+    </div>
 
     <label>Year</label>
     <input id="partYear" placeholder="2015">
@@ -349,18 +449,18 @@ button:active{
       <option>Volvo</option>
       <option>Mack</option>
       <option>Western Star</option>
+      <option>Ford</option>
+      <option>Chevy / GMC</option>
+      <option>Dodge / RAM</option>
       <option>Other</option>
     </select>
 
     <label>Model</label>
-    <input id="partModel" placeholder="Cascadia, T680, 389">
+    <input id="partModel" placeholder="Cascadia, T680, 389, ProStar">
 
     <label>Part Type</label>
     <select id="partType">
       <option>Unknown / Auto Detect</option>
-      <option>King Pin / Steering</option>
-      <option>Brake / Wheel End</option>
-      <option>Suspension</option>
       <option>Engine Component</option>
       <option>Sensor / Electrical</option>
       <option>EGR / DPF / DEF</option>
@@ -368,12 +468,17 @@ button:active{
       <option>Cooling System</option>
       <option>Turbo / Air System</option>
       <option>Oil System</option>
+      <option>Brake / Wheel End</option>
+      <option>Steering / King Pin</option>
+      <option>Suspension</option>
+      <option>Transmission</option>
+      <option>Hydraulic</option>
       <option>Filter / Maintenance</option>
     </select>
 
-    <div class="warn">
-      Use <b>Verify With Web + AI</b> for real-time part validation.<br>
-      Use <b>Lookup Options</b> for shop-safe part possibilities.
+    <div class="notice">
+      Use <b>Web + AI Verification</b> for real-time part lookup.  
+      Use <b>Lookup Options</b> for shop-safe possibilities and verification notes.
     </div>
 
     <label>Lookup Mode</label>
@@ -387,96 +492,321 @@ button:active{
     <label>Part Number / Part Name</label>
     <input id="partq" placeholder="K134A king pin, 23539639, water pump">
 
-    <label>Year (optional)</label>
-    <input id="year" placeholder="2015, 2019">
-
     <label>Notes / VIN / ESN / CPL</label>
-    <textarea id="partNote" placeholder="VIN, ESN, CPL, location, symptom"></textarea>
+    <textarea id="partNote" placeholder="VIN, ESN, CPL, old part number, location, symptom"></textarea>
 
     <div class="row">
-      <button class="green" onclick="askPart()">Lookup Options</button>
-      <button class="blue" onclick="verifyPartWeb()">Verify With Web + AI</button>
+      <button class="success" onclick="askPart()">Lookup Options</button>
+      <button class="secondary" onclick="verifyPartWeb()">Web + AI Verification</button>
     </div>
 
-    <div id="partOut" class="result">Enter part number or description.</div>
+    <div id="partOut" class="result">Enter part number, part name, or description.</div>
 
     <div class="row" style="margin-top:10px">
-      <button class="orange" onclick="addPartToWork()">Add To Work Order</button>
-      <button class="dark" onclick="copyText('partOut')">Copy</button>
+      <button class="primary" onclick="addPartToWork()">Add To Work Order</button>
+      <button class="dark" onclick="copyText('partOut')">Copy Result</button>
     </div>
   </div>
 </section>
 
-  <!-- DESCRIBE PART -->
-<section id="describe" class="section">
+
+<section id="filters" class="section">
   <button class="back dark" onclick="show('home')">← Back</button>
 
   <div class="card">
-    <h2>Describe The Part</h2>
-
-    <label>Describe it like you would in the shop</label>
-    <textarea id="desc" placeholder="Example: tube under turbo leaking oil"></textarea>
-
-    <label>Symptom</label>
-    <select id="descSymptom">
-      <option>Unknown</option>
-      <option>Oil leak</option>
-      <option>Boost / air leak</option>
-      <option>Exhaust leak</option>
-      <option>Coolant leak</option>
-      <option>Electrical issue</option>
-    </select>
-
-    <div class="row">
-      <button class="green" onclick="describePart()">Identify Part</button>
-      <button class="blue" onclick="sendDescribeToParts()">Send To Parts Lookup</button>
+    <div class="cardTitle">
+      <h2>Filter & Fluid Lookup</h2>
+      <div class="badge">Maintenance</div>
     </div>
 
-    <div id="descOut" class="result">Describe the part to identify it.</div>
+    <label>Lookup Type</label>
+    <select id="filterMode">
+      <option>Filter Number Lookup</option>
+      <option>Engine Filter Kit</option>
+      <option>Oil Capacity</option>
+      <option>Fuel Filters</option>
+      <option>Coolant / ELC</option>
+      <option>Hydraulic Filter</option>
+      <option>Air Filter</option>
+      <option>Cabin Filter</option>
+    </select>
+
+    <label>Filter Number / Engine / Unit</label>
+    <input id="filterq" placeholder="Baldwin, Fleetguard, Donaldson, engine model, unit">
+
+    <label>Preferred Brand</label>
+    <select id="filterBrand">
+      <option>Any Brand</option>
+      <option>Fleetguard</option>
+      <option>Baldwin</option>
+      <option>Donaldson</option>
+      <option>WIX</option>
+      <option>NAPA Gold</option>
+      <option>OEM</option>
+    </select>
+
+    <label>Notes / VIN / ESN</label>
+    <textarea id="filterNote" placeholder="VIN, ESN, oil type, engine family, old filter numbers"></textarea>
+
+    <div class="row">
+      <button class="success" onclick="lookupFilter()">Lookup Filter</button>
+      <button class="secondary" onclick="verifyFilterWeb()">Verify Filter Web + AI</button>
+    </div>
+
+    <div id="filterOut" class="result">Enter filter number, engine, or unit.</div>
+
+    <div class="row" style="margin-top:10px">
+      <button class="primary" onclick="addFilterToWork()">Add To Work Order</button>
+      <button class="dark" onclick="copyText('filterOut')">Copy Result</button>
+    </div>
   </div>
 </section>
 
-<!-- DIESEL DOC -->
+<!-- GPS PIN DROP -->
+<section id="pin" class="section">
+  <button class="back dark" onclick="show('home')">← Back</button>
+
+  <div class="card">
+    <div class="cardTitle">
+      <h2>GPS Pin Drop</h2>
+      <div class="badge">Location</div>
+    </div>
+
+    <div class="notice">
+      Tap “Get Current Location” to capture your position.  
+      You can save job sites or customer truck locations.
+    </div>
+
+    <div class="row">
+      <button class="primary" onclick="getLocation()">Get Current Location</button>
+      <button class="secondary" onclick="openMaps()">Open In Maps</button>
+    </div>
+
+    <label>Saved Location Name</label>
+    <input id="pinName" placeholder="Customer name, job site, truck #">
+
+    <div class="row">
+      <button class="success" onclick="savePin()">Save Pin</button>
+      <button class="dark" onclick="clearPin()">Clear</button>
+    </div>
+
+    <div id="pinOut" class="result">No location captured.</div>
+  </div>
+</section>
+
+
+<!-- LIVE LABOR CLOCK -->
+<section id="clock" class="section">
+  <button class="back dark" onclick="show('home')">← Back</button>
+
+  <div class="card">
+    <div class="cardTitle">
+      <h2>Live Labor Clock</h2>
+      <div class="badge">Billing</div>
+    </div>
+
+    <label>Labor Rate ($/hr)</label>
+    <input id="laborRate" type="number" value="135">
+
+    <label>Service Call ($)</label>
+    <input id="serviceCall" type="number" value="250">
+
+    <div class="row">
+      <button class="success" onclick="clockIn()">Start Job</button>
+      <button class="primary" onclick="clockOut()">End Job</button>
+    </div>
+
+    <div id="clockOutBox" class="result">
+Timer ready. Start a job to begin tracking.
+    </div>
+
+    <div class="small">
+      Live tracking updates every second.  
+      Includes labor rate and service call in real-time total.
+    </div>
+  </div>
+</section>
+
+
+<script>
+
+/* =====================
+   GPS PIN DROP
+===================== */
+
+let currentLat = null;
+let currentLng = null;
+
+function getLocation(){
+  if(!navigator.geolocation){
+    $("pinOut").textContent = "Geolocation not supported.";
+    return;
+  }
+
+  $("pinOut").textContent = "Getting location...";
+
+  navigator.geolocation.getCurrentPosition(pos=>{
+    currentLat = pos.coords.latitude;
+    currentLng = pos.coords.longitude;
+
+    $("pinOut").textContent =
+`Latitude: ${currentLat}
+Longitude: ${currentLng}
+
+Accuracy: ${pos.coords.accuracy.toFixed(1)} meters`;
+  },
+  err=>{
+    $("pinOut").textContent = "Location error: " + err.message;
+  });
+}
+
+function openMaps(){
+  if(!currentLat || !currentLng){
+    alert("Get location first.");
+    return;
+  }
+  window.open(`https://maps.google.com/?q=${currentLat},${currentLng}`);
+}
+
+function savePin(){
+  if(!currentLat) return alert("No location to save.");
+
+  const name = $("pinName").value || "Unnamed Location";
+
+  let pins = JSON.parse(localStorage.getItem("pins") || "[]");
+
+  pins.unshift({
+    name,
+    lat: currentLat,
+    lng: currentLng,
+    date: new Date().toLocaleString()
+  });
+
+  localStorage.setItem("pins", JSON.stringify(pins));
+
+  $("pinOut").textContent = `Saved: ${name}`;
+}
+
+function clearPin(){
+  currentLat = null;
+  currentLng = null;
+  $("pinOut").textContent = "Cleared.";
+}
+
+
+/* =====================
+   LIVE CLOCK
+===================== */
+
+let startTime = 0;
+let clockInterval = null;
+
+function clockIn(){
+  startTime = Date.now();
+
+  if(clockInterval) clearInterval(clockInterval);
+
+  clockInterval = setInterval(()=>{
+    const now = Date.now();
+    const hours = (now - startTime) / 3600000;
+
+    const rate = +$("laborRate").value || 0;
+    const call = +$("serviceCall").value || 0;
+
+    const labor = hours * rate;
+    const total = labor + call;
+
+    $("clockOutBox").textContent =
+`LIVE JOB RUNNING
+
+Start Time: ${new Date(startTime).toLocaleTimeString()}
+Current Time: ${new Date().toLocaleTimeString()}
+
+Hours: ${hours.toFixed(2)}
+
+Labor: $${labor.toFixed(2)}
+Service Call: $${call.toFixed(2)}
+
+TOTAL: $${total.toFixed(2)}
+`;
+  },1000);
+}
+
+function clockOut(){
+  if(!startTime) return alert("Start job first.");
+
+  clearInterval(clockInterval);
+
+  const hours = (Date.now() - startTime) / 3600000;
+  const rate = +$("laborRate").value || 0;
+  const call = +$("serviceCall").value || 0;
+
+  const labor = hours * rate;
+  const total = labor + call;
+
+  $("clockOutBox").textContent =
+`JOB COMPLETE
+
+Total Hours: ${hours.toFixed(2)}
+Labor: $${labor.toFixed(2)}
+Service Call: $${call.toFixed(2)}
+
+FINAL TOTAL: $${total.toFixed(2)}
+`;
+
+  startTime = 0;
+}
+
+</script>
+
+<!-- DIESEL DIAGNOSTICS -->
 <section id="diag" class="section">
   <button class="back dark" onclick="show('home')">← Back</button>
 
   <div class="card">
-    <h2>Diesel Doc (Diagnostics)</h2>
+    <div class="cardTitle">
+      <h2>Diesel Diagnostics</h2>
+      <div class="badge">AI Assist</div>
+    </div>
 
     <label>Symptom / Code / Question</label>
-    <textarea id="diagq" placeholder="MX-13 crank no start, SPN/FMI, regen issues"></textarea>
+    <textarea id="diagq" placeholder="MX-13 crank no start, SPN/FMI, regen issue, no boost, hard start"></textarea>
 
     <label>Notes</label>
-    <textarea id="diagNote"></textarea>
+    <textarea id="diagNote" placeholder="What happened, recent repairs, codes, pressures, temps, road test info"></textarea>
 
-    <button class="green" style="width:100%" onclick="runDiag()">Run Diagnostic</button>
+    <button class="success" style="width:100%" onclick="runDiag()">Run Diagnostic</button>
 
-    <div id="diagOut" class="result">Ask Diesel Doc anything.</div>
+    <div id="diagOut" class="result">Enter diagnostic question.</div>
 
     <div class="row" style="margin-top:10px">
-      <button class="orange" onclick="addDiagToWork()">Add To Work Order</button>
-      <button class="dark" onclick="copyText('diagOut')">Copy</button>
+      <button class="primary" onclick="addDiagToWork()">Add To Work Order</button>
+      <button class="dark" onclick="copyText('diagOut')">Copy Result</button>
     </div>
   </div>
 </section>
 
-<!-- QUOTE -->
+
+<!-- QUOTE BUILDER -->
 <section id="quote" class="section">
   <button class="back dark" onclick="show('home')">← Back</button>
 
   <div class="card">
-    <h2>Smart Quote Builder</h2>
+    <div class="cardTitle">
+      <h2>Quote Builder</h2>
+      <div class="badge">Pricing</div>
+    </div>
 
     <label>Job Name</label>
-    <input id="jobName" placeholder="Brakes, diagnostic, water pump">
+    <input id="jobName" placeholder="Diagnostic, brakes, water pump, king pins">
 
     <div class="row">
       <div>
-        <label>Hours</label>
+        <label>Labor Hours</label>
         <input id="hours" type="number" step=".25" value="1">
       </div>
       <div>
-        <label>Rate</label>
+        <label>Labor Rate</label>
         <input id="rate" type="number" value="135">
       </div>
     </div>
@@ -487,150 +817,207 @@ button:active{
         <input id="partsCost" type="number" value="0">
       </div>
       <div>
-        <label>Call Out</label>
+        <label>Service Call</label>
         <input id="callOut" type="number" value="250">
       </div>
     </div>
 
-    <button class="green" style="width:100%" onclick="calcQuote()">Calculate Quote</button>
+    <div class="row">
+      <div>
+        <label>Tax %</label>
+        <input id="taxRate" type="number" value="0">
+      </div>
+      <div>
+        <label>Card Fee %</label>
+        <input id="cardFee" type="number" value="0">
+      </div>
+    </div>
 
-    <div id="quoteOut" class="result">Build your quote.</div>
+    <button class="success" style="width:100%" onclick="calcQuote()">Calculate Quote</button>
+
+    <div id="quoteOut" class="result">Build quote.</div>
 
     <div class="row" style="margin-top:10px">
-      <button class="orange" onclick="addQuoteToWork()">Add To Work Order</button>
-      <button class="dark" onclick="copyText('quoteOut')">Copy</button>
+      <button class="primary" onclick="addQuoteToWork()">Add To Work Order</button>
+      <button class="dark" onclick="copyText('quoteOut')">Copy Quote</button>
     </div>
   </div>
 </section>
+
 
 <!-- WORK ORDER -->
 <section id="work" class="section">
   <button class="back dark" onclick="show('home')">← Back</button>
 
   <div class="card">
-    <h2>Work Order</h2>
+    <div class="cardTitle">
+      <h2>Work Order</h2>
+      <div class="badge">Customer Record</div>
+    </div>
 
     <label>Customer</label>
-    <input id="customer">
+    <input id="customer" placeholder="Customer name">
 
     <label>Complaint</label>
-    <textarea id="complaint"></textarea>
+    <textarea id="complaint" placeholder="Customer complaint / reason for call"></textarea>
 
     <label>Diagnosis / Parts / Work Performed</label>
-    <textarea id="workText"></textarea>
+    <textarea id="workText" placeholder="Add parts, diagnostics, quotes, and work performed here"></textarea>
 
     <div class="row">
-      <button class="green" onclick="copyWO()">Copy Work Order</button>
-      <button class="blue" onclick="saveJob()">Save Job</button>
+      <button class="success" onclick="copyWO()">Copy Work Order</button>
+      <button class="secondary" onclick="saveJob()">Save Job</button>
     </div>
 
     <div id="workOut" class="result">Work order ready.</div>
   </div>
 </section>
 
-  <!-- SUPPLIERS -->
+
+<!-- SUPPLIERS -->
 <section id="suppliers" class="section">
   <button class="back dark" onclick="show('home')">← Back</button>
 
   <div class="card">
-    <h2>Supplier Lookup</h2>
+    <div class="cardTitle">
+      <h2>Supplier Lookup</h2>
+      <div class="badge">Parts Counter</div>
+    </div>
 
-    <label>Part Number</label>
-    <input id="supplierPart" placeholder="Enter part number">
+    <label>Part Number / Description</label>
+    <input id="supplierPart" placeholder="K134R, 23539639, DD15 fuel filter">
 
-    <div class="row">
+    <div class="grid">
       <button class="dark" onclick="supplier('google')">Google</button>
       <button class="dark" onclick="supplier('napa')">NAPA</button>
       <button class="dark" onclick="supplier('oreilly')">O'Reilly</button>
       <button class="dark" onclick="supplier('fleetpride')">FleetPride</button>
     </div>
 
-    <div id="supplierOut" class="result">Search suppliers.</div>
+    <div id="supplierOut" class="result">Enter part and choose supplier.</div>
   </div>
 </section>
 
-<!-- BRAKES -->
-<section id="brakes" class="section">
+<!-- SETTINGS / TEST APP -->
+<section id="settings" class="section">
   <button class="back dark" onclick="show('home')">← Back</button>
 
   <div class="card">
-    <h2>Brake / Wheel End Tool</h2>
-
-    <label>Brake Type</label>
-    <select id="brakeType">
-      <option>Drum</option>
-      <option>Air Disc</option>
-      <option>Not Sure</option>
-    </select>
-
-    <label>Position</label>
-    <select id="brakePos">
-      <option>Drive</option>
-      <option>Steer</option>
-      <option>Trailer</option>
-    </select>
-
-    <label>Notes</label>
-    <textarea id="brakeNote" placeholder="4707, 16.5x7, Meritor, Bendix"></textarea>
-
-    <button class="green" style="width:100%" onclick="runBrake()">Run Brake Tool</button>
-
-    <div id="brakeOut" class="result">Brake results.</div>
-  </div>
-</section>
-
-<!-- CLOCK -->
-<section id="clock" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
-
-  <div class="card">
-    <h2>Labor Clock</h2>
-
-    <div class="row">
-      <button class="green" onclick="clockIn()">Clock In</button>
-      <button class="orange" onclick="clockOut()">Clock Out</button>
+    <div class="cardTitle">
+      <h2>Settings / App Test</h2>
+      <div class="badge">System</div>
     </div>
 
-    <div id="clockOutBox" class="result">Timer ready.</div>
+    <label>Default Labor Rate</label>
+    <input id="defaultRate" type="number" value="135">
+
+    <label>Default Service Call</label>
+    <input id="defaultServiceCall" type="number" value="250">
+
+    <label>Shop Name</label>
+    <input id="shopName" value="Rolling Wrench Diesel">
+
+    <div class="row">
+      <button class="success" onclick="saveSettings()">Save Settings</button>
+      <button class="secondary" onclick="testApp()">Test App</button>
+    </div>
+
+    <div id="settingsOut" class="result">Settings ready.</div>
   </div>
 </section>
 
-<!-- NAV -->
+
+<!-- SAVED JOBS -->
+<section id="saved" class="section">
+  <button class="back dark" onclick="show('home')">← Back</button>
+
+  <div class="card">
+    <div class="cardTitle">
+      <h2>Saved Jobs</h2>
+      <div class="badge">History</div>
+    </div>
+
+    <div class="row">
+      <button class="success" onclick="showSaved()">Show Saved</button>
+      <button class="danger" onclick="clearSaved()">Clear Saved</button>
+    </div>
+
+    <div id="savedOut" class="result">Saved jobs show here.</div>
+  </div>
+</section>
+
+
+<!-- BOTTOM NAV -->
 <div class="bottomNav">
-  <button onclick="show('home')"><span class="navI">🏠</span>Home</button>
-  <button onclick="show('diag')"><span class="navI">⚡</span>Doc</button>
-  <button onclick="show('parts')"><span class="navI">🔧</span>Parts</button>
-  <button onclick="show('work')"><span class="navI">📋</span>Work</button>
-  <button onclick="show('suppliers')"><span class="navI">•••</span>More</button>
+  <button id="nav-home" class="active" onclick="show('home')">
+    <span class="navI">⌂</span>Home
+  </button>
+
+  <button id="nav-diag" onclick="show('diag')">
+    <span class="navI">⚡</span>Diag
+  </button>
+
+  <button id="nav-parts" onclick="show('parts')">
+    <span class="navI">🔧</span>Parts
+  </button>
+
+  <button id="nav-work" onclick="show('work')">
+    <span class="navI">▣</span>Work
+  </button>
+
+  <button id="nav-more" onclick="show('saved')">
+    <span class="navI">•••</span>More
+  </button>
 </div>
 
-<!-- 🔥 WORKING SCRIPT -->
-<script>
 
+<!-- MAIN SCRIPT -->
+<script>
 const API_URL="https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/verify-part-web";
 
 function $(id){return document.getElementById(id)}
 
 function show(id){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  $(id).classList.add("active");
+  const target=$(id);
+  if(target) target.classList.add("active");
+
+  document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
+
+  const key =
+    id==="home" ? "home" :
+    id==="diag" ? "diag" :
+    id==="parts" || id==="filters" ? "parts" :
+    id==="work" ? "work" :
+    "more";
+
+  const nav=$("nav-"+key);
+  if(nav) nav.classList.add("active");
+
+  window.scrollTo(0,0);
 }
 
-/* =====================
-   API CALL (FIXED)
-===================== */
+function ctx(){
+  return `Year: ${$("yearGlobal")?.value || "unknown"}
+Make: ${$("makeGlobal")?.value || "unknown"}
+Model: ${$("modelGlobal")?.value || "unknown"}
+VIN/Unit: ${$("vin")?.value || "none"}
+Engine: ${$("engine")?.value || "unknown"}`;
+}
+
 async function callAI(question,mode="parts",notes=""){
   const res=await fetch(API_URL,{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
-      part:question,
-      note:notes,
-      year:$("yearGlobal")?.value||"",
-      make:$("makeGlobal")?.value||"",
-      model:$("modelGlobal")?.value||"",
-      engine:$("engine")?.value||"",
-      mode:mode
+      part: question,
+      note: notes,
+      year: $("yearGlobal")?.value || $("partYear")?.value || "",
+      make: $("makeGlobal")?.value || $("partMake")?.value || "",
+      model: $("modelGlobal")?.value || $("partModel")?.value || "",
+      engine: $("engine")?.value || "",
+      mode,
+      vehicleContext: ctx()
     })
   });
 
@@ -640,164 +1027,565 @@ async function callAI(question,mode="parts",notes=""){
     throw new Error(data.error || JSON.stringify(data));
   }
 
-  return data.answer || JSON.stringify(data);
+  return data.answer || data.error || JSON.stringify(data) || "No answer returned.";
 }
 
-/* =====================
-   PARTS
-===================== */
-async function askPart(){
-  const q=$("partq").value.trim();
-  const note=$("partNote").value.trim();
 
-  if(!q){
-    $("partOut").textContent="ENTER PART";
+/* PARTS LOOKUP */
+async function askPart(){
+  const q=$("partq")?.value.trim() || "";
+  const note=$("partNote")?.value.trim() || "";
+
+  if(!q && !note){
+    $("partOut").textContent=
+`PART NUMBER UNKNOWN — NEED PART DESCRIPTION OR NAME
+
+Enter one of these:
+- Part number
+- Part name
+- What it does
+- Location on vehicle
+- Symptom`;
     return;
   }
 
-  $("partOut").textContent="Loading...";
+  $("partOut").textContent="Looking up shop-safe options...";
+
+  const partYear=$("partYear")?.value || $("yearGlobal")?.value || "";
+  const partMake=$("partMake")?.value==="Use Home Vehicle" ? $("makeGlobal")?.value : $("partMake")?.value;
+  const partModel=$("partModel")?.value || $("modelGlobal")?.value || "";
+  const partType=$("partType")?.value || "Unknown";
+
+  const prompt=
+`Professional heavy-duty parts lookup.
+
+Input:
+${q}
+
+Vehicle:
+Year: ${partYear}
+Make: ${partMake}
+Model: ${partModel}
+Engine: ${$("engine")?.value || "unknown"}
+
+Part Type:
+${partType}
+
+Notes:
+${note || "none"}
+
+Return:
+Part / Component:
+Corrected Part Number:
+System:
+Type:
+Fits:
+Key Specs:
+Kit Contents:
+Cross References:
+Verification Needed:
+Shop Warning:
+
+Rules:
+- Do not guess exact part without VIN/ESN/OEM catalog.
+- If kit, list kit contents.
+- Do not connect chassis parts to engine.
+- Require VIN/ESN/axle tag verification before ordering.`;
 
   try{
-    let ans=await callAI(q,"parts",note);
+    const ans=await callAI(prompt,"parts",note);
     $("partOut").textContent=ans;
   }catch(e){
-    $("partOut").textContent="ERROR: "+e.message;
+    $("partOut").textContent="PART LOOKUP ERROR: "+e.message;
   }
 }
 
 async function verifyPartWeb(){
-  const q=$("partq").value.trim();
-  const note=$("partNote").value.trim();
+  const q=$("partq")?.value.trim() || "";
+  const note=$("partNote")?.value.trim() || "";
 
-  if(!q){
-    $("partOut").textContent="ENTER PART FIRST";
+  if(!q && !note){
+    $("partOut").textContent="ENTER PART NUMBER, PART NAME, OR DESCRIPTION FIRST.";
     return;
   }
 
   $("partOut").textContent="Verifying with Web + AI...";
 
   try{
-    let ans=await callAI(q,"parts",note);
+    const ans=await callAI(q,"parts",note);
     $("partOut").textContent=ans;
   }catch(e){
-    $("partOut").textContent="WEB ERROR: "+e.message;
+    $("partOut").textContent="WEB VERIFY ERROR: "+e.message;
   }
 }
 
-/* =====================
-   DIAGNOSTICS
-===================== */
-async function runDiag(){
-  const q=$("diagq").value.trim();
-  if(!q) return;
 
-  $("diagOut").textContent="Thinking...";
+/* FILTER LOOKUP */
+async function lookupFilter(){
+  const q=$("filterq")?.value.trim() || "";
+  const note=$("filterNote")?.value.trim() || "";
+  const mode=$("filterMode")?.value || "";
+  const brand=$("filterBrand")?.value || "";
 
-  try{
-    $("diagOut").textContent=await callAI(q,"diag","");
-  }catch(e){
-    $("diagOut").textContent="ERROR: "+e.message;
-  }
-}
-
-/* =====================
-   BRAKE
-===================== */
-async function runBrake(){
-  const q=`Brake setup: ${$("brakeType").value} ${$("brakePos").value} ${$("brakeNote").value}`;
-
-  $("brakeOut").textContent="Analyzing...";
-
-  try{
-    $("brakeOut").textContent=await callAI(q,"diag","");
-  }catch(e){
-    $("brakeOut").textContent="ERROR: "+e.message;
-  }
-}
-
-/* =====================
-   QUOTE
-===================== */
-function calcQuote(){
-  const h=+$("hours").value;
-  const r=+$("rate").value;
-  const p=+$("partsCost").value;
-  const c=+$("callOut").value;
-
-  const total=h*r+p+c;
-
-  $("quoteOut").textContent=
-`Labor: $${(h*r).toFixed(2)}
-Parts: $${p}
-Call Out: $${c}
-
-TOTAL: $${total.toFixed(2)}`;
-}
-
-/* =====================
-   WORK
-===================== */
-function copyWO(){
-  const txt=$("workText").value;
-  navigator.clipboard.writeText(txt);
-  $("workOut").textContent="Copied";
-}
-
-function saveJob(){
-  $("workOut").textContent="Saved";
-}
-
-/* =====================
-   SUPPLIERS
-===================== */
-function supplier(site){
-  const p=$("supplierPart").value || $("partq").value;
-
-  if(!p){
-    alert("Enter part number");
+  if(!q && !note){
+    $("filterOut").textContent="ENTER FILTER NUMBER, ENGINE, UNIT, OR DESCRIPTION.";
     return;
   }
 
-  const q=encodeURIComponent(p+" heavy truck part");
+  $("filterOut").textContent="Looking up filter / fluid information...";
 
-  const urls={
-    google:`https://google.com/search?q=${q}`,
-    napa:`https://napaonline.com/search?text=${q}`,
-    oreilly:`https://oreillyauto.com/search?q=${q}`,
-    fleetpride:`https://fleetpride.com/search?text=${q}`
-  };
+  const prompt=
+`Professional filter and fluid lookup.
 
-  window.open(urls[site]);
+Lookup Type:
+${mode}
+
+Input:
+${q}
+
+Preferred Brand:
+${brand}
+
+Vehicle:
+${ctx()}
+
+Notes:
+${note || "none"}
+
+Return:
+Filter / Fluid:
+OEM Number:
+Aftermarket Options:
+Brand Cross References:
+Capacity / Spec:
+Fits:
+Verification Needed:
+Shop Warning:
+
+Rules:
+- Do not assume filter if input is actually a part number.
+- Verify by VIN/ESN/engine family before ordering.
+- Include Fleetguard, Baldwin, Donaldson, WIX, NAPA where useful.`;
+
+  try{
+    $("filterOut").textContent=await callAI(prompt,"filters",note);
+  }catch(e){
+    $("filterOut").textContent="FILTER LOOKUP ERROR: "+e.message;
+  }
 }
 
-/* =====================
-   CLOCK
-===================== */
-let start=0;
+async function verifyFilterWeb(){
+  const q=$("filterq")?.value.trim() || "";
+  const note=$("filterNote")?.value.trim() || "";
+
+  if(!q && !note){
+    $("filterOut").textContent="ENTER FILTER NUMBER, ENGINE, UNIT, OR DESCRIPTION FIRST.";
+    return;
+  }
+
+  $("filterOut").textContent="Verifying filter with Web + AI...";
+
+  try{
+    $("filterOut").textContent=await callAI(q,"filters",note);
+  }catch(e){
+    $("filterOut").textContent="FILTER WEB ERROR: "+e.message;
+  }
+}
+
+function addFilterToWork(){
+  $("workText").value+=($("workText").value?"\n\n":"")+`FILTER LOOKUP:\n${$("filterOut").textContent}`;
+  show("work");
+}
+
+
+/* DIESEL DIAG */
+async function runDiag(){
+  const q=$("diagq")?.value.trim() || "";
+  const note=$("diagNote")?.value.trim() || "";
+
+  if(!q){
+    $("diagOut").textContent="ENTER DIAGNOSTIC QUESTION FIRST.";
+    return;
+  }
+
+  $("diagOut").textContent="Running diagnostic...";
+
+  try{
+    $("diagOut").textContent=await callAI(q,"diagnose",note);
+  }catch(e){
+    $("diagOut").textContent="DIAGNOSTIC ERROR: "+e.message;
+  }
+}
+
+
+/* QUOTE */
+function money(n){return "$"+Number(n||0).toFixed(2)}
+
+function calcQuote(){
+  const job=$("jobName")?.value || "Custom Job";
+  const h=+$("hours").value || 0;
+  const r=+$("rate").value || 0;
+  const p=+$("partsCost").value || 0;
+  const c=+$("callOut").value || 0;
+  const taxPct=+$("taxRate").value || 0;
+  const cardPct=+$("cardFee").value || 0;
+
+  const labor=h*r;
+  const subtotal=labor+p+c;
+  const tax=subtotal*(taxPct/100);
+  const card=(subtotal+tax)*(cardPct/100);
+  const total=subtotal+tax+card;
+
+  $("quoteOut").textContent=
+`QUOTE
+
+Job: ${job}
+
+Labor:
+${h} hrs x ${money(r)} = ${money(labor)}
+
+Parts: ${money(p)}
+Service Call: ${money(c)}
+
+Subtotal: ${money(subtotal)}
+Tax (${taxPct}%): ${money(tax)}
+Card Fee (${cardPct}%): ${money(card)}
+
+TOTAL DUE: ${money(total)}
+
+Notes:
+Parts not included unless listed.
+Final invoice may change after inspection.`;
+}
+
+
+/* WORK ORDER */
+function addPartToWork(){
+  $("workText").value+=($("workText").value?"\n\n":"")+`PART LOOKUP:\n${$("partOut").textContent}`;
+  show("work");
+}
+
+function addDiagToWork(){
+  $("workText").value+=($("workText").value?"\n\n":"")+`DIAGNOSTIC:\n${$("diagOut").textContent}`;
+  show("work");
+}
+
+function addQuoteToWork(){
+  $("workText").value+=($("workText").value?"\n\n":"")+`QUOTE:\n${$("quoteOut").textContent}`;
+  show("work");
+}
+
+function copyWO(){
+  const txt=
+`${$("shopName")?.value || "Rolling Wrench Diesel"} WORK ORDER
+
+Customer:
+${$("customer")?.value || ""}
+
+Vehicle:
+${ctx()}
+
+Complaint:
+${$("complaint")?.value || ""}
+
+Work / Diagnosis / Parts:
+${$("workText")?.value || ""}`;
+
+  navigator.clipboard.writeText(txt);
+  $("workOut").textContent="Copied work order:\n\n"+txt;
+}
+
+function saveJob(){
+  let arr=JSON.parse(localStorage.getItem("mmp_jobs")||"[]");
+
+  arr.unshift({
+    date:new Date().toLocaleString(),
+    customer:$("customer")?.value || "",
+    context:ctx(),
+    complaint:$("complaint")?.value || "",
+    work:$("workText")?.value || ""
+  });
+
+  localStorage.setItem("mmp_jobs",JSON.stringify(arr));
+  $("workOut").textContent="Saved job.";
+}
+
+
+/* SUPPLIERS */
+function supplier(site){
+  const p=($("supplierPart")?.value || $("partq")?.value || "").trim();
+
+  if(!p){
+    alert("Enter part number or description.");
+    return;
+  }
+
+  const q=encodeURIComponent(p+" heavy duty truck part");
+
+  const urls={
+    google:`https://www.google.com/search?q=${q}`,
+    napa:`https://www.napaonline.com/en/search?text=${q}`,
+    oreilly:`https://www.oreillyauto.com/search?q=${q}`,
+    fleetpride:`https://www.fleetpride.com/search?text=${q}`
+  };
+
+  $("supplierOut").textContent="Opening supplier search for: "+p;
+  window.open(urls[site],"_blank");
+}
+
+
+/* VIN / UNIT */
+function decodeVin(){
+  const vin=$("vin")?.value.trim() || "";
+
+  if(!vin){
+    $("vinDecodeOut").textContent="Enter VIN or unit number first.";
+    return;
+  }
+
+  $("vinDecodeOut").textContent=
+`VIN / Unit entered:
+${vin}
+
+Decode status:
+Ready for VIN API integration.
+
+Shop reminder:
+Use VIN / ESN / CPL / axle tag for exact OEM parts.`;
+}
+
+
+/* GPS PIN DROP */
+let currentLat=null;
+let currentLng=null;
+
+function dropPin(){
+  show("pin");
+  getLocation();
+}
+
+function getLocation(){
+  if(!navigator.geolocation){
+    $("pinOut").textContent="Geolocation not supported on this device.";
+    return;
+  }
+
+  $("pinOut").textContent="Getting current location...";
+
+  navigator.geolocation.getCurrentPosition(pos=>{
+    currentLat=pos.coords.latitude;
+    currentLng=pos.coords.longitude;
+
+    $("pinOut").textContent=
+`CURRENT LOCATION
+
+Latitude: ${currentLat}
+Longitude: ${currentLng}
+Accuracy: ${pos.coords.accuracy.toFixed(1)} meters
+
+Use Save Pin to store this job/truck location.`;
+  },err=>{
+    $("pinOut").textContent="Location error: "+err.message;
+  });
+}
+
+function openMaps(){
+  if(!currentLat || !currentLng){
+    alert("Get location first.");
+    return;
+  }
+
+  window.open(`https://maps.google.com/?q=${currentLat},${currentLng}`,"_blank");
+}
+
+function savePin(){
+  if(!currentLat || !currentLng){
+    alert("Get location first.");
+    return;
+  }
+
+  const name=$("pinName")?.value || "Unnamed Location";
+
+  let pins=JSON.parse(localStorage.getItem("mmp_pins")||"[]");
+
+  pins.unshift({
+    name,
+    lat:currentLat,
+    lng:currentLng,
+    date:new Date().toLocaleString()
+  });
+
+  localStorage.setItem("mmp_pins",JSON.stringify(pins));
+
+  $("pinOut").textContent=
+`SAVED PIN
+
+Name: ${name}
+Latitude: ${currentLat}
+Longitude: ${currentLng}`;
+}
+
+function clearPin(){
+  currentLat=null;
+  currentLng=null;
+  $("pinOut").textContent="Pin cleared.";
+}
+
+
+/* LIVE LABOR CLOCK */
+let startTime=0;
+let clockInterval=null;
 
 function clockIn(){
-  start=Date.now();
-  $("clockOutBox").textContent="Clocked in";
+  startTime=Date.now();
+
+  if(clockInterval) clearInterval(clockInterval);
+
+  clockInterval=setInterval(updateClockLive,1000);
+  updateClockLive();
+}
+
+function updateClockLive(){
+  if(!startTime) return;
+
+  const now=Date.now();
+  const hours=(now-startTime)/3600000;
+
+  const rate=+$("laborRate")?.value || +$("defaultRate")?.value || 135;
+  const call=+$("serviceCall")?.value || +$("defaultServiceCall")?.value || 250;
+
+  const labor=hours*rate;
+  const total=labor+call;
+
+  $("clockOutBox").textContent=
+`LIVE JOB RUNNING
+
+Start Time: ${new Date(startTime).toLocaleTimeString()}
+Current Time: ${new Date().toLocaleTimeString()}
+
+Hours: ${hours.toFixed(2)}
+
+Labor @ ${money(rate)}/hr:
+${money(labor)}
+
+Service Call:
+${money(call)}
+
+RUNNING TOTAL:
+${money(total)}`;
 }
 
 function clockOut(){
-  if(!start) return;
+  if(!startTime){
+    alert("Start job first.");
+    return;
+  }
 
-  const h=(Date.now()-start)/3600000;
+  clearInterval(clockInterval);
+
+  const hours=(Date.now()-startTime)/3600000;
+  const rate=+$("laborRate")?.value || +$("defaultRate")?.value || 135;
+  const call=+$("serviceCall")?.value || +$("defaultServiceCall")?.value || 250;
+
+  const labor=hours*rate;
+  const total=labor+call;
 
   $("clockOutBox").textContent=
-`Hours: ${h.toFixed(2)}
-Labor: $${(h*135).toFixed(2)}`;
+`JOB COMPLETE
+
+Total Hours: ${hours.toFixed(2)}
+Labor: ${money(labor)}
+Service Call: ${money(call)}
+
+FINAL TOTAL:
+${money(total)}`;
+
+  startTime=0;
 }
 
-/* =====================
-   UTIL
-===================== */
+
+/* SETTINGS / TEST */
+function saveSettings(){
+  const settings={
+    defaultRate:$("defaultRate")?.value || "135",
+    defaultServiceCall:$("defaultServiceCall")?.value || "250",
+    shopName:$("shopName")?.value || "Rolling Wrench Diesel"
+  };
+
+  localStorage.setItem("mmp_settings",JSON.stringify(settings));
+
+  $("settingsOut").textContent=
+`Settings saved.
+
+Default Labor Rate: ${money(settings.defaultRate)}
+Default Service Call: ${money(settings.defaultServiceCall)}
+Shop Name: ${settings.shopName}`;
+}
+
+function loadSettings(){
+  const settings=JSON.parse(localStorage.getItem("mmp_settings")||"{}");
+
+  if(settings.defaultRate && $("defaultRate")) $("defaultRate").value=settings.defaultRate;
+  if(settings.defaultServiceCall && $("defaultServiceCall")) $("defaultServiceCall").value=settings.defaultServiceCall;
+  if(settings.shopName && $("shopName")) $("shopName").value=settings.shopName;
+}
+
+function testApp(){
+  let checks=[];
+
+  checks.push($("partq") ? "Parts input: OK" : "Parts input: MISSING");
+  checks.push($("filterq") ? "Filter input: OK" : "Filter input: MISSING");
+  checks.push($("clockOutBox") ? "Live clock: OK" : "Live clock: MISSING");
+  checks.push($("pinOut") ? "Pin drop: OK" : "Pin drop: MISSING");
+  checks.push(API_URL.includes("verify-part-web") ? "Backend URL: OK" : "Backend URL: CHECK");
+
+  $("settingsOut").textContent=
+`APP TEST RESULTS
+
+${checks.join("\n")}
+
+If Web + AI returns weak/no data:
+Check Supabase function logs and API keys.`;
+}
+
+
+/* SAVED JOBS */
+function showSaved(){
+  let arr=JSON.parse(localStorage.getItem("mmp_jobs")||"[]");
+
+  $("savedOut").textContent=arr.length
+    ? arr.map(j=>`${j.date}
+Customer: ${j.customer}
+
+${j.context}
+
+Complaint:
+${j.complaint}
+
+Work:
+${j.work}`).join("\n\n----------------\n\n")
+    : "No saved jobs.";
+}
+
+function clearSaved(){
+  if(confirm("Clear saved jobs?")){
+    localStorage.removeItem("mmp_jobs");
+    showSaved();
+  }
+}
+
+
+/* UTIL */
 function copyText(id){
-  navigator.clipboard.writeText($(id).textContent);
+  navigator.clipboard.writeText($(id)?.textContent || "");
+  alert("Copied");
 }
 
+loadSettings();
 </script>
 </body>
 </html>
+  
+  
+  
   
