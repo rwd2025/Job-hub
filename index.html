@@ -1296,12 +1296,15 @@ function clockOut(){
   const rate=+$("laborRate")?.value || +$("defaultRate")?.value || 135;
   const call=+$("serviceCall")?.value || +$("defaultServiceCall")?.value || 250;
   const includeService=$("includeServiceCall")?.checked || false;
+  const job=$("clockJobName")?.value || "Service Job";
 
   const labor=hours*rate;
   const total=labor+(includeService ? call : 0);
 
   lastClockBill=
 `JOB COMPLETE
+
+Job: ${job}
 
 Total Hours: ${hours.toFixed(2)}
 Labor: ${money(labor)}
@@ -1311,6 +1314,13 @@ FINAL TOTAL:
 ${money(total)}`;
 
   $("clockOutBox").textContent=lastClockBill;
+
+  localStorage.setItem("lastInvoice", lastClockBill);
+
+  $("workText").value+=($("workText").value ? "\n\n" : "")+
+`LABOR / BILLING:
+${lastClockBill}`;
+
   startTime=0;
 }
 
