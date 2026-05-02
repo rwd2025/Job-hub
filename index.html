@@ -1267,7 +1267,20 @@ function clockOut(){
     alert("Start job first.");
     return;
   }
+function addClockToWork(){
+  const txt = $("clockOutBox")?.textContent || "";
 
+  if(!txt.trim()){
+    alert("No job data to send.");
+    return;
+  }
+
+  $("workText").value += ($("workText").value ? "\n\n" : "") +
+`LABOR / BILLING:
+${txt}`;
+
+  show("work");
+}
   clearInterval(clockInterval);
 
   const hours=(Date.now()-startTime)/3600000;
