@@ -1351,12 +1351,13 @@ function saveSettings(){
 
   localStorage.setItem("mmp_settings",JSON.stringify(settings));
 
-  $("settingsOut").textContent=
+$("settingsOut").textContent =
 `Settings saved.
 
 Default Labor Rate: ${money(settings.defaultRate)}
 Default Service Call: ${money(settings.defaultServiceCall)}
-Shop Name: ${settings.shopName}`;
+Shop Name: ${settings.shopName}
+Square Link: ${settings.squareLink ? "Saved" : "Not set"}`;
 }
 
 function loadSettings(){
@@ -1365,7 +1366,9 @@ function loadSettings(){
   if(settings.defaultRate && $("defaultRate")) $("defaultRate").value=settings.defaultRate;
   if(settings.defaultServiceCall && $("defaultServiceCall")) $("defaultServiceCall").value=settings.defaultServiceCall;
   if(settings.shopName && $("shopName")) $("shopName").value=settings.shopName;
+  if(settings.squareLink && $("squareLink")) $("squareLink").value=settings.squareLink;
 }
+  
 
 function testApp(){
   let checks=[];
