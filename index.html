@@ -1086,7 +1086,8 @@ function addQuoteToWork(){
   $("workText").value+=($("workText").value?"\n\n":"")+`QUOTE:\n${$("quoteOut").textContent}`;
   show("work");
 }
-
+Parts / Materials:
+${$("partsUsed")?.value || ""}
 function copyWO(){
   const txt=
 `${$("shopName")?.value || "Rolling Wrench Diesel"} WORK ORDER
