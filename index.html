@@ -1343,10 +1343,11 @@ function setServiceCall(){
 /* SETTINGS / TEST */
 function saveSettings(){
   const settings={
-    defaultRate:$("defaultRate")?.value || "135",
-    defaultServiceCall:$("defaultServiceCall")?.value || "250",
-    shopName:$("shopName")?.value || "Rolling Wrench Diesel"
-  };
+  defaultRate:$("defaultRate")?.value || "135",
+  defaultServiceCall:$("defaultServiceCall")?.value || "250",
+  shopName:$("shopName")?.value || "Rolling Wrench Diesel",
+  squareLink:$("squareLink")?.value || ""
+};
 
   localStorage.setItem("mmp_settings",JSON.stringify(settings));
 
