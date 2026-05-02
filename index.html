@@ -1125,7 +1125,25 @@ function saveJob(){
   localStorage.setItem("mmp_jobs",JSON.stringify(arr));
   $("workOut").textContent="Saved job.";
 }
+function clearWorkOrder(){
+  if(!confirm("Clear this work order and invoice?")) return;
 
+  $("customer").value = "";
+  $("complaint").value = "";
+
+  if($("partsUsed")) $("partsUsed").value = "";
+
+  $("workText").value = "";
+  $("workOut").textContent = "Work order cleared.";
+
+  lastClockBill = "";
+  localStorage.removeItem("lastInvoice");
+
+  if($("clockOutBox")){
+    $("clockOutBox").textContent =
+`Timer ready. Start a job to begin tracking.`;
+  }
+}
 
 /* SUPPLIERS */
 function supplier(site){
