@@ -1298,9 +1298,9 @@ ${money(total)}`;
   startTime=0;
 }
 
-  $("workText").value += ($("workText").value ? "\n\n" : "") +
+$("workText").value += ($("workText").value ? "\n\n" : "") +
 `LABOR / BILLING:
-${txt}`;
+${lastClockBill}`;
 
   show("work");
 }
