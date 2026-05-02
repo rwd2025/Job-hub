@@ -1060,7 +1060,12 @@ function calcQuote(){
   const total=subtotal+tax+card;
 
   $("quoteOut").textContent=
-`QUOTE
+
+    `INVOICE
+
+Invoice #: ${invoiceNo}
+Date: ${invoiceDate}
+Status: UNPAID
 
 Job: ${job}
 
