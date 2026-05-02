@@ -1282,7 +1282,7 @@ const total = labor + (includeService ? call : 0);
 
 Total Hours: ${hours.toFixed(2)}
 Labor: ${money(labor)}
-Service Call: ${money(call)}
+Service Call: ${includeService ? money(call) : "$0.00 (In-house)"}
 
 FINAL TOTAL:
 ${money(total)}`;
