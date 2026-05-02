@@ -1353,15 +1353,15 @@ function setServiceCall(){
 /* SETTINGS / TEST */
 function saveSettings(){
   const settings={
-  defaultRate:$("defaultRate")?.value || "135",
-  defaultServiceCall:$("defaultServiceCall")?.value || "250",
-  shopName:$("shopName")?.value || "Rolling Wrench Diesel",
-  squareLink:$("squareLink")?.value || ""
-};
+    defaultRate:$("defaultRate")?.value || "135",
+    defaultServiceCall:$("defaultServiceCall")?.value || "250",
+    shopName:$("shopName")?.value || "Rolling Wrench Diesel",
+    squareLink:$("squareLink")?.value || ""
+  };
 
   localStorage.setItem("mmp_settings",JSON.stringify(settings));
 
-$("settingsOut").textContent =
+  $("settingsOut").textContent=
 `Settings saved.
 
 Default Labor Rate: ${money(settings.defaultRate)}
@@ -1377,6 +1377,9 @@ function loadSettings(){
   if(settings.defaultServiceCall && $("defaultServiceCall")) $("defaultServiceCall").value=settings.defaultServiceCall;
   if(settings.shopName && $("shopName")) $("shopName").value=settings.shopName;
   if(settings.squareLink && $("squareLink")) $("squareLink").value=settings.squareLink;
+
+  const saved=localStorage.getItem("lastInvoice");
+  if(saved && $("clockOutBox")) $("clockOutBox").textContent=saved;
 }
   
 
