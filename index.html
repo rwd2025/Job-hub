@@ -1522,12 +1522,35 @@ function clearClock(){
 `Timer ready. Start a job to begin tracking.`;
 }
 function addClockToWork(){
-  const txt=lastClockBill || $("clockOutBox")?.textContent || "";
+  const txt = lastClockBill || $("clockOutBox")?.textContent || "";
 
   if(!txt.trim()){
     alert("No job data to send.");
     return;
   }
+
+  // Extract hours from clock text
+  const hrsMatch = txt.match(/Total Hours:\s*([\d.]+)/);
+  const hours = hrsMatch ? parseFloat(hrsMatch[1]) : 0;
+
+  // Extract service call
+  const callMatch = txt.match(/Service Call:\s*\$([\d.]+)/);
+  const call = callMatch ? parseFloat(callMatch[1]) : 0;
+
+  // Set invoice fields
+  if($("hours")) $("hours").value = hours.toFixed(2);
+  if($("callOut")) $("callOut").value = call;
+
+  // Auto name job
+  if($("jobName") && !$("jobName").value){
+    $("jobName").value = $("clockJobName")?.value || "Service Job";
+  }
+
+  // Go to invoice builder
+  show("quote");
+
+  alert("Clock sent to Invoice Builder ✔️\nNow hit CALCULATE INVOICE");
+}
 
   $("workText").value+=($("workText").value ? "\n\n" : "")+
 `LABOR / BILLING:
