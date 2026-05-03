@@ -1068,20 +1068,6 @@ const invoiceDate = new Date().toLocaleString();
 
   $("quoteOut").textContent=
 
-function clearInvoice(){
-  $("jobName").value = "";
-  $("hours").value = "1";
-  $("rate").value = "135";
-  $("partsCost").value = "0";
-  $("callOut").value = "250";
-  $("taxRate").value = "0";
-  $("cardFee").value = "0";
-
-  if($("manualHours")) $("manualHours").value = "";
-  if($("manualTimeNote")) $("manualTimeNote").value = "";
-
-  $("quoteOut").textContent = "Build invoice.";
-}
     
     `INVOICE
 
@@ -1108,6 +1094,21 @@ Parts not included unless listed.
 Final invoice may change after inspection.`;
 }
 
+function clearInvoice(){
+  $("jobName").value = "";
+  $("hours").value = "1";
+  $("rate").value = "135";
+  $("partsCost").value = "0";
+  $("callOut").value = "250";
+  $("taxRate").value = "0";
+  $("cardFee").value = "0";
+
+  if($("manualHours")) $("manualHours").value = "";
+  if($("manualTimeNote")) $("manualTimeNote").value = "";
+
+  $("quoteOut").textContent = "Build invoice.";
+}
+  
 function getNextInvoiceNumber(){
   let n = Number(localStorage.getItem("rwd_invoice_no") || "1000");
   n++;
