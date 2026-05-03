@@ -828,6 +828,25 @@ onclick="addManualTimeToInvoice()">
     <div id="invoiceList" class="result">No invoices loaded.</div>
   </div>
 </section>  
+
+<section id="invoices" class="section">
+  <button class="back dark" onclick="show('home')">← Back</button>
+
+  <div class="card">
+    <div class="cardTitle">
+      <h2>Saved Invoices</h2>
+      <div class="badge">History</div>
+    </div>
+
+    <div id="invoiceList" class="result">
+      No saved invoices.
+    </div>
+
+    <button class="dark" style="width:100%;margin-top:10px" onclick="clearInvoices()">
+      CLEAR ALL
+    </button>
+  </div>
+</section>
   
 <<!-- MAIN SCRIPT -->
 <script>
