@@ -1552,12 +1552,7 @@ function addClockToWork(){
   alert("Clock sent to Invoice Builder ✔️\nNow hit CALCULATE INVOICE");
 }
 
-  $("workText").value+=($("workText").value ? "\n\n" : "")+
-`LABOR / BILLING:
-${txt}`;
 
-  show("work");
-}
   function addManualTime(){
   const hrs = +$("manualHours")?.value || 0;
   const rate = +$("laborRate")?.value || +$("defaultRate")?.value || 135;
