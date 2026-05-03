@@ -325,70 +325,31 @@ button:active{
     </div>
   </div>
 
-  <div class="card">
-    <div class="cardTitle">
-      <h2>Vehicle Profile</h2>
-      <div class="badge">Shop Mode</div>
-    </div>
-
-    <label>Year</label>
-    <input id="yearGlobal" placeholder="2015">
-
-    <label>Make</label>
-    <select id="makeGlobal">
-      <option></option>
-      <option>Freightliner</option>
-      <option>Kenworth</option>
-      <option>Peterbilt</option>
-      <option>International</option>
-      <option>Volvo</option>
-      <option>Mack</option>
-      <option>Western Star</option>
-      <option>Ford</option>
-      <option>Chevy / GMC</option>
-      <option>Dodge / RAM</option>
-      <option>Other</option>
-    </select>
-
-    <label>Model</label>
-    <input id="modelGlobal" placeholder="Cascadia, T680, 389, ProStar">
-
-    <label>VIN / Unit Number</label>
-    <input id="vin" placeholder="VIN / Unit / Truck #">
-
-    <label>Engine</label>
-    <select id="engine">
-      <option></option>
-      <option>Detroit DD15</option>
-      <option>Detroit DD13</option>
-      <option>Detroit DD16</option>
-      <option>Cummins ISX</option>
-      <option>Cummins ISX15</option>
-      <option>Cummins X15</option>
-      <option>Cummins N14</option>
-      <option>PACCAR MX-13</option>
-      <option>PACCAR MX-11</option>
-      <option>CAT C15</option>
-      <option>CAT C13</option>
-      <option>MaxxForce 13</option>
-      <option>MaxxForce DT</option>
-      <option>Other</option>
-    </select>
-
-    <div class="row">
-      <button class="secondary" onclick="decodeVin()">Decode VIN / Unit</button>
-      <button class="primary" onclick="dropPin()">GPS Pin Drop</button>
-    </div>
-
-    <div id="vinDecodeOut" class="result">Vehicle data ready.</div>
+<div class="card">
+  <div class="cardTitle">
+    <h2>What can I help you with today?</h2>
+    <div class="badge">Diesel AI</div>
   </div>
 
+  <textarea id="homeAiAsk" placeholder="Example: Build invoice, find part number, diagnose no start, save customer profile, make work order..."></textarea>
+
+  <button class="success" style="width:100%" onclick="homeAI()">
+    ASK DIESEL AI
+  </button>
+
+  <div id="homeAiOut" class="result">Tell me what you need or choose a tool below.</div>
+</div>
   <div class="grid">
     <button class="toolBtn orange" onclick="show('parts')">
       <strong>Parts Lookup</strong>
       <span>OEM / aftermarket verification</span>
     </button>
 
+<button class="toolBtn blue" onclick="show('profile')">
+  <strong>Vehicle Profile</strong>
+  <span>Customer, truck, VIN, mileage</span>
+</button>
+    
     <button class="toolBtn blue" onclick="show('filters')">
       <strong>Filter & Fluid Lookup</strong>
       <span>Oil, fuel, coolant, air, hydraulic</span>
@@ -834,6 +795,76 @@ onclick="saveInvoice(); showInvoices(); show('invoices');">
     <div id="invoiceList" class="result">No saved invoices.</div>
   </div>
 </section>
+
+<section id="profile" class="section">
+  <button class="back dark" onclick="show('home')">← Back</button>
+
+  <div class="card">
+    <div class="cardTitle">
+      <h2>Customer / Vehicle Profile</h2>
+      <div class="badge">Profile</div>
+    </div>
+
+    <label>Customer Name</label>
+    <input id="profileCustomer" placeholder="Customer name">
+
+    <label>Customer Phone</label>
+    <input id="profilePhone" placeholder="260-000-0000">
+
+    <label>Year</label>
+    <input id="yearGlobal" placeholder="2015">
+
+    <label>Make</label>
+    <select id="makeGlobal">
+      <option></option>
+      <option>Freightliner</option>
+      <option>Kenworth</option>
+      <option>Peterbilt</option>
+      <option>International</option>
+      <option>Volvo</option>
+      <option>Mack</option>
+      <option>Western Star</option>
+      <option>Ford</option>
+      <option>Chevy / GMC</option>
+      <option>Dodge / RAM</option>
+      <option>Other</option>
+    </select>
+
+    <label>Model</label>
+    <input id="modelGlobal" placeholder="Cascadia, T680, 389, ProStar">
+
+    <label>VIN / Unit Number</label>
+    <input id="vin" placeholder="VIN / Unit / Truck #">
+
+    <label>Mileage</label>
+    <input id="mileageGlobal" placeholder="Mileage">
+
+    <label>Engine</label>
+    <select id="engine">
+      <option></option>
+      <option>Detroit DD15</option>
+      <option>Detroit DD13</option>
+      <option>Detroit DD16</option>
+      <option>Cummins ISX</option>
+      <option>Cummins ISX15</option>
+      <option>Cummins X15</option>
+      <option>Cummins N14</option>
+      <option>PACCAR MX-13</option>
+      <option>PACCAR MX-11</option>
+      <option>CAT C15</option>
+      <option>CAT C13</option>
+      <option>MaxxForce 13</option>
+      <option>MaxxForce DT</option>
+      <option>Other</option>
+    </select>
+
+    <button class="success" style="width:100%" onclick="saveCustomerProfile()">
+      SAVE CUSTOMER / VEHICLE PROFILE
+    </button>
+
+    <div id="vinDecodeOut" class="result">Profile ready.</div>
+  </div>
+</section>
   
 <<!-- MAIN SCRIPT -->
 <script>
@@ -894,6 +925,47 @@ async function callAI(question,mode="parts",notes=""){
   return data.answer || data.error || JSON.stringify(data) || "No answer returned.";
 }
 
+function homeAI(){
+  const q = $("homeAiAsk")?.value.toLowerCase() || "";
+
+  if(!q.trim()){
+    $("homeAiOut").textContent = "Tell me what you need: invoice, part lookup, diagnostic, work order, profile, or saved invoices.";
+    return;
+  }
+
+  if(q.includes("invoice") || q.includes("bill") || q.includes("cash out")){
+    show("quote");
+    return;
+  }
+
+  if(q.includes("part") || q.includes("filter")){
+    show(q.includes("filter") ? "filters" : "parts");
+    return;
+  }
+
+  if(q.includes("diagnose") || q.includes("code") || q.includes("no start")){
+    show("diag");
+    return;
+  }
+
+  if(q.includes("work order") || q.includes("job")){
+    show("work");
+    return;
+  }
+
+  if(q.includes("customer") || q.includes("vehicle") || q.includes("profile") || q.includes("vin")){
+    show("profile");
+    return;
+  }
+
+  if(q.includes("saved") || q.includes("history") || q.includes("paid")){
+    show("invoices");
+    showInvoices();
+    return;
+  }
+
+  $("homeAiOut").textContent = "I can help with invoices, diagnostics, parts, work orders, saved invoices, or customer profiles.";
+}  
 
 /* PARTS LOOKUP */
 async function askPart(){
@@ -1061,7 +1133,7 @@ function addFilterToWork(){
   show("work");
 }
 
-
+  
 /* DIESEL DIAG */
 async function runDiag(){
   const q=$("diagq")?.value.trim() || "";
