@@ -1087,6 +1087,14 @@ Notes:
 Parts not included unless listed.
 Final invoice may change after inspection.`;
 }
+
+function getNextInvoiceNumber(){
+  let n = Number(localStorage.getItem("rwd_invoice_no") || "1000");
+  n++;
+  localStorage.setItem("rwd_invoice_no", String(n));
+  return "RWD-" + n;
+}
+  
 function addManualTimeToInvoice(){
   const hrs = +$("manualHours")?.value || 0;
   const rate = +$("rate")?.value || +$("defaultRate")?.value || 135;
