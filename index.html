@@ -414,6 +414,11 @@ button:active{
       <span>Labor, call-out, parts, totals</span>
     </button>
 
+    <button class="toolBtn blue" onclick="show('invoices')">
+  <strong>Saved Invoices</strong>
+  <span>History, paid/unpaid, reopen</span>
+</button>
+
     <button class="toolBtn" onclick="show('work')">
       <strong>Work Order</strong>
       <span>Complaint, cause, correction</span>
@@ -798,6 +803,31 @@ onclick="addManualTimeToInvoice()">
     <div id="workOut" class="result">Work order ready.</div>
   </div>
 </section>
+
+<section id="invoices" class="section">
+  <button class="back dark" onclick="show('home')">← Back</button>
+
+  <div class="card">
+    <div class="cardTitle">
+      <h2>Saved Invoices</h2>
+      <div class="badge">History</div>
+    </div>
+
+    <button class="success" style="width:100%" onclick="saveInvoice()">
+      SAVE CURRENT INVOICE
+    </button>
+
+    <button class="secondary" style="width:100%;margin-top:10px" onclick="showInvoices()">
+      REFRESH INVOICE LIST
+    </button>
+
+    <button class="danger" style="width:100%;margin-top:10px" onclick="clearInvoices()">
+      CLEAR ALL SAVED INVOICES
+    </button>
+
+    <div id="invoiceList" class="result">No invoices loaded.</div>
+  </div>
+</section>  
   
 <<!-- MAIN SCRIPT -->
 <script>
@@ -1211,7 +1241,52 @@ function clearWorkOrder(){
 `Timer ready. Start a job to begin tracking.`;
   }
 }
+function saveInvoice(){
+  const txt = $("quoteOut")?.textContent || "";
 
+  if(!txt.includes("INVOICE")){
+    alert("Build an invoice first.");
+    return;
+  }
+
+  let invoices = JSON.parse(localStorage.getItem("rwd_invoices") || "[]");
+
+  invoices.unshift({
+    id: Date.now(),
+    date: new Date().toLocaleString(),
+    paid: false,
+    text: txt
+  });
+
+  localStorage.setItem("rwd_invoices", JSON.stringify(invoices));
+  alert("Invoice saved.");
+  showInvoices();
+  show("invoices");
+}
+
+function showInvoices(){
+  let invoices = JSON.parse(localStorage.getItem("rwd_invoices") || "[]");
+
+  if(!invoices.length){
+    $("invoiceList").textContent = "No saved invoices.";
+    return;
+  }
+
+  $("invoiceList").textContent = invoices.map((inv, i) =>
+`#${i + 1} — ${inv.paid ? "PAID" : "UNPAID"}
+Saved: ${inv.date}
+
+${inv.text}
+
+-------------------------`
+  ).join("\n\n");
+}
+
+function clearInvoices(){
+  if(!confirm("Clear all saved invoices?")) return;
+  localStorage.removeItem("rwd_invoices");
+  $("invoiceList").textContent = "Saved invoices cleared.";
+}
 /* SUPPLIERS */
 function supplier(site){
   const p=($("supplierPart")?.value || $("partq")?.value || "").trim();
