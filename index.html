@@ -934,7 +934,8 @@ async function callAI(question,mode="parts",notes=""){
 
 async function homeAI(){
   const q = $("homeAiAsk")?.value.trim() || "";
-
+<label>Upload Photo / Diagram / Part Number</label>
+<input id="homeAiImage" type="file" accept="image/*">
   if(!q){
     $("homeAiOut").textContent =
       "Ask me anything: build invoice, diagnose a truck, find parts, write work order notes, explain a code, or help cash out a job.";
