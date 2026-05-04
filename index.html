@@ -1404,11 +1404,29 @@ function markPaid(id){
   invoices = invoices.map(inv => {
     if(inv.id === id){
       const newPaid = !inv.paid;
+      const paidDate = newPaid ? new Date().toLocaleString() : "";
+
+      let updatedText = inv.text;
+
+      // REMOVE old paid stamp if it exists
+      updatedText = updatedText
+        .replace(/STATUS: PAID\n?/g, "")
+        .replace(/PAID ON: .*\n?/g, "");
+
+      // ADD new paid stamp if marking paid
+      if(newPaid){
+        updatedText =
+`STATUS: PAID
+PAID ON: ${paidDate}
+
+` + updatedText;
+      }
 
       return {
         ...inv,
         paid: newPaid,
-        paidDate: newPaid ? new Date().toLocaleString() : ""
+        paidDate,
+        text: updatedText
       };
     }
 
@@ -1418,7 +1436,6 @@ function markPaid(id){
   localStorage.setItem("rwd_invoices", JSON.stringify(invoices));
   showInvoices();
 }
-
 function sendInvoice(id){
   let invoices = JSON.parse(localStorage.getItem("rwd_invoices") || "[]");
   let inv = invoices.find(x => x.id === id);
