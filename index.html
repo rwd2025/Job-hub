@@ -1365,7 +1365,9 @@ function saveInvoice(){
     html += `
       <div style="margin-bottom:14px;padding:12px;border:1px solid ${inv.paid ? "#20b765" : "#e14b4b"};border-radius:14px;background:#111">
         <b>${inv.paid ? "PAID" : "UNPAID"} — Invoice ${i + 1}</b><br>
-        Saved: ${inv.date}<br><br>
+Saved: ${inv.date}<br>
+${inv.paid && inv.paidDate ? `Paid: ${inv.paidDate}<br>` : ""}
+<br>        
 
         <pre style="white-space:pre-wrap;color:#ffd6a0">${inv.text}</pre>
 
