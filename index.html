@@ -857,12 +857,19 @@ onclick="saveInvoice(); showInvoices(); show('invoices');">
       <option>MaxxForce DT</option>
       <option>Other</option>
     </select>
+<div class="row">
+  <button class="secondary" onclick="decodeVin()">Decode VIN / Unit</button>
+  <button class="primary" onclick="dropPin()">GPS Pin Drop</button>
+</div>
 
+<div id="vinDecodeOut" class="result">
+  Vehicle data ready.
+</div>
     <button class="success" style="width:100%" onclick="saveCustomerProfile()">
       SAVE CUSTOMER / VEHICLE PROFILE
     </button>
 
-    <div id="vinDecodeOut" class="result">Profile ready.</div>
+  
   </div>
 </section>
   
