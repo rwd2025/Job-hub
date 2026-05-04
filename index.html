@@ -1347,7 +1347,8 @@ function saveInvoice(){
   alert("Invoice saved.");
   showInvoices();
   show("
-function showInvoices(){
+
+    function showInvoices(){
   let invoices = JSON.parse(localStorage.getItem("rwd_invoices") || "[]");
 
   if(!invoices.length){
@@ -1355,26 +1356,32 @@ function showInvoices(){
     return;
   }
 
-  $("invoiceList").innerHTML = invoices.map((inv, i) => `
-<div style="margin-bottom:14px;padding:12px;border:1px solid ${inv.paid ? '#20b765' : '#e14b4b'};border-radius:14px;background:#111">
-  <b>${inv.paid ? "🟢 PAID" : "🔴 UNPAID"} — Invoice #${i + 1}</b><br>
-  Saved: ${inv.date}<br><br>
+  let html = "";
 
-  <pre style="white-space:pre-wrap;color:#ffd6a0">${inv.text}</pre>
+  invoices.forEach((inv, i) => {
+    html += `
+      <div style="margin-bottom:14px;padding:12px;border:1px solid ${inv.paid ? "#20b765" : "#e14b4b"};border-radius:14px;background:#111">
+        <b>${inv.paid ? "PAID" : "UNPAID"} — Invoice ${i + 1}</b><br>
+        Saved: ${inv.date}<br><br>
 
-  <button class="secondary" style="width:100%;margin-top:8px" onclick="openInvoice(${inv.id})">
-    OPEN INVOICE
-  </button>
+        <pre style="white-space:pre-wrap;color:#ffd6a0">${inv.text}</pre>
 
-  <button class="success" style="width:100%;margin-top:8px" onclick="markPaid(${inv.id})">
-    MARK PAID / UNPAID
-  </button>
+        <button class="secondary" style="width:100%;margin-top:8px" onclick="openInvoice(${inv.id})">
+          OPEN INVOICE
+        </button>
 
-  <button class="primary" style="width:100%;margin-top:8px" onclick="sendInvoice(${inv.id})">
-    SEND / COPY INVOICE
-  </button>
-</div>
-`).join("");
+        <button class="success" style="width:100%;margin-top:8px" onclick="markPaid(${inv.id})">
+          MARK PAID / UNPAID
+        </button>
+
+        <button class="primary" style="width:100%;margin-top:8px" onclick="sendInvoice(${inv.id})">
+          SEND / COPY INVOICE
+        </button>
+      </div>
+    `;
+  });
+
+  $("invoiceList").innerHTML = html;
 }
 
 function openInvoice(id){
@@ -1403,8 +1410,8 @@ function sendInvoice(id){
   if(!inv) return;
 
   navigator.clipboard.writeText(inv.text);
-  alert("Invoice copied. Paste into text, email, or Square.");
-}
+  alert("Invoice copied.");
+}   
   
 function clearInvoices(){
   if(!confirm("Clear all saved invoices?")) return;
