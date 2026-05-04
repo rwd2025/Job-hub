@@ -1678,10 +1678,6 @@ ${money(total)}`;
 
   localStorage.setItem("lastInvoice", lastClockBill);
 
-  $("workText").value+=($("workText").value ? "\n\n" : "")+
-`LABOR / BILLING:
-${lastClockBill}`;
-
   startTime=0;
 }
 function clearClock(){
