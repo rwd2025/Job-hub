@@ -1399,9 +1399,19 @@ function openInvoice(id){
 function markPaid(id){
   let invoices = JSON.parse(localStorage.getItem("rwd_invoices") || "[]");
 
-  invoices = invoices.map(inv =>
-    inv.id === id ? {...inv, paid: !inv.paid} : inv
-  );
+  invoices = invoices.map(inv => {
+    if(inv.id === id){
+      const newPaid = !inv.paid;
+
+      return {
+        ...inv,
+        paid: newPaid,
+        paidDate: newPaid ? new Date().toLocaleString() : ""
+      };
+    }
+
+    return inv;
+  });
 
   localStorage.setItem("rwd_invoices", JSON.stringify(invoices));
   showInvoices();
