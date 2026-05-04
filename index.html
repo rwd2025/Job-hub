@@ -932,48 +932,45 @@ async function callAI(question,mode="parts",notes=""){
   return data.answer || data.error || JSON.stringify(data) || "No answer returned.";
 }
 
-function homeAI(){
-  const q = $("homeAiAsk")?.value.toLowerCase() || "";
+async function homeAI(){
+  const q = $("homeAiAsk")?.value.trim() || "";
 
-  if(!q.trim()){
-    $("homeAiOut").textContent = "Tell me what you need: invoice, part lookup, diagnostic, work order, profile, or saved invoices.";
+  if(!q){
+    $("homeAiOut").textContent =
+      "Ask me anything: build invoice, diagnose a truck, find parts, write work order notes, explain a code, or help cash out a job.";
     return;
   }
 
-  if(q.includes("invoice") || q.includes("bill") || q.includes("cash out")){
-    show("quote");
-    return;
+  $("homeAiOut").textContent = "Diesel AI thinking...";
+
+  const prompt =
+`You are Diesel Doc AI for Rolling Wrench Diesel.
+
+Act like a professional mobile diesel mechanic assistant.
+
+Vehicle/Profile:
+${ctx()}
+
+User request:
+${q}
+
+Answer like ChatGPT but for a diesel repair shop.
+
+Rules:
+- Be practical and field-ready.
+- If diagnostic, give likely causes, tests, what NOT to replace first, and next steps.
+- If invoice/quote, suggest labor, parts, service call, and notes.
+- If parts, ask for VIN/ESN/CPL if needed and do not guess exact OEM parts.
+- If work order, write customer-ready complaint/cause/correction notes.
+- Keep it clear and useful.`;
+
+  try{
+    const ans = await callAI(prompt, "diesel_ai", q);
+    $("homeAiOut").textContent = ans;
+  }catch(e){
+    $("homeAiOut").textContent = "Diesel AI error: " + e.message;
   }
-
-  if(q.includes("part") || q.includes("filter")){
-    show(q.includes("filter") ? "filters" : "parts");
-    return;
-  }
-
-  if(q.includes("diagnose") || q.includes("code") || q.includes("no start")){
-    show("diag");
-    return;
-  }
-
-  if(q.includes("work order") || q.includes("job")){
-    show("work");
-    return;
-  }
-
-  if(q.includes("customer") || q.includes("vehicle") || q.includes("profile") || q.includes("vin")){
-    show("profile");
-    return;
-  }
-
-  if(q.includes("saved") || q.includes("history") || q.includes("paid")){
-    show("invoices");
-    showInvoices();
-    return;
-  }
-
-  $("homeAiOut").textContent = "I can help with invoices, diagnostics, parts, work orders, saved invoices, or customer profiles.";
-}  
-
+}
 /* PARTS LOOKUP */
 async function askPart(){
   const q=$("partq")?.value.trim() || "";
