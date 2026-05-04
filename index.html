@@ -1443,7 +1443,53 @@ function supplier(site){
   window.open(urls[site],"_blank");
 }
 
+function saveCustomerProfile(){
+  const profile = {
+    id: Date.now(),
+    date: new Date().toLocaleString(),
+    customer: $("profileCustomer")?.value || "",
+    phone: $("profilePhone")?.value || "",
+    year: $("yearGlobal")?.value || "",
+    make: $("makeGlobal")?.value || "",
+    model: $("modelGlobal")?.value || "",
+    vin: $("vin")?.value || "",
+    mileage: $("mileageGlobal")?.value || "",
+    engine: $("engine")?.value || ""
+  };
 
+  if(!profile.customer && !profile.vin){
+    alert("Enter customer name or VIN/unit first.");
+    return;
+  }
+
+  let profiles = JSON.parse(localStorage.getItem("rwd_customer_profiles") || "[]");
+
+  profiles = profiles.filter(p =>
+    p.customer !== profile.customer || p.vin !== profile.vin
+  );
+
+  profiles.unshift(profile);
+
+  localStorage.setItem("rwd_customer_profiles", JSON.stringify(profiles));
+
+  if($("customer")) $("customer").value = profile.customer;
+  if($("jobName")) $("jobName").value = `${profile.year} ${profile.make} ${profile.model}`.trim();
+  if($("clockJobName")) $("clockJobName").value = `${profile.year} ${profile.make} ${profile.model}`.trim();
+
+  $("vinDecodeOut").textContent =
+`CUSTOMER / VEHICLE PROFILE SAVED
+
+Customer: ${profile.customer}
+Phone: ${profile.phone}
+
+Vehicle:
+${profile.year} ${profile.make} ${profile.model}
+VIN/Unit: ${profile.vin}
+Mileage: ${profile.mileage}
+Engine: ${profile.engine}
+
+Auto-filled Work Order, Invoice, and Clock.`;
+}
 /* VIN / UNIT */
 function decodeVin(){
   const vin=$("vin")?.value.trim() || "";
