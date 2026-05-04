@@ -1412,9 +1412,15 @@ function sendInvoice(id){
   let inv = invoices.find(x => x.id === id);
   if(!inv) return;
 
-  navigator.clipboard.writeText(inv.text);
-  alert("Invoice copied.");
-}   
+  const phone = $("profilePhone")?.value || "";
+  const msg = encodeURIComponent(inv.text);
+
+  if(phone.trim()){
+    window.location.href = `sms:${phone}&body=${msg}`;
+  }else{
+    window.location.href = `sms:&body=${msg}`;
+  }
+}
   
 function clearInvoices(){
   if(!confirm("Clear all saved invoices?")) return;
