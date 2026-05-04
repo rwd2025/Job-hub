@@ -1346,9 +1346,7 @@ function saveInvoice(){
   localStorage.setItem("rwd_invoices", JSON.stringify(invoices));
   alert("Invoice saved.");
   showInvoices();
-  show("invoices");
-}
-
+  show("
 function showInvoices(){
   let invoices = JSON.parse(localStorage.getItem("rwd_invoices") || "[]");
 
@@ -1357,14 +1355,26 @@ function showInvoices(){
     return;
   }
 
-  $("invoiceList").textContent = invoices.map((inv, i) =>
-`#${i + 1} — ${inv.paid ? "PAID" : "UNPAID"}
-Saved: ${inv.date}
+  $("invoiceList").innerHTML = invoices.map((inv, i) => `
+<div style="margin-bottom:14px;padding:12px;border:1px solid ${inv.paid ? '#20b765' : '#e14b4b'};border-radius:14px;background:#111">
+  <b>${inv.paid ? "🟢 PAID" : "🔴 UNPAID"} — Invoice #${i + 1}</b><br>
+  Saved: ${inv.date}<br><br>
 
-${inv.text}
+  <pre style="white-space:pre-wrap;color:#ffd6a0">${inv.text}</pre>
 
--------------------------`
-  ).join("\n\n");
+  <button class="secondary" style="width:100%;margin-top:8px" onclick="openInvoice(${inv.id})">
+    OPEN INVOICE
+  </button>
+
+  <button class="success" style="width:100%;margin-top:8px" onclick="markPaid(${inv.id})">
+    MARK PAID / UNPAID
+  </button>
+
+  <button class="primary" style="width:100%;margin-top:8px" onclick="sendInvoice(${inv.id})">
+    SEND / COPY INVOICE
+  </button>
+</div>
+`).join("");
 }
 
 function clearInvoices(){
