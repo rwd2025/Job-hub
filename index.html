@@ -1377,6 +1377,35 @@ function showInvoices(){
 `).join("");
 }
 
+function openInvoice(id){
+  let invoices = JSON.parse(localStorage.getItem("rwd_invoices") || "[]");
+  let inv = invoices.find(x => x.id === id);
+  if(!inv) return;
+
+  $("quoteOut").textContent = inv.text;
+  show("quote");
+}
+
+function markPaid(id){
+  let invoices = JSON.parse(localStorage.getItem("rwd_invoices") || "[]");
+
+  invoices = invoices.map(inv =>
+    inv.id === id ? {...inv, paid: !inv.paid} : inv
+  );
+
+  localStorage.setItem("rwd_invoices", JSON.stringify(invoices));
+  showInvoices();
+}
+
+function sendInvoice(id){
+  let invoices = JSON.parse(localStorage.getItem("rwd_invoices") || "[]");
+  let inv = invoices.find(x => x.id === id);
+  if(!inv) return;
+
+  navigator.clipboard.writeText(inv.text);
+  alert("Invoice copied. Paste into text, email, or Square.");
+}
+  
 function clearInvoices(){
   if(!confirm("Clear all saved invoices?")) return;
   localStorage.removeItem("rwd_invoices");
