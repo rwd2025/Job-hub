@@ -946,16 +946,26 @@ function imageToBase64(file){
     reader.readAsDataURL(file);
   });
 }
+
 async function homeAI(){
   const q = $("homeAiAsk")?.value.trim() || "";
+  const file = $("homeAiImage")?.files?.[0];
 
-  if(!q){
+  if(!q && !file){
     $("homeAiOut").textContent =
-      "Ask me anything: build invoice, diagnose a truck, find parts, write work order notes, explain a code, or help cash out a job.";
+      "Ask me anything or upload a photo/diagram: diagnose a truck, find parts, read a part number, explain a code, or help build an invoice.";
     return;
   }
 
-  $("homeAiOut").textContent = "Diesel AI thinking...";
+  $("homeAiOut").textContent = file
+    ? "Diesel AI reading image..."
+    : "Diesel AI thinking...";
+
+  let imageData = "";
+
+  if(file){
+    imageData = await imageToBase64(file);
+  }
 
   const prompt =
 `You are Diesel Doc AI for Rolling Wrench Diesel.
@@ -966,25 +976,34 @@ Vehicle/Profile:
 ${ctx()}
 
 User request:
-${q}
+${q || "Analyze the uploaded image."}
 
-Answer like ChatGPT but for a diesel repair shop.
+If an image was uploaded:
+- Identify visible part numbers, labels, components, wiring, damage, leaks, or codes.
+- Explain what it may be.
+- Give field-ready next steps.
+- If it looks like a diagram/schematic, explain it clearly.
+- Do NOT fake exact OEM wiring diagrams. Say what must be verified.
 
 Rules:
 - Be practical and field-ready.
 - If diagnostic, give likely causes, tests, what NOT to replace first, and next steps.
 - If invoice/quote, suggest labor, parts, service call, and notes.
 - If parts, ask for VIN/ESN/CPL if needed and do not guess exact OEM parts.
-- If work order, write customer-ready complaint/cause/correction notes.
-- Keep it clear and useful.`;
+- If work order, write customer-ready complaint/cause/correction notes.`;
 
   try{
-    const ans = await callAI(prompt, "diesel_ai", q);
+    const ans = await callAI(prompt, "diesel_ai", {
+      question: q,
+      image: imageData
+    });
+
     $("homeAiOut").textContent = ans;
   }catch(e){
     $("homeAiOut").textContent = "Diesel AI error: " + e.message;
   }
 }
+  
 /* PARTS LOOKUP */
 async function askPart(){
   const q=$("partq")?.value.trim() || "";
