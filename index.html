@@ -1597,6 +1597,11 @@ function clearClock(){
 
   localStorage.removeItem("lastInvoice");
 
+// 🔥 AUTO-FILL INVOICE BUILDER
+if($("hours")) $("hours").value = hours.toFixed(2);
+if($("callOut")) $("callOut").value = includeService ? call : 0;
+if($("jobName")) $("jobName").value = job;
+  
   $("clockOutBox").textContent =
 `Timer ready. Start a job to begin tracking.`;
 }
