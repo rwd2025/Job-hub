@@ -1326,6 +1326,7 @@ function clearWorkOrder(){
 `Timer ready. Start a job to begin tracking.`;
   }
 }
+
 function saveInvoice(){
   const txt = $("quoteOut")?.textContent || "";
 
@@ -1343,6 +1344,11 @@ function saveInvoice(){
     text: txt
   });
 
+  localStorage.setItem("rwd_invoices", JSON.stringify(invoices));
+  alert("Invoice saved.");
+  showInvoices();
+  show("invoices");
+}
   localStorage.setItem("rwd_invoices", JSON.stringify(invoices));
   alert("Invoice saved.");
   showInvoices();
