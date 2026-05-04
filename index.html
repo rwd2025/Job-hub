@@ -1349,10 +1349,7 @@ function saveInvoice(){
   showInvoices();
   show("invoices");
 }
-  localStorage.setItem("rwd_invoices", JSON.stringify(invoices));
-  alert("Invoice saved.");
-  showInvoices();
-  show("
+  
 
     function showInvoices(){
   let invoices = JSON.parse(localStorage.getItem("rwd_invoices") || "[]");
