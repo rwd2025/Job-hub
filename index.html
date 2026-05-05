@@ -968,6 +968,7 @@ async function homeAI(){
 
   if(file){
     imageData = await imageToBase64(file);
+imageData = imageData.split(",")[1];
   }
 
   const prompt =
