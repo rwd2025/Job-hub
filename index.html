@@ -1301,19 +1301,25 @@ Now hit Calculate Quote to finalize total.`;
 }
 
 /* WORK ORDER */
-function addPartToWork(){
-  $("workText").value+=($("workText").value?"\n\n":"")+`PART LOOKUP:\n${$("partOut").textContent}`;
-  show("work");
+function addToParts(){
+  const text = $("homeAiOut")?.innerText || "";
+  if($("partq")) $("partq").value = text;
+  show("parts");
+  alert("Added to Parts Lookup");
 }
 
-function addDiagToWork(){
-  $("workText").value+=($("workText").value?"\n\n":"")+`DIAGNOSTIC:\n${$("diagOut").textContent}`;
+function addToWorkOrder(){
+  const text = $("homeAiOut")?.innerText || "";
+  if($("workText")) $("workText").value += ($("workText").value ? "\n\n" : "") + "AI NOTES:\n" + text;
   show("work");
+  alert("Added to Work Order");
 }
 
-function addQuoteToWork(){
-  $("workText").value+=($("workText").value?"\n\n":"")+`QUOTE:\n${$("quoteOut").textContent}`;
-  show("work");
+function addToInvoice(){
+  const text = $("homeAiOut")?.innerText || "";
+  if($("quoteOut")) $("quoteOut").textContent = "INVOICE NOTES:\n\n" + text;
+  show("quote");
+  alert("Added to Invoice");
 }
 function copyWO(){
   const txt=
@@ -1928,7 +1934,7 @@ function copyText(id){
   alert("Copied");
 }
 
-  if($("homeAiImage")){
+ if($("homeAiImage")){
   $("homeAiImage").addEventListener("change", function(){
     const file = this.files?.[0];
     if(!file) return;
@@ -1939,7 +1945,6 @@ function copyText(id){
     preview.src = URL.createObjectURL(file);
     preview.style.display = "block";
   });
-}); // closes event listener
 }
 
 // SAFE CALL (won’t crash if missing)
