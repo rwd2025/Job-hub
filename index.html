@@ -916,15 +916,17 @@ async function callAI(question,mode="parts",notes=""){
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
-      part: question,
-      note: notes,
-      year: $("yearGlobal")?.value || $("partYear")?.value || "",
-      make: $("makeGlobal")?.value || $("partMake")?.value || "",
-      model: $("modelGlobal")?.value || $("partModel")?.value || "",
-      engine: $("engine")?.value || "",
-      mode,
-      vehicleContext: ctx()
-    })
+  part: question,
+  note: notes,
+  image: typeof notes === "object" ? notes.image : "",
+  question: typeof notes === "object" ? notes.question : question,
+  year: $("yearGlobal")?.value || $("partYear")?.value || "",
+  make: $("makeGlobal")?.value || $("partMake")?.value || "",
+  model: $("modelGlobal")?.value || $("partModel")?.value || "",
+  engine: $("engine")?.value || "",
+  mode,
+  vehicleContext: ctx()
+})
   });
 
   const data=await res.json();
