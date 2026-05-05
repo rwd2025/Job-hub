@@ -992,17 +992,18 @@ Rules:
 - If invoice/quote, suggest labor, parts, service call, and notes.
 - If parts, ask for VIN/ESN/CPL if needed and do not guess exact OEM parts.
 - If work order, write customer-ready complaint/cause/correction notes.`;
+try{
+  const ans = await callAI(prompt, "diesel_ai", {
+    question: q,
+    image: imageData
+  });
 
-  try{
-    const ans = await callAI(prompt, "diesel_ai", {
-      question: q,
-      image: imageData
-    });
+  $("homeAiOut").textContent = ans;
 
-    $("homeAiOut").textContent = ans;
-  }catch(e){
-    $("homeAiOut").textContent = "Diesel AI error: " + e.message;
-  }
+}catch(e){
+  $("homeAiOut").textContent = "Diesel AI error: " + e.message;
+}
+  
 }
   
 /* PARTS LOOKUP */
