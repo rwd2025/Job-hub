@@ -924,11 +924,15 @@ async function callAI(question,mode="parts",notes=""){
   const res=await fetch(API_URL,{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
+    body: JSON.stringify({
   part: question,
   note: notes,
   image: typeof notes === "object" ? notes.image : "",
   question: typeof notes === "object" ? notes.question : question,
+
+  // 🔥 ADD THIS LINE (VIN FIX)
+  vin: $("vin")?.value || "",
+
   year: $("yearGlobal")?.value || $("partYear")?.value || "",
   make: $("makeGlobal")?.value || $("partMake")?.value || "",
   model: $("modelGlobal")?.value || $("partModel")?.value || "",
