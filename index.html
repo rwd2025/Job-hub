@@ -2184,54 +2184,22 @@ function copyText(id){
   });
 }
 
-function setTheme(theme){
-
-  document.body.className = "theme-" + theme;
-
-  localStorage.setItem("theme", theme);
-}
-
 window.addEventListener("load", ()=>{
 
   const savedTheme =
     localStorage.getItem("theme") || "black";
 
   setTheme(savedTheme);
+
+  const select = $("themeSelect");
+  if(select) select.value = savedTheme;
 });
   
 // SAFE CALL (won’t crash if missing)
 if (typeof loadSettings === "function") {
   loadSettings();
 }
-  function addToParts(){
-
-  const text = document.getElementById("homeAiOut").innerText;
-
-  document.getElementById("partq").value = text;
-
-  alert("Added to Parts Lookup");
-
-}
-
-function addToWorkOrder(){
-
-  const text = document.getElementById("homeAiOut").innerText;
-
-  document.getElementById("workOrderNotes").value = text;
-
-  alert("Added to Work Order");
-
-}
-
-function addToInvoice(){
-
-  const text = document.getElementById("homeAiOut").innerText;
-
-  document.getElementById("invoiceNotes").value = text;
-
-  alert("Added to Invoice Notes");
-
-}
+  
 </script>
 </body>
 </html>
