@@ -765,8 +765,13 @@ onclick="saveInvoice(); showInvoices(); show('invoices');">
 </section>
 
 <section id="settings" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
+
+  <button class="back dark" onclick="show('home')">
+    ← Back
+  </button>
+
   <div class="card">
+
     <div class="cardTitle">
       <h2>Settings / App Test</h2>
       <div class="badge">System</div>
@@ -781,32 +786,61 @@ onclick="saveInvoice(); showInvoices(); show('invoices');">
     <label>Shop Name</label>
     <input id="shopName" value="Rolling Wrench Diesel">
 
-<label>Square Payment Link</label>
-<input id="squareLink" placeholder="Paste your Square checkout link">
-    
-    <div class="row">
-      <button class="success" onclick="saveSettings()">Save Settings</button>
-      <button class="secondary" onclick="testApp()">Test App</button>
+    <label>Square Payment Link</label>
+    <input id="squareLink" placeholder="Paste your Square checkout link">
+
+    <label>APP THEME</label>
+
+    <select id="themeSelect" onchange="setTheme(this.value)">
+      <option value="green">Dark Green</option>
+      <option value="blue">Navy Blue</option>
+      <option value="orange">Industrial Orange</option>
+      <option value="gray">Steel Gray</option>
+      <option value="black" selected>Minimal Black</option>
+      <option value="light">Light Mode</option>
+    </select>
+
+    <div class="notice">
+      Theme changes apply instantly and save automatically.
     </div>
 
-    <div id="settingsOut" class="result">Settings ready.</div>
+    <div class="row">
+
+      <button class="success" onclick="saveSettings()">
+        Save Settings
+      </button>
+
+      <button class="secondary" onclick="testApp()">
+        Test App
+      </button>
+
+    </div>
+
+    <button
+      class="dark"
+      style="width:100%;margin-top:10px"
+      onclick="localStorage.clear();location.reload();">
+
+      RESET APP CACHE
+
+    </button>
+
+    <div id="settingsOut" class="result">
+      Settings ready.
+    </div>
+
   </div>
+
 </section>
 
-<label>APP THEME</label>
+<section id="work" class="section">
 
-<select id="themeSelect" onchange="setTheme(this.value)">
-  <option value="green">Dark Green</option>
-  <option value="blue">Navy Blue</option>
-  <option value="orange">Industrial Orange</option>
-  <option value="gray">Steel Gray</option>
-  <option value="black">Minimal Black</option>
-  <option value="light">Light Mode</option>
-</select>
-  
-  <section id="work" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
+  <button class="back dark" onclick="show('home')">
+    ← Back
+  </button>
+
   <div class="card">
+
     <div class="cardTitle">
       <h2>Work Order</h2>
       <div class="badge">Customer Record</div>
@@ -816,56 +850,108 @@ onclick="saveInvoice(); showInvoices(); show('invoices');">
     <input id="customer" placeholder="Customer name">
 
     <label>Complaint</label>
-<textarea id="complaint" placeholder="Customer complaint / reason for call"></textarea>
 
-<label>Parts / Materials Used</label>
-<textarea id="partsUsed" placeholder="Part numbers, filters, oil, supplies, prices"></textarea>
+    <textarea
+      id="complaint"
+      placeholder="Customer complaint / reason for call"></textarea>
 
-<label>Diagnosis / Parts / Work Performed</label>
-<textarea id="workText" placeholder="Add parts, diagnostics, quotes, and work performed here"></textarea>
- 
+    <label>Parts / Materials Used</label>
+
+    <textarea
+      id="partsUsed"
+      placeholder="Part numbers, filters, oil, supplies, prices"></textarea>
+
+    <label>Diagnosis / Parts / Work Performed</label>
+
+    <textarea
+      id="workText"
+      placeholder="Add parts, diagnostics, quotes, and work performed here"></textarea>
+
     <div class="row">
-      <button class="success" onclick="copyWO()">Copy Work Order</button>
-      <button class="secondary" onclick="saveJob()">Save Job</button>
+
+      <button class="success" onclick="copyWO()">
+        Copy Work Order
+      </button>
+
+      <button class="secondary" onclick="saveJob()">
+        Save Job
+      </button>
+
     </div>
-<button class="dark" style="width:100%;margin-top:10px" onclick="clearWorkOrder()">
-  CLEAR WORK ORDER
-</button>
-    <div id="workOut" class="result">Work order ready.</div>
+
+    <button
+      class="dark"
+      style="width:100%;margin-top:10px"
+      onclick="clearWorkOrder()">
+
+      CLEAR WORK ORDER
+
+    </button>
+
+    <div id="workOut" class="result">
+      Work order ready.
+    </div>
+
   </div>
+
 </section>
 
-
-
 <section id="invoices" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
+
+  <button class="back dark" onclick="show('home')">
+    ← Back
+  </button>
 
   <div class="card">
+
     <div class="cardTitle">
       <h2>Saved Invoices</h2>
       <div class="badge">History</div>
     </div>
 
-    <button class="success" style="width:100%" onclick="saveInvoice()">
+    <button
+      class="success"
+      style="width:100%"
+      onclick="saveInvoice()">
+
       SAVE CURRENT INVOICE
+
     </button>
 
-    <button class="secondary" style="width:100%;margin-top:10px" onclick="showInvoices()">
+    <button
+      class="secondary"
+      style="width:100%;margin-top:10px"
+      onclick="showInvoices()">
+
       REFRESH INVOICE LIST
+
     </button>
 
-    <button class="danger" style="width:100%;margin-top:10px" onclick="clearInvoices()">
+    <button
+      class="danger"
+      style="width:100%;margin-top:10px"
+      onclick="clearInvoices()">
+
       CLEAR ALL SAVED INVOICES
+
     </button>
 
-    <div id="invoiceList" class="result">No saved invoices.</div>
+    <div id="invoiceList" class="result">
+      No saved invoices.
+    </div>
+
   </div>
+
 </section>
 
 <section id="profile" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
+
+  <button class="back dark" onclick="show('home')">
+    ← Back
+  </button>
 
   <div class="card">
+
     <div class="cardTitle">
       <h2>Customer / Vehicle Profile</h2>
       <div class="badge">Profile</div>
@@ -881,6 +967,7 @@ onclick="saveInvoice(); showInvoices(); show('invoices');">
     <input id="yearGlobal" placeholder="2015">
 
     <label>Make</label>
+
     <select id="makeGlobal">
       <option></option>
       <option>Freightliner</option>
@@ -906,37 +993,60 @@ onclick="saveInvoice(); showInvoices(); show('invoices');">
     <input id="mileageGlobal" placeholder="Mileage">
 
     <label>Engine</label>
+
     <select id="engine">
+
       <option></option>
+
       <option>Detroit DD15</option>
       <option>Detroit DD13</option>
       <option>Detroit DD16</option>
+
       <option>Cummins ISX</option>
       <option>Cummins ISX15</option>
       <option>Cummins X15</option>
       <option>Cummins N14</option>
+
       <option>PACCAR MX-13</option>
       <option>PACCAR MX-11</option>
+
       <option>CAT C15</option>
       <option>CAT C13</option>
+
       <option>MaxxForce 13</option>
       <option>MaxxForce DT</option>
-      <option>Other</option>
-    </select>
-<div class="row">
-  <button class="secondary" onclick="decodeVin()">Decode VIN / Unit</button>
-  <button class="primary" onclick="dropPin()">GPS Pin Drop</button>
-</div>
 
-<div id="vinDecodeOut" class="result">
-  Vehicle data ready.
-</div>
-    <button class="success" style="width:100%" onclick="saveCustomerProfile()">
+      <option>Other</option>
+
+    </select>
+
+    <div class="row">
+
+      <button class="secondary" onclick="decodeVin()">
+        Decode VIN / Unit
+      </button>
+
+      <button class="primary" onclick="dropPin()">
+        GPS Pin Drop
+      </button>
+
+    </div>
+
+    <div id="vinDecodeOut" class="result">
+      Vehicle data ready.
+    </div>
+
+    <button
+      class="success"
+      style="width:100%"
+      onclick="saveCustomerProfile()">
+
       SAVE CUSTOMER / VEHICLE PROFILE
+
     </button>
 
-  
   </div>
+
 </section>
   
 <!-- MAIN SCRIPT -->
