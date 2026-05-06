@@ -228,6 +228,24 @@ button:active{
   gap:10px;
 }
 
+.ai-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:12px 0;
+}
+
+.ai-actions button{
+  width:100%;
+  background:var(--card);
+  color:var(--text);
+  border:1px solid var(--line);
+}
+
+.ai-actions button:nth-child(3){
+  grid-column:1 / -1;
+}
+  
 .toolBtn{
   min-height:98px;
   background:linear-gradient(180deg,#171717,#0b0b0b);
