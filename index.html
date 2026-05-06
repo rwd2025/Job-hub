@@ -1580,25 +1580,77 @@ Engine: ${profile.engine}
 Auto-filled Work Order, Invoice, and Clock.`;
 }
 /* VIN / UNIT */
-function decodeVin(){
-  const vin=$("vin")?.value.trim() || "";
+async function decodeVin(){
+
+  const vin = $("vin")?.value.trim() || "";
 
   if(!vin){
-    $("vinDecodeOut").textContent="Enter VIN or unit number first.";
+    $("vinDecodeOut").textContent =
+    "Enter VIN or Unit Number first.";
     return;
   }
 
-  $("vinDecodeOut").textContent=
-`VIN / Unit entered:
-${vin}
+  $("vinDecodeOut").textContent =
+  "Decoding VIN...";
 
-Decode status:
-Ready for VIN API integration.
+  try{
 
-Shop reminder:
-Use VIN / ESN / CPL / axle tag for exact OEM parts.`;
+    const res = await fetch(API_URL,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        mode:"vin_decode",
+        vin:vin,
+        question:`Decode VIN ${vin}`,
+        vehicleContext:ctx()
+      })
+    });
+
+    const data = await res.json();
+
+    $("vinDecodeOut").textContent =
+`VIN DECODE RESULT
+
+${data.answer || data.vinResults || "No VIN data returned."}`;
+
+    if(data.answer){
+
+      const txt = data.answer;
+
+      const year =
+      txt.match(/Year:\s*(.*)/i)?.[1]?.trim() || "";
+
+      const make =
+      txt.match(/Make:\s*(.*)/i)?.[1]?.trim() || "";
+
+      const model =
+      txt.match(/Model:\s*(.*)/i)?.[1]?.trim() || "";
+
+      const engine =
+      txt.match(/Engine:\s*(.*)/i)?.[1]?.trim() || "";
+
+      if(year && $("yearGlobal"))
+        $("yearGlobal").value = year;
+
+      if(make && $("makeGlobal"))
+        $("makeGlobal").value = make;
+
+      if(model && $("modelGlobal"))
+        $("modelGlobal").value = model;
+
+      if(engine && $("engineGlobal"))
+        $("engineGlobal").value = engine;
+    }
+
+  }catch(e){
+
+    $("vinDecodeOut").textContent =
+    "VIN DECODE ERROR: " + e.message;
+
+  }
 }
-
 
 /* GPS PIN DROP */
 let currentLat=null;
