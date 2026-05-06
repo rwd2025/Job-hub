@@ -23,6 +23,48 @@
   --result:#0b1820;
 }
 
+.theme-green{
+  --bg:#050505;
+  --card:#101010;
+  --accent:#35d46a;
+  --text:#ffffff;
+}
+
+.theme-blue{
+  --bg:#06111f;
+  --card:#0d1b2d;
+  --accent:#1d6fff;
+  --text:#ffffff;
+}
+
+.theme-orange{
+  --bg:#0b0b0b;
+  --card:#171717;
+  --accent:#ff7b00;
+  --text:#ffffff;
+}
+
+.theme-gray{
+  --bg:#111111;
+  --card:#1c1c1c;
+  --accent:#95a5b3;
+  --text:#ffffff;
+}
+
+.theme-black{
+  --bg:#000000;
+  --card:#0d0d0d;
+  --accent:#42ff7b;
+  --text:#ffffff;
+}
+
+.theme-light{
+  --bg:#f4f4f4;
+  --card:#ffffff;
+  --accent:#35d46a;
+  --text:#111111;
+}
+  
 *{
   box-sizing:border-box;
 }
@@ -751,6 +793,17 @@ onclick="saveInvoice(); showInvoices(); show('invoices');">
   </div>
 </section>
 
+<label>APP THEME</label>
+
+<select id="themeSelect" onchange="setTheme(this.value)">
+  <option value="green">Dark Green</option>
+  <option value="blue">Navy Blue</option>
+  <option value="orange">Industrial Orange</option>
+  <option value="gray">Steel Gray</option>
+  <option value="black">Minimal Black</option>
+  <option value="light">Light Mode</option>
+</select>
+  
   <section id="work" class="section">
   <button class="back dark" onclick="show('home')">← Back</button>
   <div class="card">
@@ -2003,6 +2056,21 @@ function copyText(id){
   });
 }
 
+function setTheme(theme){
+
+  document.body.className = "theme-" + theme;
+
+  localStorage.setItem("theme", theme);
+}
+
+window.addEventListener("load", ()=>{
+
+  const savedTheme =
+    localStorage.getItem("theme") || "black";
+
+  setTheme(savedTheme);
+});
+  
 // SAFE CALL (won’t crash if missing)
 if (typeof loadSettings === "function") {
   loadSettings();
