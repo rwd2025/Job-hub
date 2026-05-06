@@ -370,6 +370,63 @@ button:active{
   color:var(--muted);
   line-height:1.35;
 }
+
+  body{
+  background:var(--bg);
+}
+
+.header,
+.card{
+  background:var(--card);
+}
+
+.toolBtn{
+  min-height:120px;
+  align-items:center;
+  text-align:center;
+  background:var(--card);
+  border:1px solid var(--line);
+}
+
+.toolBtn strong{
+  font-size:16px;
+}
+
+.toolBtn span{
+  text-align:center;
+}
+
+.success,
+.primary,
+.secondary{
+  background:var(--accent);
+  color:#061408;
+}
+
+.ai-actions button{
+  background:#102033;
+  color:#fff;
+  border:1px solid #28496b;
+}
+
+.badge{
+  background:var(--accent);
+  color:#061408;
+  border:0;
+}
+
+input,
+select,
+textarea{
+  background:#070707;
+  color:var(--text);
+  border:1px solid var(--line);
+}
+
+.result{
+  background:#071720;
+  border:1px solid #315b78;
+}
 </style>
 </head>
 
@@ -806,22 +863,42 @@ onclick="saveInvoice(); showInvoices(); show('invoices');">
 
     <label>Square Payment Link</label>
     <input id="squareLink" placeholder="Paste your Square checkout link">
+<label>APP THEME</label>
 
-    <label>APP THEME</label>
+<div class="themeGrid">
 
-    <select id="themeSelect" onchange="setTheme(this.value)">
-      <option value="green">Dark Green</option>
-      <option value="blue">Navy Blue</option>
-      <option value="orange">Industrial Orange</option>
-      <option value="gray">Steel Gray</option>
-      <option value="black" selected>Minimal Black</option>
-      <option value="light">Light Mode</option>
-    </select>
+  <button class="themeBtn"
+    onclick="setTheme('black')">
+    Minimal Black
+  </button>
 
-    <div class="notice">
-      Theme changes apply instantly and save automatically.
-    </div>
+  <button class="themeBtn"
+    onclick="setTheme('blue')">
+    Navy Blue
+  </button>
 
+  <button class="themeBtn"
+    onclick="setTheme('orange')">
+    Industrial Orange
+  </button>
+
+  <button class="themeBtn"
+    onclick="setTheme('gray')">
+    Steel Gray
+  </button>
+
+  <button class="themeBtn"
+    onclick="setTheme('green')">
+    Dark Green
+  </button>
+
+  <button class="themeBtn"
+    onclick="setTheme('light')">
+    Light Mode
+  </button>
+
+</div>
+   
     <div class="row">
 
       <button class="success" onclick="saveSettings()">
