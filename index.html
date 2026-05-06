@@ -1146,6 +1146,14 @@ onclick="saveInvoice(); showInvoices(); show('invoices');">
   
 <!-- MAIN SCRIPT -->
 <script>
+  const SUPABASE_URL = "https://uxpkqwcmvtqvubibbrek.supabase.co";
+
+const SUPABASE_KEY = "PASTE_ANON_KEY_HERE";
+
+const supabaseClient = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 const API_URL="https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/verify-part-web";
 
 function $(id){return document.getElementById(id)}
