@@ -469,6 +469,25 @@ textarea{
   <button onclick="addToInvoice()">Add to Invoice</button>
 
 </div>
+
+<!-- PASTE DIAGNOSTIC TROUBLESHOOTER HERE -->
+
+<label>Fault / Symptom / Code</label>
+<input id="diagFault" placeholder="EGR delta pressure negative, EGR low flow, SPN/FMI, etc">
+
+<label>Engine / Truck Notes</label>
+<textarea id="diagNotes"></textarea>
+
+<div class="row">
+  <button class="success" onclick="troubleshootFault()">
+    TROUBLESHOOT
+  </button>
+</div>
+
+<div id="diagAnswer" class="result">
+  Enter a fault or symptom
+</div>
+
   <div class="grid">
     <button class="toolBtn orange" onclick="show('parts')">
       <strong>Parts Lookup</strong>
