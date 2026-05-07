@@ -1130,7 +1130,7 @@ function saveVinRepairHistory(){
 
   alert("Saved to VIN repair history.");
 }
-function confirmFixLearning(){
+async function confirmFixLearning(){
   const vin = $("vin")?.value.trim() || "NO VIN / UNIT";
   const fault = $("diagFault")?.value.trim() || "";
   const notes = $("diagNotes")?.value.trim() || "";
@@ -1141,6 +1141,33 @@ function confirmFixLearning(){
     alert("Enter or run a fault first.");
     return;
   }
+
+  const fix = prompt("What fixed it? Example: Cleaned blocked EGR delta tubes");
+  if(!fix) return;
+
+  const failedPart = prompt("Failed part / root cause? Example: Soot plugged delta tubes") || "";
+  const laborHours = prompt("Labor hours? Example: 1.5") || "";
+  const partsUsed = prompt("Parts used? Example: none, delta P sensor, NOx sensor") || "";
+
+  $("diagAnswer").textContent += "\n\nSaving confirmed fix to cloud repair brain...";
+
+  try{
+    const ans = await callAI(fault, "save_confirmed_fix", {
+      note: notes,
+      confirmed_fix: fix,
+      failed_part: failedPart,
+      labor_hours: laborHours,
+      parts_used: partsUsed,
+      engine,
+      vehicle_context: vehicle
+    });
+
+    alert(ans || "Confirmed fix saved to cloud.");
+  }catch(e){
+    alert("Cloud save failed: " + e.message);
+  }
+}
+  
 
   const fix = prompt("What fixed it? Example: Cleaned blocked EGR delta tubes");
   if(!fix) return;
@@ -1168,30 +1195,13 @@ function confirmFixLearning(){
 
   alert("Confirmed fix saved. The app learned this repair.");
 }
-  function learnedFixSearch(fault, notes){
-  const f = (fault + " " + notes).toLowerCase();
-  const fixes = JSON.parse(localStorage.getItem("rwd_confirmed_fixes") || "[]");
-
-  const matches = fixes.filter(x => {
-    const text = (x.fault + " " + x.notes + " " + x.engine).toLowerCase();
-    return f.split(" ").some(word => word.length > 3 && text.includes(word));
-  }).slice(0,5);
-
-  if(!matches.length) return "";
-
-  return `
-
-CONFIRMED SHOP FIX HISTORY:
-` + matches.map((x,i)=>`
-#${i+1}
-Date: ${x.date}
-Engine: ${x.engine || "Unknown"}
-Fault: ${x.fault}
-Confirmed Fix: ${x.confirmedFix}
-Root Cause: ${x.failedPart}
-Labor Hours: ${x.laborHours}
-Parts Used: ${x.partsUsed}
-`).join("\n----------------------\n");
+  async function learnedFixSearch(fault, notes){
+  try{
+    const ans = await callAI(fault, "search_confirmed_fixes", notes);
+    return ans || "";
+  }catch(e){
+    return "";
+  }
 }
 function showVinRepairHistory(){
   const vin = $("vin")?.value.trim() || "NO VIN / UNIT";
