@@ -420,6 +420,13 @@ button:active{transform:scale(.98)}
     <button class="success" style="width:100%" onclick="troubleshootFault()">Troubleshoot</button>
 
     <div id="diagAnswer" class="result">Enter a fault or symptom.</div>
+ <button class="primary" style="width:100%;margin-top:10px" onclick="saveVinRepairHistory()">
+  SAVE TO VIN REPAIR HISTORY
+</button>
+
+<button class="dark" style="width:100%;margin-top:10px" onclick="showVinRepairHistory()">
+  VIEW VIN REPAIR HISTORY
+</button>
   </div>
 </section>
 
@@ -1073,7 +1080,75 @@ Start with basic field checks first:
 
 AI is building the full diagnostic path below.`;
 }
-async function troubleshootFault(){
+
+function saveVinRepairHistory(){
+  const vin = $("vin")?.value.trim() || "NO VIN / UNIT";
+  const fault = $("diagFault")?.value.trim() || "";
+  const notes = $("diagNotes")?.value.trim() || "";
+  const answer = $("diagAnswer")?.textContent || "";
+
+  if(!fault || !answer){
+    alert("Run a diagnostic first.");
+    return;
+  }
+
+  let history = JSON.parse(localStorage.getItem("rwd_vin_repair_history") || "[]");
+
+  history.unshift({
+    date: new Date().toLocaleString(),
+    vin,
+    vehicle: ctx(),
+    fault,
+    notes,
+    answer
+  });
+
+  localStorage.setItem("rwd_vin_repair_history", JSON.stringify(history));
+
+  alert("Saved to VIN repair history.");
+}
+
+function showVinRepairHistory(){
+  const vin = $("vin")?.value.trim() || "NO VIN / UNIT";
+
+  let history = JSON.parse(
+    localStorage.getItem("rwd_vin_repair_history") || "[]"
+  );
+
+  let matches = history.filter(h => h.vin === vin);
+
+  if(!matches.length){
+    $("diagAnswer").textContent =
+`VIN REPAIR HISTORY
+
+VIN / Unit: ${vin}
+
+No saved repair history found for this truck yet.`;
+
+    return;
+  }
+
+  $("diagAnswer").textContent =
+`VIN REPAIR HISTORY
+
+VIN / Unit: ${vin}
+
+` + matches.map((h,i)=>`
+#${i+1}
+Date: ${h.date}
+
+Fault:
+${h.fault}
+
+Notes:
+${h.notes}
+
+Saved Diagnostic:
+${h.answer}
+`).join("\n----------------------\n");
+}
+  
+  async function troubleshootFault(){
 
   let fault = $("diagFault").value.trim();
   let notes = $("diagNotes").value.trim();
