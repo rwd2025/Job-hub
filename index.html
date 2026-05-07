@@ -629,7 +629,36 @@ textarea{
     </div>
   </div>
 </section>
+<section id="troubleshooter" class="section">
 
+<div class="card">
+
+<h2>Diagnostic Troubleshooter</h2>
+
+<label>Fault / Symptom / Code</label>
+<input id="diagFault"
+placeholder="EGR delta pressure negative, EGR low flow, SPN/FMI">
+
+<label>Engine / Truck Notes</label>
+<textarea id="diagNotes"
+placeholder="DD15, X15, MX13, live data, repairs already done"></textarea>
+
+<div class="row">
+  <button class="success"
+  style="color:white;background:#ff6500;font-weight:900;"
+  onclick="troubleshootFault()">
+
+    TROUBLESHOOT
+
+  </button>
+</div>
+
+<div id="diagAnswer" class="result">
+Enter a fault or symptom
+</div>
+
+</div>
+</section>
 
 <section id="filters" class="section">
   <button class="back dark" onclick="show('home')">← Back</button>
