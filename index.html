@@ -1283,6 +1283,7 @@ Verify fuel pressure and cranking voltage before chasing injectors.`;
 $("diagAnswer").textContent =
   fastDieselAnswer(fault, notes) +
   knownFixDatabase(fault, notes) +
+  learnedFixSearch(fault, notes) +
   "\n\nFULL AI DIAGNOSTIC:\nBuilding full test path...";
   let q = `
 You are Diesel Doc AI for Rolling Wrench Diesel.
