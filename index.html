@@ -991,7 +991,88 @@ function addFilterToWork(){
 //////////////////////////////////////////////////////
 // PASTE NEW troubleshootFault FUNCTION HERE
 //////////////////////////////////////////////////////
+function fastDieselAnswer(fault, notes){
+  const f = (fault + " " + notes).toLowerCase();
 
+  if(f.includes("egr") && f.includes("delta") && f.includes("negative")){
+    return `QUICK ANSWER:
+
+EGR delta pressure negative usually means the sensor is seeing pressure backwards, no flow, blocked tubes, reversed hoses, bad sensor signal, or wiring issue.
+
+FAST CHECKS:
+1. Inspect and clean EGR delta pressure tubes.
+2. Verify hoses are not reversed.
+3. Check sensor connector and 5V reference.
+4. Compare key-on reading to expected baseline.
+5. Command EGR and watch live data response.
+
+DO NOT REPLACE FIRST:
+Do not throw an EGR valve or cooler at it until tubes, hose routing, sensor voltage, and live data are checked.`;
+  }
+
+  if(f.includes("nox") || f.includes("conversion") || f.includes("efficiency")){
+    return `QUICK ANSWER:
+
+NOx efficiency / conversion faults usually mean the SCR system is not reducing NOx correctly.
+
+FAST CHECKS:
+1. Check DEF quality.
+2. Check DEF dosing.
+3. Compare inlet NOx vs outlet NOx.
+4. Check exhaust leaks before SCR.
+5. Verify temp sensors are reading correctly.
+6. Check for crystallization or restricted dosing valve.
+
+DO NOT REPLACE FIRST:
+Do not replace both NOx sensors until DEF quality, dosing, exhaust leaks, and temps are checked.`;
+  }
+
+  if(f.includes("no start") || f.includes("crank no start")){
+    return `QUICK ANSWER:
+
+Crank no start needs air, fuel, compression, timing, and ECM command checks.
+
+FAST CHECKS:
+1. Check battery voltage while cranking.
+2. Check fuel pressure while cranking.
+3. Check rail pressure commanded vs actual.
+4. Check cam/crank signal.
+5. Check for active engine shutdown codes.
+6. Verify primer/fuel supply side.
+
+DO NOT REPLACE FIRST:
+Do not replace injectors or ECM until fuel supply, rail pressure, and cam/crank signals are verified.`;
+  }
+
+  if(f.includes("regen") || f.includes("dpf")){
+    return `QUICK ANSWER:
+
+Regen / DPF faults usually come from soot load, failed sensors, exhaust leaks, dosing issues, or engine problems creating excess soot.
+
+FAST CHECKS:
+1. Check soot load.
+2. Check DPF differential pressure.
+3. Verify exhaust temp sensors.
+4. Check DOC/DPF inlet and outlet temps.
+5. Look for boost leaks or fuel issues.
+6. Verify regen inhibit conditions.
+
+DO NOT REPLACE FIRST:
+Do not replace the DPF until sensors, soot load, exhaust leaks, and engine cause are checked.`;
+  }
+
+  return `QUICK ANSWER:
+
+Start with basic field checks first:
+1. Verify code/fault is active.
+2. Check battery voltage and grounds.
+3. Inspect connectors and wiring.
+4. Check live data against command.
+5. Verify recent repairs did not create the issue.
+6. Test before replacing parts.
+
+AI is building the full diagnostic path below.`;
+}
 async function troubleshootFault(){
 
   let fault = $("diagFault").value.trim();
@@ -1002,8 +1083,8 @@ async function troubleshootFault(){
     return;
   }
 
-  $("diagAnswer").textContent =
-    "Building diagnostic path...";
+$("diagAnswer").textContent = fastDieselAnswer(fault, notes) +
+  "\n\nFULL AI DIAGNOSTIC:\nBuilding full test path...";
 
   let q = `
 You are Diesel Doc AI for Rolling Wrench Diesel.
