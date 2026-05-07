@@ -577,23 +577,42 @@ textarea{
       Use <b>Lookup Options</b> for shop-safe possibilities and verification notes.
     </div>
 
-    <label>Lookup Mode</label>
-    <select id="partsMode">
-      <option>Options Mode</option>
-      <option>Exact Part Number Verify</option>
-      <option>Component Name Lookup</option>
-      <option>Cross Reference Lookup</option>
-    </select>
+<label>Lookup Mode</label>
+<select id="partsMode">
+  <option>Options Mode</option>
+  <option>Exact Part Number Verify</option>
+  <option>Component Name Lookup</option>
+  <option>Cross Reference Lookup</option>
+</select>
 
- <label>Part Number / Part Name</label>
-<input id="partq" ...
+<label>Part Number / Part Name</label>
+<input id="partq" placeholder="K134A king pin, OEM number, etc">
 
 <label>Notes / VIN / ESN / CPL</label>
-<textarea id="partNote" ...
+<textarea id="partNote" placeholder="VIN, ESN, CPL, old part number, location, symptom"></textarea>
 
 <div class="row">
-  <button class="success" onclick="askPart()">
-  ...
+  <button class="success" onclick="lookupPartLocalFirst()">
+    LOOKUP OPTIONS
+  </button>
+
+  <button class="secondary" onclick="verifyPart()">
+    WEB + AI VERIFICATION
+  </button>
+</div>
+
+<div id="partAnswer" class="result">
+  Enter part number
+</div>
+
+<div class="row" style="margin-top:10px">
+  <button class="primary" onclick="addPartToWork()">
+    ADD TO WORK ORDER
+  </button>
+
+  <button class="dark" onclick="copyText('partAnswer')">
+    COPY RESULT
+  </button>
 </div>
 
 <div id="partOut" class="result">
