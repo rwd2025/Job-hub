@@ -630,11 +630,42 @@ textarea{
       <button class="dark" onclick="copyText('partOut')">Copy Result</button>
     </div>
   </div>
-</
-<label>Fault / Symptom / Code</label>
-<input id="diagFault"
-placeholder="EGR delta pressure negative, EGR low flow, SPN/FMI">
-section>
+</section>
+
+<section id="troubleshooter" class="section">
+
+  <button class="back dark" onclick="show('home')">
+    ← Back
+  </button>
+
+  <div class="card">
+
+    <div class="cardTitle">
+      <h2>Diagnostic Troubleshooter</h2>
+      <div class="badge">Repair Logic</div>
+    </div>
+
+    <label>Fault / Symptom / Code</label>
+    <input id="diagFault"
+      placeholder="EGR delta pressure negative, EGR low flow, SPN/FMI">
+
+    <label>Engine / Truck Notes</label>
+    <textarea id="diagNotes"
+      placeholder="DD15, X15, MX13, live data, repairs already done"></textarea>
+
+    <button class="success"
+      style="width:100%;color:white;background:#ff6500;font-weight:900;"
+      onclick="troubleshootFault()">
+      TROUBLESHOOT
+    </button>
+
+    <div id="diagAnswer" class="result">
+      Enter a fault or symptom
+    </div>
+
+  </div>
+
+</section>
 
 <label>Engine / Truck Notes</label>
 <textarea id="diagNotes"
