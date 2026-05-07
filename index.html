@@ -1005,7 +1005,7 @@ Fault / symptom:
 ${fault}
 
 Vehicle context:
-${vehicleContext ? vehicleContext() : "No vehicle context provided"}
+${ctx()}
 
 Engine / notes:
 ${notes || "none"}
@@ -1023,11 +1023,7 @@ Return:
   try{
 
     $("diagAnswer").textContent =
-      await callAI(
-        q,
-        vehicleContext ? vehicleContext() : "",
-        notes
-      );
+     await callAI(q, "troubleshooter", notes);
 
   }catch(e){
 
