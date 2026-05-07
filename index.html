@@ -427,6 +427,9 @@ button:active{transform:scale(.98)}
 <button class="dark" style="width:100%;margin-top:10px" onclick="showVinRepairHistory()">
   VIEW VIN REPAIR HISTORY
 </button>
+    <button class="success" style="width:100%;margin-top:10px" onclick="confirmFixLearning()">
+  CONFIRM FIX / TEACH APP
+</button>
   </div>
 </section>
 
@@ -1107,7 +1110,44 @@ function saveVinRepairHistory(){
 
   alert("Saved to VIN repair history.");
 }
+function confirmFixLearning(){
+  const vin = $("vin")?.value.trim() || "NO VIN / UNIT";
+  const fault = $("diagFault")?.value.trim() || "";
+  const notes = $("diagNotes")?.value.trim() || "";
+  const engine = $("engine")?.value || "";
+  const vehicle = ctx();
 
+  if(!fault){
+    alert("Enter or run a fault first.");
+    return;
+  }
+
+  const fix = prompt("What fixed it? Example: Cleaned blocked EGR delta tubes");
+  if(!fix) return;
+
+  const failedPart = prompt("Failed part / root cause? Example: Soot plugged delta tubes") || "";
+  const laborHours = prompt("Labor hours? Example: 1.5") || "";
+  const partsUsed = prompt("Parts used? Example: none, delta P sensor, NOx sensor") || "";
+
+  let fixes = JSON.parse(localStorage.getItem("rwd_confirmed_fixes") || "[]");
+
+  fixes.unshift({
+    date: new Date().toLocaleString(),
+    vin,
+    vehicle,
+    engine,
+    fault,
+    notes,
+    confirmedFix: fix,
+    failedPart,
+    laborHours,
+    partsUsed
+  });
+
+  localStorage.setItem("rwd_confirmed_fixes", JSON.stringify(fixes));
+
+  alert("Confirmed fix saved. The app learned this repair.");
+}
 function showVinRepairHistory(){
   const vin = $("vin")?.value.trim() || "NO VIN / UNIT";
 
