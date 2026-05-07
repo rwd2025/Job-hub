@@ -1493,7 +1493,65 @@ function addFilterToWork(){
   show("work");
 }
 
-  
+ }
+
+//////////////////////////////////////////////////////
+// PASTE NEW troubleshootFault FUNCTION HERE
+//////////////////////////////////////////////////////
+
+async function troubleshootFault(){
+
+  let fault = $("diagFault").value.trim();
+  let notes = $("diagNotes").value.trim();
+
+  if(!fault){
+    alert("Enter a fault, symptom, or code");
+    return;
+  }
+
+  $("diagAnswer").textContent =
+    "Building diagnostic path...";
+
+  let q = `
+You are Diesel Doc AI for Rolling Wrench Diesel.
+
+Troubleshoot this heavy diesel fault like an experienced field diesel technician.
+
+Fault / symptom:
+${fault}
+
+Vehicle context:
+${vehicleContext ? vehicleContext() : "No vehicle context provided"}
+
+Engine / notes:
+${notes || "none"}
+
+Return:
+1. WHAT THIS FAULT MEANS
+2. MOST LIKELY CAUSES — RANKED
+3. FIRST TESTS TO DO
+4. LIVE DATA TO WATCH
+5. WHAT NOT TO REPLACE YET
+6. COMMON MISDIAGNOSIS
+7. CONFIRM THE REPAIR
+`;
+
+  try{
+
+    $("diagAnswer").textContent =
+      await callAI(
+        q,
+        vehicleContext ? vehicleContext() : "",
+        notes
+      );
+
+  }catch(e){
+
+    $("diagAnswer").textContent =
+      "AI troubleshoot failed: " + e.message;
+  }
+}
+
 /* DIESEL DIAG */
 async function runDiag(){
   const q=$("diagq")?.value.trim() || "";
