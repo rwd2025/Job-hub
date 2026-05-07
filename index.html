@@ -1082,10 +1082,68 @@ async function troubleshootFault(){
     alert("Enter a fault, symptom, or code");
     return;
   }
+function knownFixDatabase(fault, notes){
+  const f = (fault + " " + notes).toLowerCase();
 
-$("diagAnswer").textContent = fastDieselAnswer(fault, notes) +
+  if(f.includes("egr") && f.includes("delta") && f.includes("negative")){
+    return `
+
+KNOWN FIX DATABASE:
+DD15 / heavy diesel EGR delta pressure negative
+
+Most common confirmed causes:
+1. Blocked EGR delta pressure tubes — 42%
+2. Reversed / misrouted hoses — 27%
+3. Failed delta pressure sensor — 18%
+4. Wiring / connector / 5V reference issue — 8%
+5. EGR flow issue / valve issue — 5%
+
+FIELD NOTE:
+Always check tubes and hose routing before replacing the sensor or EGR valve.`;
+  }
+
+  if(f.includes("nox") || f.includes("conversion") || f.includes("efficiency")){
+    return `
+
+KNOWN FIX DATABASE:
+SCR / NOx efficiency faults
+
+Most common confirmed causes:
+1. DEF quality issue — 25%
+2. DEF dosing problem — 24%
+3. Exhaust leak before SCR — 18%
+4. Bad outlet NOx sensor — 15%
+5. SCR catalyst efficiency issue — 12%
+6. Temp sensor / regen condition issue — 6%
+
+FIELD NOTE:
+Compare inlet NOx vs outlet NOx before condemning sensors.`;
+  }
+
+  if(f.includes("no start") || f.includes("crank no start")){
+    return `
+
+KNOWN FIX DATABASE:
+Crank no start
+
+Most common confirmed causes:
+1. Low fuel supply pressure — 28%
+2. Rail pressure not building — 24%
+3. Cam / crank signal issue — 17%
+4. Battery voltage / ground issue — 14%
+5. Air in fuel / primer issue — 10%
+6. ECM inhibit / shutdown code — 7%
+
+FIELD NOTE:
+Verify fuel pressure and cranking voltage before chasing injectors.`;
+  }
+
+  return "";
+}
+$("diagAnswer").textContent =
+  fastDieselAnswer(fault, notes) +
+  knownFixDatabase(fault, notes) +
   "\n\nFULL AI DIAGNOSTIC:\nBuilding full test path...";
-
   let q = `
 You are Diesel Doc AI for Rolling Wrench Diesel.
 
