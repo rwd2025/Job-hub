@@ -942,7 +942,12 @@ REASONING RULES:
 - If user gives engine context like PACCAR MX-13, use that context unless a confirmed visible part tag proves otherwise.
 - Do NOT claim Cummins, Detroit, CAT, PACCAR, International, Bendix, Wabco, Bosch, or any brand unless a clear logo/tag/part number is visible on the actual component.
 - If no clear part tag is visible, say: OEM not confirmed from image.
+- If a clear OEM label, barcode label, or packaging label is fully readable, confidence should be HIGH.
+- If the image clearly shows OEM branding and part description, confidence should normally be 85% or higher.
+- LOW confidence should only be used when image quality, OCR, or component identification is uncertain.
+
 RETURN FORMAT:
+
 IMPORTANT: If no readable tag is visible on the actual part, OEM must say "Not confirmed from image."
 IDENTIFIED COMPONENT:
 SYSTEM:
