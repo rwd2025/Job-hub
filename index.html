@@ -1176,7 +1176,8 @@ async function verifyPartWeb(){
   $("partOut").textContent="Verifying with Web + AI...";
 
   try{
-    const ans=await callAI(q,"parts",note);
+    const aiPrompt = buildDieselPrompt(q, ctx(), note);
+const ans = await callAI(aiPrompt, "parts", note);
     $("partOut").textContent=ans;
   }catch(e){
     $("partOut").textContent="WEB VERIFY ERROR: "+e.message;
