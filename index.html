@@ -1099,7 +1099,24 @@ try{
 async function askPart(){
   const q=$("partq")?.value.trim() || "";
   const note=$("partNote")?.value.trim() || "";
+const intent = detectIntent(q);
 
+if(intent === "torque_specs"){
+  $("partOut").textContent =
+`TORQUE REQUEST DETECTED
+
+Checking:
+- exact engine family
+- bolt application
+- torque units
+- OEM procedure verification
+
+WARNING:
+Torque specs will NOT be guessed.
+Small bolts may use inch-pound values, not ft-lb.
+
+Consulting Diesel AI...`;
+}
   if(!q && !note){
     $("partOut").textContent=
 `PART NUMBER UNKNOWN — NEED PART DESCRIPTION OR NAME
