@@ -2114,6 +2114,79 @@ Mileage: ${profile.mileage}
 Engine: ${profile.engine}
 
 Auto-filled Work Order, Invoice, and Clock.`;
+
+
+}
+  function savePartToVehicleHistory(partData){
+
+  const vin = $("vin")?.value.trim() || "NO VIN";
+  const customer = $("profileCustomer")?.value || $("customer")?.value || "";
+  const vehicle = ctx();
+
+  let history = JSON.parse(
+    localStorage.getItem("rwd_vehicle_parts_history") || "[]"
+  );
+
+  history.unshift({
+    date: new Date().toLocaleString(),
+    vin,
+    customer,
+    vehicle,
+    part: partData
+  });
+
+  localStorage.setItem(
+    "rwd_vehicle_parts_history",
+    JSON.stringify(history)
+  );
+
+  return true;
+}
+
+function showVehiclePartsHistory(){
+
+  const vin = $("vin")?.value.trim() || "NO VIN";
+
+  let history = JSON.parse(
+    localStorage.getItem("rwd_vehicle_parts_history") || "[]"
+  );
+
+  let matches = history.filter(h => h.vin === vin);
+
+  if(!matches.length){
+
+    $("partOut").textContent =
+`VEHICLE PARTS HISTORY
+
+VIN: ${vin}
+
+No saved parts history found.`;
+
+    return;
+  }
+
+  $("partOut").textContent =
+`VEHICLE PARTS HISTORY
+
+VIN: ${vin}
+
+` + matches.map((h,i)=>`
+
+#${i+1}
+DATE:
+${h.date}
+
+CUSTOMER:
+${h.customer}
+
+PART INFO:
+${h.part}
+
+VEHICLE:
+${h.vehicle}
+
+`).join("\n----------------------\n");
+
 }
 /* VIN / UNIT */
 async function decodeVin(){
