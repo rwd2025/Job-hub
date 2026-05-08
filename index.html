@@ -747,7 +747,80 @@ Model: ${$("modelGlobal")?.value || "unknown"}
 VIN/Unit: ${$("vin")?.value || "none"}
 Engine: ${$("engine")?.value || "unknown"}`;
 }
+const COMPONENT_RULES = [
+  {
+    name: "Foot Brake Valve / Treadle Valve",
+    system: "Air Brake Control System",
+    location: "cab firewall / under dash / pedal area",
+    clues: [
+      "brake pedal linkage",
+      "mounted high on firewall",
+      "multiple primary and secondary air lines",
+      "driver input location",
+      "treadle mechanism visible"
+    ],
+    not_if: [
+      "mounted near axle",
+      "ABS wires connected",
+      "near brake chamber"
+    ],
+    confidenceBoost: 30,
+    warning: "Do not call an axle-mounted ABS valve a foot brake valve."
+  },
+  {
+    name: "ABS Relay / Modulator Valve",
+    system: "Air Brake ABS System",
+    location: "frame rail / axle / suspension area",
+    clues: [
+      "ABS wires",
+      "electrical connector",
+      "air lines",
+      "near axle",
+      "near brake chamber",
+      "frame mounted"
+    ],
+    not_if: [
+      "brake pedal linkage visible",
+      "mounted on cab firewall"
+    ],
+    confidenceBoost: 35,
+    warning: "If air lines and ABS wiring are present near the axle, rank ABS modulator above plain relay valve or foot valve."
+  },
+  {
+    name: "Air Brake Relay Valve",
+    system: "Air Brake System",
+    location: "frame rail / axle area",
+    clues: [
+      "air lines",
+      "exhaust port",
+      "frame mounted",
+      "near brake chambers",
+      "no electrical connector"
+    ],
+    not_if: [
+      "ABS wires connected",
+      "brake pedal linkage visible"
+    ],
+    confidenceBoost: 20,
+    warning: "If electrical connector or ABS wires are present, check for ABS modulator instead."
+  }
+];
 
+const REPAIR_MEMORY = [
+  {
+    symptom: "air valve with ABS wires near axle",
+    likely_component: "ABS relay/modulator valve",
+    common_misdiagnosis: "foot brake valve or plain relay valve",
+    note: "ABS wiring plus air brake lines near axle means modulator should rank highest."
+  },
+  {
+    symptom: "air valve mounted on firewall with brake pedal linkage",
+    likely_component: "foot brake valve / treadle valve",
+    common_misdiagnosis: "relay valve",
+    note: "Pedal linkage and firewall location identify driver input valve."
+  }
+];
+  
 async function callAI(question,mode="parts",notes=""){
   const res=await fetch(API_URL,{
     method:"POST",
@@ -815,27 +888,45 @@ imageData = imageData.split(",")[1];
   const prompt =
 `You are Diesel Doc AI for Rolling Wrench Diesel.
 
-Act like a professional mobile diesel mechanic assistant.
+Act like a professional mobile diesel mechanic and heavy-duty parts identifier.
 
 Vehicle/Profile:
 ${ctx()}
 
+LOCAL COMPONENT RULES:
+${JSON.stringify(COMPONENT_RULES, null, 2)}
+
+REPAIR MEMORY:
+${JSON.stringify(REPAIR_MEMORY, null, 2)}
+
 User request:
 ${q || "Analyze the uploaded image."}
 
-If an image was uploaded:
-- Identify visible part numbers, labels, components, wiring, damage, leaks, or codes.
-- Explain what it may be.
-- Give field-ready next steps.
-- If it looks like a diagram/schematic, explain it clearly.
-- Do NOT fake exact OEM wiring diagrams. Say what must be verified.
+TASK:
+Identify the visible component/system from the image and notes.
 
-Rules:
+REASONING RULES:
+- Identify the system first.
+- Use mounting location as a major clue.
+- Use nearby parts, wires, air lines, hoses, brackets, and connectors as clues.
+- If brake pedal linkage or firewall mounting is visible, rank Foot Brake Valve / Treadle Valve highest.
+- If ABS wires/electrical connector plus air lines are present near axle/frame, rank ABS Relay / Modulator Valve highest.
+- If air lines are present near axle/frame with NO electrical connector, rank Air Brake Relay Valve higher.
+- Do NOT call an axle/frame mounted ABS modulator a foot brake valve.
+- Do NOT call a firewall-mounted pedal valve an ABS modulator.
+- Do NOT fake exact OEM part numbers.
+- If unsure, give likely component family and verification steps.
 - Be practical and field-ready.
-- If diagnostic, give likely causes, tests, what NOT to replace first, and next steps.
-- If invoice/quote, suggest labor, parts, service call, and notes.
-- If parts, ask for VIN/ESN/CPL if needed and do not guess exact OEM parts.
-- If work order, write customer-ready complaint/cause/correction notes.`;
+
+RETURN FORMAT:
+IDENTIFIED COMPONENT:
+SYSTEM:
+CONFIDENCE:
+WHY:
+COMMON MISDIAGNOSIS:
+COMMON FAILURES:
+VERIFY BEFORE ORDER:
+NEXT STEP:`;
 try{
   const ans = await callAI(prompt, "diesel_ai", {
     question: q,
