@@ -1324,7 +1324,7 @@ Return:
   try{
 
     $("diagAnswer").textContent =
-     await callAI(q, "diagnose", notes);
+     await callAI(q, "smart_diagnostics_brain", notes);
 
   }catch(e){
 
@@ -1346,7 +1346,7 @@ async function runDiag(){
   $("diagOut").textContent="Running diagnostic...";
 
   try{
-    $("diagOut").textContent=await callAI(q,"diagnose",note);
+    await callAI(q, "smart_diagnostics_brain", notes);
   }catch(e){
     $("diagOut").textContent="DIAGNOSTIC ERROR: "+e.message;
   }
