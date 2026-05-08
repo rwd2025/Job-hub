@@ -1094,7 +1094,32 @@ try{
 }
   
 }
-  
+  const COMMON_TORQUE_HINTS = [
+  {
+    keywords:["oil pan","mx13"],
+    warning:"MX-13 oil pan bolts are small pan/cover hardware. Do NOT use high ft-lb torque. Verify exact bolt size, pan type, and OEM procedure."
+  },
+  {
+    keywords:["water pump","isx"],
+    warning:"ISX water pump job: verify ESN/CPL, pump style, gasket/O-ring, coolant, belt condition, and exact bolt torque before install."
+  },
+  {
+    keywords:["turbo","stud"],
+    warning:"Turbo/exhaust studs are high-heat hardware. Use correct OEM stud/nut, anti-seize only if procedure allows, and verify torque by engine."
+  }
+];
+
+function localDieselHints(q){
+  q = (q || "").toLowerCase();
+
+  for(const item of COMMON_TORQUE_HINTS){
+    if(item.keywords.every(k => q.includes(k))){
+      return item.warning;
+    }
+  }
+
+  return "";
+}
 /* PARTS LOOKUP */
 async function askPart(){
   const q=$("partq")?.value.trim() || "";
@@ -1116,6 +1141,11 @@ Torque specs will NOT be guessed.
 Small bolts may use inch-pound values, not ft-lb.
 
 Consulting Diesel AI...`;
+}
+  const localHint = localDieselHints(q);
+
+if(localHint){
+  $("partOut").textContent += "\n\nLOCAL DIESEL CHECK:\n" + localHint;
 }
   if(!q && !note){
     $("partOut").textContent=
