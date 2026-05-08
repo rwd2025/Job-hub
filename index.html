@@ -846,9 +846,27 @@ const REPAIR_MEMORY = [
     return "torque_specs";
   }
 
-  if(q.includes("i need") || q.includes("need a") || q.includes("replace") || q.includes("job kit") || q.includes("what all do i need")){
-    return "smart_job_kit";
-  }
+if(
+  q.includes("i need") ||
+  q.includes("need a") ||
+  q.includes("replace") ||
+  q.includes("job kit") ||
+  q.includes("what all do i need") ||
+  q.includes("what do i need") ||
+  q.includes("doing a") ||
+  q.includes("installing") ||
+  q.includes("changing") ||
+  q.includes("water pump") ||
+  q.includes("rear main") ||
+  q.includes("front cover") ||
+  q.includes("head gasket") ||
+  q.includes("turbo") ||
+  q.includes("injector") ||
+  q.includes("fuel pump")
+){
+  return "smart_job_kit";
+}
+  
 
   if(q.includes("spn") || q.includes("fmi") || q.includes("fault code") || q.includes("code")){
     return "fault_code";
