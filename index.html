@@ -1300,16 +1300,7 @@ $("diagAnswer").textContent =
   fastDieselAnswer(fault, notes) +
   knownFixDatabase(fault, notes) +
   enginePatterns +
-  cloudFixes +
-  "\n\nFULL AI DIAGNOSTIC:\nBuilding full test path...";
-
-const cloudFixes = await learnedFixSearch(fault, notes);
-
-$("diagAnswer").textContent =
-  fastDieselAnswer(fault, notes) +
-  knownFixDatabase(fault, notes) +
-  cloudFixes +
-  "\n\nFULL AI DIAGNOSTIC:\nBuilding full test path...";
+  cloudFixes;
   
   let q = `
 You are Diesel Doc AI for Rolling Wrench Diesel.
