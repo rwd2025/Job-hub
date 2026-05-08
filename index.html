@@ -838,6 +838,130 @@ const REPAIR_MEMORY = [
     note: "Pedal linkage and firewall location identify driver input valve."
   }
 ];
+  function detectIntent(q){
+  q = (q || "").toLowerCase();
+
+  if(q.includes("torque") || q.includes("ft-lb") || q.includes("ft lb") || q.includes("in-lb") || q.includes("in lb") || q.includes("nm")){
+    return "torque_specs";
+  }
+
+  if(q.includes("i need") || q.includes("need a") || q.includes("replace") || q.includes("job kit") || q.includes("what all do i need")){
+    return "smart_job_kit";
+  }
+
+  if(q.includes("spn") || q.includes("fmi") || q.includes("fault code") || q.includes("code")){
+    return "fault_code";
+  }
+
+  if(q.includes("wiring") || q.includes("pinout") || q.includes("connector")){
+    return "wiring";
+  }
+
+  if(q.includes("part number") || q.includes("oem") || q.includes("aftermarket") || q.includes("fits")){
+    return "part_lookup";
+  }
+
+  return "general";
+}
+
+function buildDieselPrompt(userQuestion, vehicleContext, ocrText){
+  const intent = detectIntent(userQuestion);
+
+  if(intent === "smart_job_kit"){
+    return `
+REQUEST TYPE: SMART JOB KIT
+
+USER QUESTION:
+${userQuestion}
+
+VEHICLE / ENGINE CONTEXT:
+${vehicleContext || "Not provided"}
+
+OCR / IMAGE TEXT:
+${ocrText || "None"}
+
+RULES:
+- Identify the main part or repair job.
+- Give OEM part number ONLY if verified.
+- Give aftermarket options if known.
+- List all gaskets, O-rings, seals, coolant, hardware, and one-time-use parts likely needed.
+- Include torque specs ONLY if exact and verified.
+- Never guess torque specs.
+- Never invent part numbers.
+- Separate known facts from “verify by VIN/ESN.”
+- If VIN/ESN/CPL is missing, say exact fitment requires VIN/ESN/CPL.
+- Give labor estimate range.
+- Give final checklist.
+
+ANSWER FORMAT:
+REQUEST:
+ENGINE:
+MAIN PART:
+OEM PART NUMBER:
+AFTERMARKET OPTIONS:
+ALSO NEEDED:
+TORQUE SPECS:
+LABOR RANGE:
+VERIFY BEFORE ORDER:
+WARNINGS:
+NEXT STEP:
+`;
+  }
+
+  if(intent === "torque_specs"){
+    return `
+REQUEST TYPE: TORQUE SPECS
+
+USER QUESTION:
+${userQuestion}
+
+VEHICLE / ENGINE CONTEXT:
+${vehicleContext || "Not provided"}
+
+OCR / IMAGE TEXT:
+${ocrText || "None"}
+
+TORQUE SAFETY RULES:
+- Do NOT treat this as a part lookup.
+- Give torque specs ONLY if exact and verified.
+- Never guess torque.
+- Always include units.
+- If bolt size affects spec, ask for bolt size.
+- Flag unrealistic torque for small bolts.
+- If exact spec is not verified, say EXACT TORQUE NOT VERIFIED.
+
+ANSWER FORMAT:
+ENGINE:
+COMPONENT:
+BOLT SIZE:
+TORQUE SPEC:
+SEQUENCE:
+WARNINGS:
+NEEDED TO VERIFY:
+`;
+  }
+
+  return `
+REQUEST TYPE: ${intent.toUpperCase()}
+
+USER QUESTION:
+${userQuestion}
+
+VEHICLE / ENGINE CONTEXT:
+${vehicleContext || "Not provided"}
+
+OCR / IMAGE TEXT:
+${ocrText || "None"}
+
+RULES:
+- Answer as a professional diesel technician.
+- Be precise.
+- Do not guess torque specs.
+- Do not invent part numbers.
+- Separate part identification from exact fitment.
+- Ask for VIN/ESN/CPL when exact confirmation is needed.
+`;
+}
   
 async function callAI(question,mode="parts",notes=""){
   const res=await fetch(API_URL,{
