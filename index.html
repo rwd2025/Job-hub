@@ -912,7 +912,7 @@ Rules:
 - Require VIN/ESN/axle tag verification before ordering.`;
 
   try{
-    const ans=await callAI(prompt,"parts",note);
+    const ans=await callAI(prompt,"smart_parts_brain",note);
     $("partOut").textContent=ans;
   }catch(e){
     $("partOut").textContent="PART LOOKUP ERROR: "+e.message;
