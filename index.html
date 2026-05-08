@@ -1206,41 +1206,16 @@ Enter one of these:
   const partModel=$("partModel")?.value || $("modelGlobal")?.value || "";
   const partType=$("partType")?.value || "Unknown";
 
-  const prompt=
-`Professional heavy-duty parts lookup.
-
-Input:
-${q}
-
-Vehicle:
-Year: ${partYear}
+  const prompt = buildDieselPrompt(
+  q,
+  `Year: ${partYear}
 Make: ${partMake}
 Model: ${partModel}
 Engine: ${$("engine")?.value || "unknown"}
-
-Part Type:
-${partType}
-
-Notes:
-${note || "none"}
-
-Return:
-Part / Component:
-Corrected Part Number:
-System:
-Type:
-Fits:
-Key Specs:
-Kit Contents:
-Cross References:
-Verification Needed:
-Shop Warning:
-
-Rules:
-- Do not guess exact part without VIN/ESN/OEM catalog.
-- If kit, list kit contents.
-- Do not connect chassis parts to engine.
-- Require VIN/ESN/axle tag verification before ordering.`;
+Part Type: ${partType}
+${ctx()}`,
+  note
+);
 
   try{
     const ans=await callAI(prompt,"smart_parts_brain",note);
@@ -1696,7 +1671,7 @@ async function runDiag(){
   $("diagOut").textContent="Running diagnostic...";
 
   try{
-    await callAI(q, "smart_diagnostics_brain", notes);
+    $("diagOut").textContent = await callAI(q, "smart_diagnostics_brain", note);
   }catch(e){
     $("diagOut").textContent="DIAGNOSTIC ERROR: "+e.message;
   }
