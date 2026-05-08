@@ -1286,7 +1286,21 @@ Verify fuel pressure and cranking voltage before chasing injectors.`;
 $("diagAnswer").textContent =
   fastDieselAnswer(fault, notes) +
   knownFixDatabase(fault, notes) +
+  "\n\nSearching known engine patterns..." +
   "\n\nSearching cloud repair brain..." +
+  "\n\nFULL AI DIAGNOSTIC:\nBuilding full test path...";
+
+const enginePatterns =
+  await callAI(fault, "engine_pattern_lookup", notes);
+
+const cloudFixes =
+  await learnedFixSearch(fault, notes);
+
+$("diagAnswer").textContent =
+  fastDieselAnswer(fault, notes) +
+  knownFixDatabase(fault, notes) +
+  enginePatterns +
+  cloudFixes +
   "\n\nFULL AI DIAGNOSTIC:\nBuilding full test path...";
 
 const cloudFixes = await learnedFixSearch(fault, notes);
