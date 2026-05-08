@@ -998,7 +998,55 @@ WARNINGS:
 NEEDED TO VERIFY:
 `;
   }
+if(intent === "part_lookup"){
+  return `
+REQUEST TYPE: PART LOOKUP
 
+USER QUESTION:
+${userQuestion}
+
+VEHICLE / ENGINE CONTEXT:
+${vehicleContext || "Not provided"}
+
+OCR / IMAGE TEXT:
+${ocrText || "None"}
+
+RULES:
+- Separate PART IDENTIFICATION from FITMENT VERIFICATION.
+- A part may be visually identified even if exact fitment is unknown.
+- Do NOT lower identification confidence because VIN/ESN is missing.
+- Do NOT invent part numbers.
+- Do NOT guess torque specs.
+- Use separate fields:
+  IDENTIFICATION CONFIDENCE
+  FITMENT CONFIDENCE
+- If the component is visually obvious, say so.
+- Distinguish “known component” from “exact application unknown.”
+- Include OEM and aftermarket options if known.
+- Require VIN/ESN/CPL for exact fitment verification.
+
+ANSWER FORMAT:
+PART:
+OEM:
+PART NUMBER:
+TYPE:
+SYSTEM:
+
+IDENTIFICATION CONFIDENCE:
+FITMENT CONFIDENCE:
+
+VISUAL MATCH:
+LIKELY APPLICATION:
+
+OEM OPTIONS:
+AFTERMARKET OPTIONS:
+
+FITS:
+VERIFY BEFORE ORDER:
+WARNINGS:
+NEXT STEP:
+`;
+}
   return `
 REQUEST TYPE: ${intent.toUpperCase()}
 
