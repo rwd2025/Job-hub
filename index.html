@@ -695,8 +695,14 @@ VIEW VEHICLE PARTS HISTORY
       <button class="secondary" onclick="testApp()">Test App</button>
     </div>
 
-    <button class="dark" style="width:100%;margin-top:10px" onclick="localStorage.clear();location.reload();">Reset App Cache</button>
+  <button class="dark" style="width:100%;margin-top:10px"
+onclick="localStorage.clear();location.reload();">
+Reset App Cache
+</button>
 
+<button class="danger" style="width:100%;margin-top:10px" onclick="repairApp()">
+REPAIR APP / RESET BROKEN SESSION
+</button>
     <div id="settingsOut" class="result">Settings ready.</div>
   </div>
 </section>
@@ -2859,6 +2865,146 @@ window.addEventListener(
 "load",
 loadClockState
 );
+/* AUTO SAVE + SAFE SELF REPAIR */
+
+const RWD_AUTOSAVE_KEY = "rwd_v36_autosave";
+
+function getAllFieldData(){
+  const data = {};
+
+  document.querySelectorAll("input, textarea, select").forEach(el => {
+    if(!el.id) return;
+
+    if(el.type === "checkbox"){
+      data[el.id] = el.checked;
+    }else{
+      data[el.id] = el.value;
+    }
+  });
+
+  data.activeSection =
+    document.querySelector(".section.active")?.id || "home";
+
+  data.clock = {
+    startTime: typeof startTime !== "undefined" ? startTime : 0,
+    lastClockBill: typeof lastClockBill !== "undefined" ? lastClockBill : ""
+  };
+
+  data.savedAt = new Date().toLocaleString();
+
+  return data;
+}
+
+function autoSaveEverything(){
+  try{
+    const data = getAllFieldData();
+    localStorage.setItem(RWD_AUTOSAVE_KEY, JSON.stringify(data));
+  }catch(e){
+    console.log("Auto-save failed:", e);
+  }
+}
+
+function restoreEverything(){
+  try{
+    const raw = localStorage.getItem(RWD_AUTOSAVE_KEY);
+    if(!raw) return;
+
+    const data = JSON.parse(raw);
+
+    Object.keys(data).forEach(id => {
+      const el = $(id);
+      if(!el) return;
+
+      if(el.type === "checkbox"){
+        el.checked = data[id];
+      }else{
+        el.value = data[id];
+      }
+    });
+
+    if(data.clock){
+      startTime = data.clock.startTime || startTime || 0;
+      lastClockBill = data.clock.lastClockBill || lastClockBill || "";
+    }
+
+    if(data.activeSection){
+      show(data.activeSection);
+    }
+
+  }catch(e){
+    console.log("Restore failed:", e);
+  }
+}
+
+function repairApp(){
+  try{
+    localStorage.removeItem("rwd_clock_state");
+
+    document.querySelectorAll("button").forEach(btn => {
+      btn.disabled = false;
+      btn.style.pointerEvents = "auto";
+      btn.style.opacity = "1";
+    });
+
+    if(typeof show === "function"){
+      show("home");
+    }
+
+    alert("App repair complete. Buttons reset and app returned Home.");
+  }catch(e){
+    alert("Repair failed: " + e.message);
+  }
+}
+
+window.addEventListener("error", function(e){
+  const report =
+`APP ERROR CAUGHT
+
+Message:
+${e.message}
+
+File:
+${e.filename}
+
+Line:
+${e.lineno}
+
+Column:
+${e.colno}
+
+Time:
+${new Date().toLocaleString()}`;
+
+  localStorage.setItem("rwd_last_error", report);
+
+  console.log(report);
+});
+
+window.addEventListener("unhandledrejection", function(e){
+  const report =
+`APP PROMISE ERROR
+
+Reason:
+${e.reason}
+
+Time:
+${new Date().toLocaleString()}`;
+
+  localStorage.setItem("rwd_last_error", report);
+
+  console.log(report);
+});
+
+document.addEventListener("input", autoSaveEverything);
+document.addEventListener("change", autoSaveEverything);
+setInterval(autoSaveEverything, 5000);
+
+window.addEventListener("load", function(){
+  restoreEverything();
+  autoSaveEverything();
+});
+
+  
   </script>
 
 <script src="app_integration.js"></script>
