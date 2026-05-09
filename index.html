@@ -391,7 +391,23 @@ button:active{transform:scale(.98)}
 
     <label>Notes / VIN / ESN / CPL</label>
     <textarea id="partNote" placeholder="VIN, ESN, CPL, old part number, location, symptom"></textarea>
+<label>EPA / Emissions</label>
+<select id="epaGlobal">
+  <option value="">Select EPA</option>
+  <option>EPA98</option>
+  <option>EPA04</option>
+  <option>EPA07</option>
+  <option>EPA10</option>
+  <option>GHG14</option>
+  <option>GHG17</option>
+  <option>EPA21</option>
+</select>
 
+<label>ESN / Engine Serial Number</label>
+<input id="esnGlobal" placeholder="79345678">
+
+<label>CPL</label>
+<input id="cplGlobal" placeholder="4583">
     <div class="row">
       <button class="success" onclick="askPart()">Lookup Options</button>
       <button class="secondary" onclick="verifyPartWeb()">Web + AI Verify</button>
