@@ -2848,8 +2848,12 @@ window.addEventListener("load", ()=>{
 });
   
 // SAFE CALL (won’t crash if missing)
-if (typeof loadSettings === "function") {
-  loadSettings();
+try{
+  if(typeof loadSettings === "function"){
+    loadSettings();
+  }
+}catch(e){
+  console.log("loadSettings skipped", e);
 }
 window.addEventListener(
 "load",
