@@ -756,7 +756,10 @@ function ctx(){
 Make: ${$("makeGlobal")?.value || "unknown"}
 Model: ${$("modelGlobal")?.value || "unknown"}
 VIN/Unit: ${$("vin")?.value || "none"}
-Engine: ${$("engine")?.value || "unknown"}`;
+Engine: ${$("engine")?.value || "unknown"}
+EPA: ${$("epaGlobal")?.value || "unknown"}
+ESN: ${$("esnGlobal")?.value || "unknown"}
+CPL: ${$("cplGlobal")?.value || "unknown"}`;
 }
 const COMPONENT_RULES = [
   {
@@ -1127,7 +1130,10 @@ async function callAI(question,mode="parts",notes=""){
   make: $("makeGlobal")?.value || $("partMake")?.value || "",
   model: $("modelGlobal")?.value || $("partModel")?.value || "",
   engine: $("engine")?.value || "",
-  mode,
+epa: $("epaGlobal")?.value || "",
+esn: $("esnGlobal")?.value || "",
+cpl: $("cplGlobal")?.value || "",
+      mode,
   vehicleContext: ctx()
 })
   });
@@ -2205,6 +2211,9 @@ function saveCustomerProfile(){
     vin: $("vin")?.value || "",
     mileage: $("mileageGlobal")?.value || "",
     engine: $("engine")?.value || ""
+  epa: $("epaGlobal")?.value || "",
+esn: $("esnGlobal")?.value || "",
+cpl: $("cplGlobal")?.value || "",
   };
 
   if(!profile.customer && !profile.vin){
