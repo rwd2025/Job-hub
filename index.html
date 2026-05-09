@@ -2226,7 +2226,7 @@ function saveCustomerProfile(){
     model: $("modelGlobal")?.value || "",
     vin: $("vin")?.value || "",
     mileage: $("mileageGlobal")?.value || "",
-    engine: $("engine")?.value || ""
+    engine: $("engine")?.value || "",
   epa: $("epaGlobal")?.value || "",
 esn: $("esnGlobal")?.value || "",
 cpl: $("cplGlobal")?.value || "",
@@ -2559,7 +2559,7 @@ setInterval(updateClockLive,1000);
 updateClockLive();
 }
 
-
+}
 function clockIn(){
   startTime=Date.now();
   lastClockBill="";
