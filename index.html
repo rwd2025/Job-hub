@@ -2851,7 +2851,10 @@ window.addEventListener("load", ()=>{
 if (typeof loadSettings === "function") {
   loadSettings();
 }
-
+window.addEventListener(
+"load",
+loadClockState
+);
   </script>
 
 <script src="app_integration.js"></script>
