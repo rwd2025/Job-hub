@@ -2492,7 +2492,74 @@ function clearPin(){
 let startTime=0;
 let clockInterval=null;
 let lastClockBill="";
+function saveClockState(){
 
+const state = {
+startTime,
+lastClockBill,
+
+laborRate: $("laborRate")?.value || "",
+serviceCall: $("serviceCall")?.value || "",
+parts: $("parts")?.value || "",
+tax: $("tax")?.value || "",
+cardFee: $("cardFee")?.value || "",
+customer: $("customer")?.value || "",
+jobName: $("jobName")?.value || "",
+workPerformed: $("workPerformed")?.value || ""
+};
+
+localStorage.setItem(
+"rwd_clock_state",
+JSON.stringify(state)
+);
+
+}
+
+function loadClockState(){
+
+const raw =
+localStorage.getItem("rwd_clock_state");
+
+if(!raw) return;
+
+const state = JSON.parse(raw);
+
+startTime = state.startTime || 0;
+lastClockBill = state.lastClockBill || "";
+
+if($("laborRate"))
+$("laborRate").value = state.laborRate || "";
+
+if($("serviceCall"))
+$("serviceCall").value = state.serviceCall || "";
+
+if($("parts"))
+$("parts").value = state.parts || "";
+
+if($("tax"))
+$("tax").value = state.tax || "";
+
+if($("cardFee"))
+$("cardFee").value = state.cardFee || "";
+
+if($("customer"))
+$("customer").value = state.customer || "";
+
+if($("jobName"))
+$("jobName").value = state.jobName || "";
+
+if($("workPerformed"))
+$("workPerformed").value =
+state.workPerformed || "";
+
+if(startTime){
+clockInterval =
+setInterval(updateClockLive,1000);
+
+updateClockLive();
+}
+
+}
 function clockIn(){
   startTime=Date.now();
   lastClockBill="";
@@ -2501,6 +2568,7 @@ function clockIn(){
 
   clockInterval=setInterval(updateClockLive,1000);
   updateClockLive();
+  saveClockState();
 }
 function sendToSquare(){
   const settings=JSON.parse(localStorage.getItem("mmp_settings")||"{}");
@@ -2543,6 +2611,7 @@ ${includeService ? money(call) : "$0.00 (In-house)"}
 
 RUNNING TOTAL:
 ${money(total)}`;
+  saveClockState();
 }
 
 function clockOut(){
