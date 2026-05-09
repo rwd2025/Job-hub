@@ -3184,7 +3184,35 @@ window.addEventListener("load", function(){
   autoSaveEverything();
 });
 
-  
+  function setTheme(theme){
+
+  document.body.classList.remove(
+    "theme-orange",
+    "theme-cat",
+    "theme-cummins"
+  );
+
+  document.body.classList.add("theme-" + theme);
+
+  localStorage.setItem("rwdTheme", theme);
+
+  const sel = document.getElementById("themeSelect");
+  if(sel) sel.value = theme;
+}
+
+function loadTheme(){
+
+  const saved =
+    localStorage.getItem("rwdTheme")
+    || "orange";
+
+  setTheme(saved);
+}
+
+window.addEventListener(
+  "DOMContentLoaded",
+  loadTheme
+);
   </script>
 
 <script src="app_integration.js"></script>
