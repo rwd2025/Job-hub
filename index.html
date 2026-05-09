@@ -337,15 +337,24 @@ button:active{transform:scale(.98)}
 
     <button class="success" style="width:100%" onclick="homeAI()">ASK DIESEL AI</button>
 
+
+ 
     <div id="homeAiOut" class="result">Tell me what you need or choose a tool below.</div>
   </div>
-
+<button class="danger" style="width:100%;margin-top:10px"
+onclick="clearHomeAI()">
+CLEAR AI SESSION
+</button>
+  
   <div class="ai-actions">
     <button onclick="addToParts()">Add to Parts Lookup</button>
     <button onclick="addToWorkOrder()">Add to Work Order</button>
     <button onclick="addToInvoice()">Add to Invoice</button>
   </div>
-
+<button class="danger" style="grid-column:1/-1"
+onclick="newJobSession()">
+NEW JOB / CLEAR ACTIVE SESSION
+</button>
   <div class="grid">
     <button class="toolBtn orange" onclick="show('parts')"><strong>Parts Lookup</strong><span>OEM / aftermarket</span></button>
     <button class="toolBtn orange" onclick="show('troubleshooter')"><strong>Troubleshooter</strong><span>Repair logic</span></button>
@@ -455,6 +464,10 @@ VIEW VEHICLE PARTS HISTORY
     <button class="success" style="width:100%;margin-top:10px" onclick="confirmFixLearning()">
   CONFIRM FIX / TEACH APP
 </button>
+    <button class="danger" style="width:100%;margin-top:10px"
+onclick="clearTroubleshooter()">
+CLEAR TROUBLESHOOTER
+</button>
   </div>
 </section>
 
@@ -559,6 +572,10 @@ VIEW VEHICLE PARTS HISTORY
       <button class="primary" onclick="addDiagToWork()">Add To Work Order</button>
       <button class="dark" onclick="copyText('diagOut')">Copy Result</button>
     </div>
+    <button class="danger" style="width:100%;margin-top:10px"
+onclick="clearDiagAI()">
+CLEAR DIAGNOSTICS
+</button>
   </div>
 </section>
 
@@ -2958,7 +2975,80 @@ function repairApp(){
     alert("Repair failed: " + e.message);
   }
 }
+function newJobSession(){
 
+if(!confirm(
+"Start a new job session?\n\nThis clears active fields but keeps saved invoices/history."
+)){
+return;
+}
+
+document.querySelectorAll("input, textarea, select")
+.forEach(el=>{
+
+if(!el.id) return;
+
+if(
+el.id.includes("default") ||
+el.id.includes("shopName") ||
+el.id.includes("squareLink")
+){
+return;
+}
+
+if(el.type === "checkbox"){
+el.checked = false;
+}else{
+el.value = "";
+}
+
+});
+
+if($("homeAiPreview")){
+$("homeAiPreview").style.display = "none";
+$("homeAiPreview").src = "";
+}
+
+if($("homeAiOut")){
+$("homeAiOut").textContent =
+"Tell me what you need or choose a tool below.";
+}
+
+if($("partOut")){
+$("partOut").textContent =
+"Enter part number.";
+}
+
+if($("diagAnswer")){
+$("diagAnswer").textContent =
+"Enter a fault or symptom.";
+}
+
+if($("diagOut")){
+$("diagOut").textContent =
+"Enter diagnostic question.";
+}
+
+if($("filterOut")){
+$("filterOut").textContent =
+"Enter filter number, engine, or unit.";
+}
+
+if($("quoteOut")){
+$("quoteOut").textContent =
+"Build invoice.";
+}
+
+if($("workOut")){
+$("workOut").textContent =
+"Work order ready.";
+}
+
+show("home");
+
+alert("New job session started.");
+
+}
 window.addEventListener("error", function(e){
   const report =
 `APP ERROR CAUGHT
@@ -2982,7 +3072,44 @@ ${new Date().toLocaleString()}`;
 
   console.log(report);
 });
+function clearPartsLookup(){
 
+$("partq").value = "";
+$("partNote").value = "";
+$("partOut").textContent =
+"Enter part number.";
+
+}
+
+function clearTroubleshooter(){
+
+$("diagFault").value = "";
+$("diagNotes").value = "";
+
+$("diagAnswer").textContent =
+"Enter a fault or symptom.";
+
+}
+
+function clearDiagAI(){
+
+$("diagq").value = "";
+$("diagNote").value = "";
+
+$("diagOut").textContent =
+"Enter diagnostic question.";
+
+}
+
+function clearFilterLookup(){
+
+$("filterq").value = "";
+$("filterNote").value = "";
+
+$("filterOut").textContent =
+"Enter filter number, engine, or unit.";
+
+}
 window.addEventListener("unhandledrejection", function(e){
   const report =
 `APP PROMISE ERROR
