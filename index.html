@@ -1308,28 +1308,6 @@ Enter one of these:
   }
 $("partOut").textContent="Searching Diesel Vector Brain...";
 
-const vector = await vectorSearchDieselBrain(
-  q + " " + note
-);
-
-if(vector?.results?.length){
-
-  $("partOut").textContent =
-`DIESEL VECTOR BRAIN MATCH
-
-STATUS: ${vector.status}
-
-TOP MATCH:
-${JSON.stringify(vector.results[0], null, 2)}
-
-Running full AI verification...`;
-
-}else{
-
-  $("partOut").textContent =
-"No vector match yet. Running full AI verification...";
-
-}
   $("partOut").textContent="Looking up shop-safe options...";
 
   const partYear=$("partYear")?.value || $("yearGlobal")?.value || "";
