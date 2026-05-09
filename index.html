@@ -1267,6 +1267,33 @@ function localDieselHints(q){
 
   return "";
 }
+
+function validatePartsResponse(txt){
+
+const banned = [
+"likely",
+"typically",
+"may fit",
+"subject to confirmation",
+"dealer verification",
+"consult dealer",
+"not verified",
+"requires verification",
+"confidence score",
+"most likely"
+];
+
+for(let b of banned){
+
+if(txt.toLowerCase().includes(b)){
+return "INVALID RESPONSE — AI USED NON-OEM LANGUAGE";
+}
+
+}
+
+return txt;
+}
+  
 /* PARTS LOOKUP */
 async function askPart(){
   const q=$("partq")?.value.trim() || "";
@@ -1315,16 +1342,71 @@ $("partOut").textContent="Searching Diesel Vector Brain...";
   const partModel=$("partModel")?.value || $("modelGlobal")?.value || "";
   const partType=$("partType")?.value || "Unknown";
 
-  const prompt = buildDieselPrompt(
-  q,
-  `Year: ${partYear}
+  const prompt = `
+YOU ARE OEM PART FINDER PRO.
+
+STRICT RULES:
+- NEVER GUESS
+- NEVER INVENT PARTS
+- NEVER USE:
+likely
+typically
+may fit
+possibly
+subject to confirmation
+dealer verification
+consult dealer
+not verified
+
+IF EXACT OEM DATA IS UNKNOWN:
+RESPOND:
+UNKNOWN
+
+OUTPUT FORMAT:
+
+PART IDENTIFIED:
+[part]
+
+OEM PART NUMBER:
+[number or UNKNOWN]
+
+AFTERMARKET OPTIONS:
+[verified only]
+
+GASKETS / SEALS:
+[verified only]
+
+TORQUE SPECS:
+[verified only]
+
+LABOR:
+[verified only]
+
+CONFIDENCE:
+HIGH / MEDIUM / LOW
+
+VEHICLE:
+Year: ${partYear}
 Make: ${partMake}
 Model: ${partModel}
 Engine: ${$("engine")?.value || "unknown"}
-Part Type: ${partType}
-${ctx()}`,
-  note
-);
+
+PART TYPE:
+${partType}
+
+VIN:
+${$("vinGlobal")?.value || "UNKNOWN"}
+
+REQUEST:
+${q}
+
+NOTES:
+${note}
+
+SHORT ANSWERS ONLY.
+NO PARAGRAPHS.
+NO DISCLAIMERS.
+`;
 
   try{
     const ans=await callAI(prompt,"smart_parts_brain",note);
@@ -1348,7 +1430,8 @@ async function verifyPartWeb(){
   try{
     const aiPrompt = buildDieselPrompt(q, ctx(), note);
 const ans = await callAI(aiPrompt, "parts", note);
-    $("partOut").textContent=ans;
+   $("partOut").textContent =
+validatePartsResponse(ans);
   }catch(e){
     $("partOut").textContent="WEB VERIFY ERROR: "+e.message;
   }
