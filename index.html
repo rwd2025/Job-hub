@@ -1078,6 +1078,25 @@ RULES:
 - Ask for VIN/ESN/CPL when exact confirmation is needed.
 `;
 }
+
+async function vectorSearchDieselBrain(query){
+  if(!query) return null;
+
+  try{
+    const res = await fetch(VECTOR_API,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        query,
+        vin:$("vin")?.value || ""
+      })
+    });
+
+    return await res.json();
+  }catch(e){
+    return null;
+  }
+}
   
 async function callAI(question,mode="parts",notes=""){
   const res=await fetch(API_URL,{
@@ -1275,7 +1294,25 @@ Enter one of these:
 - Symptom`;
     return;
   }
+$("partOut").textContent="Searching Diesel Vector Brain...";
 
+const vector = await vectorSearchDieselBrain(
+  q + " " + note
+);
+
+if(vector?.results?.length){
+
+  $("partOut").textContent =
+`DIESEL VECTOR BRAIN MATCH
+
+STATUS: ${vector.status}
+
+TOP MATCH:
+${JSON.stringify(vector.results[0], null, 2)}
+
+Running full AI verification...`;
+
+}
   $("partOut").textContent="Looking up shop-safe options...";
 
   const partYear=$("partYear")?.value || $("yearGlobal")?.value || "";
