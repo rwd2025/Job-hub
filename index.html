@@ -20,12 +20,55 @@
   --red:#e14b4b;
   --result:#071720;
 }
+.theme-orange{
+  --bg:#050505;
+  --card:#141414;
+  --card2:#171717;
+  --line:#343434;
+  --text:#f5f5f5;
+  --muted:#aaa;
+  --orange:#ff6500;
+  --accent:#ff6500;
+  --blue:#2f73e8;
+  --green:#20b765;
+  --red:#e14b4b;
+  --result:#071720;
+}
 
+.theme-cat{
+  --bg:#070707;
+  --card:#171717;
+  --card2:#1f1f1f;
+  --line:#4a3b00;
+  --text:#ffffff;
+  --muted:#bdbdbd;
+  --orange:#f2c300;
+  --accent:#f2c300;
+  --blue:#ffd54d;
+  --green:#d4ff5e;
+  --red:#ff6b6b;
+  --result:#1a1600;
+}
+
+.theme-cummins{
+  --bg:#080808;
+  --card:#171111;
+  --card2:#201515;
+  --line:#4a1c1c;
+  --text:#ffffff;
+  --muted:#bbbbbb;
+  --orange:#d62828;
+  --accent:#d62828;
+  --blue:#ff5a5a;
+  --green:#45d483;
+  --red:#ff4444;
+  --result:#1a0d0d;
+}
 *{box-sizing:border-box}
 
 body{
   margin:0;
-  background:radial-gradient(circle at top,#171717,#030303 60%,#000);
+  background:var(--bg);
   color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
   padding:12px 12px 105px;
@@ -63,7 +106,8 @@ h1{
 }
 
 .card{
-  background:linear-gradient(180deg,#151515,#0a0a0a);
+  background:var(--card);
+  color:var(--text);
   border:1px solid var(--line);
   border-radius:18px;
   padding:14px;
@@ -136,14 +180,14 @@ button{
 button:active{transform:scale(.98)}
 
 .success,.primary,.secondary{
-  background:var(--orange);
+  background:var(--accent);
   color:#fff;
 }
 
 .dark{
-  background:#202020;
-  color:#fff;
-  border:1px solid #444;
+  background:var(--card2);
+  color:var(--text);
+  border:1px solid var(--line);
 }
 
 .danger{
@@ -696,7 +740,13 @@ CLEAR DIAGNOSTICS
     <label>Default Service Call</label><input id="defaultServiceCall" type="number" value="250">
     <label>Shop Name</label><input id="shopName" value="Rolling Wrench Diesel">
     <label>Square Payment Link</label><input id="squareLink" placeholder="Paste your Square checkout link">
+<label>APP THEME</label>
 
+<select id="themeSelect" onchange="setTheme(this.value)">
+  <option value="orange">Industrial Orange</option>
+  <option value="cat">CAT Yellow</option>
+  <option value="cummins">Cummins Red</option>
+</select>
     <label>App Theme</label>
     <div class="themeGrid">
       <button class="themeBtn" onclick="setTheme('black')">Minimal Black</button>
