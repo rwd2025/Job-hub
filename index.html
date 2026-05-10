@@ -460,11 +460,10 @@ button:active{
   margin-top:14px;
 }
 
+.heroTool,
+.heroCard{
 
-.toolBtn,
-.miniGrid button{
-
-  min-height:86px;
+  min-height:185px;
 
   background:
     linear-gradient(
@@ -475,26 +474,22 @@ button:active{
 
   border:2px solid #ffb347;
 
-  border-radius:18px;
+  border-radius:22px;
 
-  padding:12px;
+  padding:18px;
 
   text-align:center;
 
   display:flex;
   flex-direction:column;
-  align-items:center;
   justify-content:center;
-  gap:6px;
+  align-items:center;
 
   box-shadow:
-    0 0 18px rgba(255,140,0,.35),
+    0 0 24px rgba(255,140,0,.40),
     inset 0 1px 0 rgba(255,255,255,.25);
-
-  color:#fff;
-
-  transition:.18s;
 }
+
 
 .toolBtn strong,
 .heroTitle{
@@ -665,7 +660,9 @@ button:active{
 
   <div class="header">
     <div class="brand">Rolling Wrench Diesel</div>
-   <button class="topGear" onclick="toggleTopMenu()">
+<h1>DIESEL REPAIR</h1>
+<div class="subhead">AI ASSISTANT</div>
+    <button class="topGear" onclick="toggleTopMenu()">
 ⚙️
 </button>
 
@@ -693,17 +690,29 @@ button:active{
 
 </div>
     <h1>Mobile Mechanic Pro V36</h1>
-    <div class="subhead">
-      Professional diesel repair and shop management.
-    </div>
+   
   </div>
 
   <div class="card">
 
-    <div class="cardTitle">
-      <h2>What can I help you with today?</h2>
-      <div class="badge">Diesel AI</div>
-    </div>
+ <div class="mockSearchBar" onclick="openAiDrawer()">
+  <span class="searchIcon">⌕</span>
+  <span class="searchText">Ask AI anything about your truck...</span>
+
+  <button class="mockMic" onclick="event.stopPropagation(); startVoiceInput()">
+    🎤
+  </button>
+</div>
+
+<div id="aiDrawer" class="aiDrawer">
+  <textarea id="homeAiAsk" placeholder="Type diagnostic question, part number, VIN, or upload a picture..."></textarea>
+
+  <div class="aiDrawerBtns">
+    <button onclick="document.getElementById('homeAiImage').click()">📷 Picture</button>
+    <button onclick="startVoiceInput()">🎤 Voice</button>
+    <button onclick="homeAI()">➜ Send</button>
+  </div>
+</div>
 
  <div class="aiBar">
 
