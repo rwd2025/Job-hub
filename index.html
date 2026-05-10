@@ -3078,20 +3078,7 @@ function copyText(id){
 }
 
 
-function setTheme(theme){
-  document.body.className = "theme-" + theme;
-  localStorage.setItem("theme", theme);
-}  
-window.addEventListener("load", ()=>{
 
-  const savedTheme =
-    localStorage.getItem("theme") || "black";
-
-  setTheme(savedTheme);
-
-  const select = $("themeSelect");
-  if(select) select.value = savedTheme;
-});
   
 // SAFE CALL (won’t crash if missing)
 try{
