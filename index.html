@@ -840,9 +840,17 @@ body.notHome .activeTruck{display:none}
       <button onclick="document.getElementById('invoicePhoto').click()">📷 SNAP / UPLOAD</button>
       <button onclick="addInvoicePhotoToNotes()">ADD PHOTO NOTE</button>
     </div>
-    <input id="invoicePhoto" type="file" accept="image/*" style="display:none">
-    <img id="invoicePreview" style="width:100%;margin-top:10px;border-radius:14px;display:none">
+  <input
+  id="invoicePhoto"
+  type="file"
+  accept="image/*"
+  multiple
+  style="display:none"
+>
 
+<div id="invoicePhotoList" class="result">
+No invoice photos attached.
+</div>
     <label>Labor Description</label><input id="laborDesc" placeholder="Diagnostics, water pump, brakes">
     <div class="row">
       <div><label>Labor Hours</label><input id="laborHours" type="number" step=".25" value="1"></div>
