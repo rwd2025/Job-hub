@@ -1380,6 +1380,7 @@ function imageToBase64(file){
 }
 
 async function homeAI(){
+ showClearAiButton();
   const q = $("homeAiAsk")?.value.trim() || "";
   const file = $("homeAiImage")?.files?.[0];
 
