@@ -474,6 +474,105 @@ button:active{transform:scale(.98)}
 .layout-roadside .toolBtn:nth-child(10){
   display:block;
 }
+  .aiBar{
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(20,20,20,.96),
+      rgba(8,8,8,.96)
+    );
+
+  border:1px solid #2d2d2d;
+
+  border-radius:24px;
+
+  padding:8px;
+
+  margin-top:12px;
+  margin-bottom:14px;
+
+  box-shadow:
+    0 8px 24px rgba(0,0,0,.45),
+    inset 0 0 18px rgba(255,120,0,.05);
+}
+
+.aiBar input{
+  flex:1;
+
+  background:#0a0a0a;
+
+  border:1px solid #252525;
+
+  color:#fff;
+
+  border-radius:16px;
+
+  padding:14px;
+
+  font-size:15px;
+
+  outline:none;
+}
+
+.aiMini{
+  width:48px;
+  height:48px;
+
+  border-radius:14px;
+
+  border:none;
+
+  background:#1b1b1b;
+
+  color:#fff;
+
+  font-size:18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.micBtn{
+  background:
+    linear-gradient(
+      180deg,
+      #ff7b00,
+      #d85600
+    );
+
+  box-shadow:
+    0 0 18px rgba(255,120,0,.28);
+}
+
+.aiSend{
+  width:54px;
+  height:54px;
+
+  border:none;
+
+  border-radius:16px;
+
+  font-size:24px;
+
+  font-weight:900;
+
+  color:#fff;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ff7b00,
+      #d85600
+    );
+
+  box-shadow:
+    0 0 20px rgba(255,120,0,.35);
+}
 @media(max-width:390px){
   .grid{grid-template-columns:repeat(2,1fr)}
   .ai-actions{grid-template-columns:1fr}
