@@ -349,7 +349,65 @@ button:active{transform:scale(.98)}
 .theme-gray{--bg:#111;--card:#1c1c1c;--accent:#95a5b3}
 .theme-black{--bg:#000;--card:#0d0d0d;--accent:#42ff7b}
 .theme-light{--bg:#f4f4f4;--card:#fff;--accent:#35d46a;--text:#111}
+/* REAL LAYOUT MODES */
 
+.layout-grid .grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.layout-list .grid{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:10px;
+}
+
+.layout-list .toolBtn{
+  width:100%;
+  min-height:68px;
+  display:block;
+}
+
+.layout-compact .grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:6px;
+}
+
+.layout-compact .toolBtn{
+  min-height:58px;
+  padding:9px;
+  border-radius:12px;
+}
+
+.layout-compact .toolBtn strong{
+  font-size:10px;
+}
+
+.layout-compact .toolBtn span{
+  display:none;
+}
+
+.layout-roadside .grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.layout-roadside .toolBtn{
+  display:none;
+}
+
+.layout-roadside .toolBtn:nth-child(1),
+.layout-roadside .toolBtn:nth-child(2),
+.layout-roadside .toolBtn:nth-child(5),
+.layout-roadside .toolBtn:nth-child(6),
+.layout-roadside .toolBtn:nth-child(7),
+.layout-roadside .toolBtn:nth-child(8),
+.layout-roadside .toolBtn:nth-child(10){
+  display:block;
+}
 @media(max-width:390px){
   .grid{grid-template-columns:repeat(2,1fr)}
   .ai-actions{grid-template-columns:1fr}
