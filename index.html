@@ -836,10 +836,14 @@ body.notHome .activeTruck{display:none}
     <label>Truck / Unit</label><input id="invoiceTruck">
     <label>VIN</label><input id="invoiceVin">
 
-    <div class="row">
-      <button onclick="document.getElementById('invoicePhoto').click()">📷 SNAP / UPLOAD</button>
-      <button onclick="addInvoicePhotoToNotes()">ADD PHOTO NOTE</button>
-    </div>
+  <div class="row" style="margin-top:10px">
+  <button onclick="document.getElementById('invoicePhoto').click()">📷 ADD PHOTOS / RECEIPTS</button>
+  <button onclick="readInvoicePhotos()">READ PART # FROM PHOTOS</button>
+</div>
+
+<button class="danger" onclick="clearInvoice()" style="width:100%;margin-top:10px">
+  CLEAR INVOICE
+</button>
   <input
   id="invoicePhoto"
   type="file"
