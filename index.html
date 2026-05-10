@@ -641,6 +641,9 @@ button:active{transform:scale(.98)}
     <div class="row">
       <button class="success" onclick="askPart()">Lookup Options</button>
       <button class="secondary" onclick="verifyPartWeb()">Web + AI Verify</button>
+ <button class="secondary" onclick="Utils.findNearestDealer()">
+  FIND NEAREST PARTS / DEALER
+</button>
     </div>
 
     <div id="partOut" class="result">Enter part number.</div>
@@ -1357,7 +1360,45 @@ RULES:
 - Ask for VIN/ESN/CPL when exact confirmation is needed.
 `;
 }
+const Utils = {
+  getDieselContext(){
+    return `
+VEHICLE:
+Year: ${$("yearGlobal")?.value || $("partYear")?.value || "unknown"}
+Make: ${$("makeGlobal")?.value || $("partMake")?.value || "unknown"}
+Model: ${$("modelGlobal")?.value || $("partModel")?.value || "unknown"}
+VIN: ${$("vinGlobal")?.value || $("vin")?.value || "unknown"}
+Engine: ${$("engine")?.value || "unknown"}
+EPA: ${$("epaGlobal")?.value || "unknown"}
+ESN: ${$("esnGlobal")?.value || "unknown"}
+CPL: ${$("cplGlobal")?.value || "unknown"}
+`.trim();
+  },
 
+  formatTorqueSpecs(text){
+    return String(text || "").replace(
+      /(\d+\s?(ft-lb|in-lb|lb-ft|lb-in|nm|newton\s?meters))/gi,
+      "⚠️ $1"
+    );
+  },
+
+  findNearestDealer(){
+    if(!navigator.geolocation){
+      alert("GPS not supported");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(pos=>{
+      const { latitude, longitude } = pos.coords;
+      const query =
+        "FleetPride OR Cummins Dealer OR Kenworth OR Peterbilt OR Freightliner Parts";
+      window.open(
+        `https://www.google.com/maps/search/${encodeURIComponent(query)}/@${latitude},${longitude},12z`,
+        "_blank"
+      );
+    });
+  }
+};
 async function vectorSearchDieselBrain(query){
   if(!query) return null;
 
