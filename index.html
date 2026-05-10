@@ -1400,2156 +1400,64 @@ setInvoiceStatus("UNPAID");
 
   
 
-  <!-- MAIN SCRIPT -->
 
+<!-- =====================================================
+     MAIN SCRIPT — MOBILE MECHANIC PRO V36
+     CLEAN CONTROLLER
+===================================================== -->
 
-  
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
 <script>
+/* =====================================================
+   1. APP CONFIG
+===================================================== */
+const SUPABASE_URL = "https://uxpkqwcmvtqvubibbrek.supabase.co";
+const SUPABASE_KEY = "YOUR_ANON_KEY_HERE";
+const API_URL = "https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/verify-part-web";
 
-  /*
-====================================================
+const supabaseClient = window.supabase
+  ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  : null;
 
-ROLLING WRENCH DIESEL
-MOBILE MECHANIC PRO V36
-DIESEL DOC AI
+const $ = (id) => document.getElementById(id);
 
-Copyright © 2026 Rolling Wrench Diesel LLC
-All Rights Reserved.
+let invoiceStatus = "UNPAID";
+let startTime = null;
+let clockInterval = null;
 
-Unauthorized copying, redistribution,
-reverse engineering, resale, or reuse
-of this software or backend logic is prohibited.
-
-====================================================
-*/
-  const SUPABASE_URL = "https://uxpkqwcmvtqvubibbrek.supabase.co";
-const VECTOR_API =
-"https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/bright-task";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4cGtxd2NtdnRxdnViaWJicmVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzk4NjQsImV4cCI6MjA5MjgxNTg2NH0.afiaSFqkRFEXW5nPQVRXKZcpKkS6iF3T_hTQC2P15HQ";
-
-const supabaseClient = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-const API_URL="https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/verify-part-web";
-
-function $(id){return document.getElementById(id)}
-
+/* =====================================================
+   2. NAVIGATION
+===================================================== */
 function show(id){
-  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  const target=$(id);
+  document.querySelectorAll(".section").forEach(s=>{
+    s.classList.remove("active");
+  });
+
+  const target = $(id);
   if(target) target.classList.add("active");
 
-  document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
+  document.body.classList.toggle("notHome", id !== "home");
 
-  const key =
-    id==="home" ? "home" :
-    id==="diag" ? "diag" :
-    id==="parts" || id==="filters" ? "parts" :
-    id==="work" ? "work" :
-    "more";
+  document.querySelectorAll(".bottomNav button").forEach(b=>{
+    b.classList.remove("active");
+  });
 
-  const nav=$("nav-"+key);
-  if(nav) nav.classList.add("active");
+  const navMap = {
+    home: 1,
+    diag: 2,
+    parts: 3,
+    quote: 4,
+    work: 4
+  };
+
+  const navIndex = navMap[id];
+  if(navIndex){
+    const btn = document.querySelector(`.bottomNav button:nth-child(${navIndex})`);
+    if(btn) btn.classList.add("active");
+  }
 
   window.scrollTo(0,0);
-}
-
-function ctx(){
-  return `Year: ${$("yearGlobal")?.value || "unknown"}
-Make: ${$("makeGlobal")?.value || "unknown"}
-Model: ${$("modelGlobal")?.value || "unknown"}
-VIN/Unit: ${$("vin")?.value || "none"}
-Engine: ${$("engine")?.value || "unknown"}
-EPA: ${$("epaGlobal")?.value || "unknown"}
-ESN: ${$("esnGlobal")?.value || "unknown"}
-CPL: ${$("cplGlobal")?.value || "unknown"}`;
-}
-const COMPONENT_RULES = [
-  {
-    name: "Foot Brake Valve / Treadle Valve",
-    system: "Air Brake Control System",
-    location: "cab firewall / under dash / pedal area",
-    clues: [
-      "brake pedal linkage",
-      "mounted high on firewall",
-      "multiple primary and secondary air lines",
-      "driver input location",
-      "treadle mechanism visible"
-    ],
-    not_if: [
-      "mounted near axle",
-      "ABS wires connected",
-      "near brake chamber"
-    ],
-    confidenceBoost: 30,
-    warning: "Do not call an axle-mounted ABS valve a foot brake valve."
-  },
-  {
-    name: "ABS Relay / Modulator Valve",
-    system: "Air Brake ABS System",
-    location: "frame rail / axle / suspension area",
-    clues: [
-      "ABS wires",
-      "electrical connector",
-      "air lines",
-      "near axle",
-      "near brake chamber",
-      "frame mounted"
-    ],
-    not_if: [
-      "brake pedal linkage visible",
-      "mounted on cab firewall"
-    ],
-    confidenceBoost: 35,
-    warning: "If air lines and ABS wiring are present near the axle, rank ABS modulator above plain relay valve or foot valve."
-  },
-  {
-    name: "Air Brake Relay Valve",
-    system: "Air Brake System",
-    location: "frame rail / axle area",
-    clues: [
-      "air lines",
-      "exhaust port",
-      "frame mounted",
-      "near brake chambers",
-      "no electrical connector"
-    ],
-    not_if: [
-      "ABS wires connected",
-      "brake pedal linkage visible"
-    ],
-    confidenceBoost: 20,
-    warning: "If electrical connector or ABS wires are present, check for ABS modulator instead."
-  },
-{
-name:"MX-13 Water Pump",
-system:"Cooling System",
-clues:[
-"multi rib pulley",
-"pump impeller",
-"coolant flange",
-"water pump housing",
-"front engine accessory",
-"cooling system component"
-],
-not_if:[
-"turbo vane linkage",
-"boost ports",
-"actuator arm"
-],
-confidenceBoost:40
-}
-];
-
-const REPAIR_MEMORY = [
-  {
-    symptom: "air valve with ABS wires near axle",
-    likely_component: "ABS relay/modulator valve",
-    common_misdiagnosis: "foot brake valve or plain relay valve",
-    note: "ABS wiring plus air brake lines near axle means modulator should rank highest."
-  },
-  {
-    symptom: "air valve mounted on firewall with brake pedal linkage",
-    likely_component: "foot brake valve / treadle valve",
-    common_misdiagnosis: "relay valve",
-    note: "Pedal linkage and firewall location identify driver input valve."
-  }
-];
-  function detectIntent(q){
-  q = (q || "").toLowerCase();
-
-  if(q.includes("torque") || q.includes("ft-lb") || q.includes("ft lb") || q.includes("in-lb") || q.includes("in lb") || q.includes("nm")){
-    return "torque_specs";
-  }
-
-if(
-  q.includes("i need") ||
-  q.includes("need a") ||
-  q.includes("replace") ||
-  q.includes("job kit") ||
-  q.includes("what all do i need") ||
-  q.includes("what do i need") ||
-  q.includes("doing a") ||
-  q.includes("installing") ||
-  q.includes("changing") ||
-  q.includes("water pump") ||
-  q.includes("rear main") ||
-  q.includes("front cover") ||
-  q.includes("head gasket") ||
-  q.includes("turbo") ||
-  q.includes("injector") ||
-  q.includes("fuel pump")
-){
-  return "smart_job_kit";
-}
-  
-
-  if(q.includes("spn") || q.includes("fmi") || q.includes("fault code") || q.includes("code")){
-    return "fault_code";
-  }
-
-  if(q.includes("wiring") || q.includes("pinout") || q.includes("connector")){
-    return "wiring";
-  }
-
-  if(q.includes("part number") || q.includes("oem") || q.includes("aftermarket") || q.includes("fits")){
-    return "part_lookup";
-  }
-
-  return "general";
-}
-
-function buildDieselPrompt(userQuestion, vehicleContext, ocrText){
-  const intent = detectIntent(userQuestion);
-
-  if(intent === "smart_job_kit"){
-    return `
-REQUEST TYPE: SMART JOB KIT
-
-USER QUESTION:
-${userQuestion}
-
-VEHICLE / ENGINE CONTEXT:
-${vehicleContext || "Not provided"}
-
-OCR / IMAGE TEXT:
-${ocrText || "None"}
-
-RULES:
-- Identify the main part or repair job.
-- Give OEM part number ONLY if verified.
-- Give aftermarket options if known.
-- List all gaskets, O-rings, seals, coolant, hardware, and one-time-use parts likely needed.
-- Include torque specs ONLY if exact and verified.
-- Never guess torque specs.
-- Never invent part numbers.
-- Separate known facts from “verify by VIN/ESN.”
-- If VIN/ESN/CPL is missing, say exact fitment requires VIN/ESN/CPL.
-- Give labor estimate range.
-- Give final checklist.
-- Separate PART IDENTIFICATION from FITMENT VERIFICATION.
-- A part may be visually identified even if exact fitment is unknown.
-- Do NOT lower identification confidence because VIN/ESN is missing.
-- Use separate fields:
-  IDENTIFICATION CONFIDENCE
-  FITMENT CONFIDENCE
-- If the component is visually obvious, say so.
-- Distinguish:
-  "known component"
-  vs
-  "exact application unknown"
-
-- Separate PART IDENTIFICATION from FITMENT VERIFICATION.
-- A part may be visually identified even if exact fitment is unknown.
-- Do NOT lower identification confidence because VIN/ESN is missing.
-- Do NOT invent part numbers.
-- Do NOT guess torque specs.
-- Use separate fields:
-  IDENTIFICATION CONFIDENCE
-  FITMENT CONFIDENCE
-- If the component is visually obvious, say so.
-- Distinguish “known component” from “exact application unknown.”
-- Include related gaskets, O-rings, seals, hardware, fluids, and chemicals when the user asks what they need.
-
-ANSWER FORMAT:
-PART:
-OEM:
-PART NUMBER:
-TYPE:
-SYSTEM:
-
-IDENTIFICATION CONFIDENCE:
-FITMENT CONFIDENCE:
-
-VISUAL MATCH:
-LIKELY APPLICATION:
-
-OEM OPTIONS:
-AFTERMARKET OPTIONS:
-
-GASKETS / O-RINGS / SEALS NEEDED:
-HARDWARE NEEDED:
-FLUIDS / CHEMICALS NEEDED:
-
-TORQUE SPECS:
-- Exact torque only if verified.
-- If not verified, say EXACT TORQUE NOT VERIFIED.
-
-FITS:
-VERIFY BEFORE ORDER:
-WARNINGS:
-NEXT STEP:
-`;
-  }
-
-  if(intent === "torque_specs"){
-    return `
-REQUEST TYPE: TORQUE SPECS
-
-USER QUESTION:
-${userQuestion}
-
-VEHICLE / ENGINE CONTEXT:
-${vehicleContext || "Not provided"}
-
-OCR / IMAGE TEXT:
-${ocrText || "None"}
-
-TORQUE SAFETY RULES:
-- Do NOT treat this as a part lookup.
-- Give torque specs ONLY if exact and verified.
-- Never guess torque.
-- Always include units.
-- If bolt size affects spec, ask for bolt size.
-- Flag unrealistic torque for small bolts.
-- If exact spec is not verified, say EXACT TORQUE NOT VERIFIED.
-
-ANSWER FORMAT:
-ENGINE:
-COMPONENT:
-BOLT SIZE:
-TORQUE SPEC:
-SEQUENCE:
-WARNINGS:
-NEEDED TO VERIFY:
-`;
-  }
-if(intent === "part_lookup"){
-  return `
-REQUEST TYPE: PART LOOKUP
-
-USER QUESTION:
-${userQuestion}
-
-VEHICLE / ENGINE CONTEXT:
-${vehicleContext || "Not provided"}
-
-OCR / IMAGE TEXT:
-${ocrText || "None"}
-
-RULES:
-- Separate PART IDENTIFICATION from FITMENT VERIFICATION.
-- A part may be visually identified even if exact fitment is unknown.
-- Do NOT lower identification confidence because VIN/ESN is missing.
-- Do NOT invent part numbers.
-- Do NOT guess torque specs.
-- Use separate fields:
-  IDENTIFICATION CONFIDENCE
-  FITMENT CONFIDENCE
-- If the component is visually obvious, say so.
-- Distinguish “known component” from “exact application unknown.”
-- Include OEM and aftermarket options if known.
-- Require VIN/ESN/CPL for exact fitment verification.
-
-ANSWER FORMAT:
-PART:
-OEM:
-PART NUMBER:
-TYPE:
-SYSTEM:
-
-IDENTIFICATION CONFIDENCE:
-FITMENT CONFIDENCE:
-
-VISUAL MATCH:
-LIKELY APPLICATION:
-
-OEM OPTIONS:
-AFTERMARKET OPTIONS:
-
-FITS:
-VERIFY BEFORE ORDER:
-WARNINGS:
-NEXT STEP:
-`;
-}
-  return `
-REQUEST TYPE: ${intent.toUpperCase()}
-
-USER QUESTION:
-${userQuestion}
-
-VEHICLE / ENGINE CONTEXT:
-${vehicleContext || "Not provided"}
-
-OCR / IMAGE TEXT:
-${ocrText || "None"}
-
-RULES:
-- Answer as a professional diesel technician.
-- Be precise.
-- Do not guess torque specs.
-- Do not invent part numbers.
-- Separate part identification from exact fitment.
-- Ask for VIN/ESN/CPL when exact confirmation is needed.
-`;
-}
-const Utils = {
-  getDieselContext(){
-    return `
-VEHICLE:
-Year: ${$("yearGlobal")?.value || $("partYear")?.value || "unknown"}
-Make: ${$("makeGlobal")?.value || $("partMake")?.value || "unknown"}
-Model: ${$("modelGlobal")?.value || $("partModel")?.value || "unknown"}
-VIN: ${$("vinGlobal")?.value || $("vin")?.value || "unknown"}
-Engine: ${$("engine")?.value || "unknown"}
-EPA: ${$("epaGlobal")?.value || "unknown"}
-ESN: ${$("esnGlobal")?.value || "unknown"}
-CPL: ${$("cplGlobal")?.value || "unknown"}
-`.trim();
-  },
-
-  formatTorqueSpecs(text){
-    return String(text || "").replace(
-      /(\d+\s?(ft-lb|in-lb|lb-ft|lb-in|nm|newton\s?meters))/gi,
-      "⚠️ $1"
-    );
-  },
-
-  findNearestDealer(){
-    if(!navigator.geolocation){
-      alert("GPS not supported");
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(pos=>{
-      const { latitude, longitude } = pos.coords;
-      const query =
-        "FleetPride OR Cummins Dealer OR Kenworth OR Peterbilt OR Freightliner Parts";
-      window.open(
-        `https://www.google.com/maps/search/${encodeURIComponent(query)}/@${latitude},${longitude},12z`,
-        "_blank"
-      );
-    });
-  }
-};
-async function vectorSearchDieselBrain(query){
-  if(!query) return null;
-
-  try{
-
-    const res = await fetch(VECTOR_API,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        query,
-        vin:$("vin")?.value || ""
-      })
-    });
-
-    const data = await res.json();
-
-    if(data.error){
-      console.log("Vector error:", data.error);
-      return null;
-    }
-
-    return data;
-
-  }catch(e){
-    console.log("Vector failed:", e.message);
-    return null;
-  }
-}
-  
-async function callAI(question,mode="parts",notes=""){
-  const res=await fetch(API_URL,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-  part: question,
-  note: notes,
-  image: typeof notes === "object" ? notes.image : "",
-  question: typeof notes === "object" ? notes.question : question,
-
-  // 🔥 ADD THIS LINE (VIN FIX)
- vin:
-  $("vinGlobal")?.value ||
-  $("vin")?.value ||
-  (notes.match(/[A-HJ-NPR-Z0-9]{17}/i)?.[0] || ""),
-
-year: $("yearGlobal")?.value || $("partYear")?.value || "",
-make: $("makeGlobal")?.value || $("partMake")?.value || "",
-model: $("modelGlobal")?.value || $("partModel")?.value || "",
-engine: $("engine")?.value || "",
-epa: $("epaGlobal")?.value || "",
-esn:
-  $("esnGlobal")?.value ||
-  (notes.match(/\b\d{7,9}\b/)?.[0] || ""),
-
-cpl:
-  $("cplGlobal")?.value ||
-  (notes.match(/CPL\s*#?:?\s*(\d{3,5})/i)?.[1] || ""),
-      mode,
-  vehicleContext: ctx()
-})
-  });
-
-  const data=await res.json();
-
-  if(!res.ok){
-    throw new Error(data.error || JSON.stringify(data));
-  }
-
-  return data.answer || data.error || JSON.stringify(data) || "No answer returned.";
-}
-function imageToBase64(file){
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      resolve(reader.result);
-    };
-
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-async function homeAI(){
- showClearAiButton();
-  const q = $("homeAiAsk")?.value.trim() || "";
-  const file = $("homeAiImage")?.files?.[0];
-
-  if(!q && !file){
-    $("homeAiOut").textContent =
-      "Ask me anything or upload a photo/diagram: diagnose a truck, find parts, read a part number, explain a code, or help build an invoice.";
-    return;
-  }
-
-  $("homeAiOut").textContent = file
-    ? "Diesel AI reading image..."
-    : "Diesel AI thinking...";
-
-  let imageData = "";
-
-  if(file){
-    imageData = await imageToBase64(file);
-imageData = imageData.split(",")[1];
-  }
-
-  const prompt =
-`You are Diesel Doc AI for Rolling Wrench Diesel.
-
-Act like a professional mobile diesel mechanic and heavy-duty parts identifier.
-
-Vehicle/Profile:
-${ctx()}
-
-LOCAL COMPONENT RULES:
-${JSON.stringify(COMPONENT_RULES, null, 2)}
-
-REPAIR MEMORY:
-${JSON.stringify(REPAIR_MEMORY, null, 2)}
-
-User request:
-${q || "Analyze the uploaded image."}
-
-TASK:
-Identify the visible component/system from the image and notes.
-
-REASONING RULES:
-- Identify the system first.
-- Use mounting location as a major clue.
-- Use nearby parts, wires, air lines, hoses, brackets, and connectors as clues.
-- If brake pedal linkage or firewall mounting is visible, rank Foot Brake Valve / Treadle Valve highest.
-- If ABS wires/electrical connector plus air lines are present near axle/frame, rank ABS Relay / Modulator Valve highest.
-- If air lines are present near axle/frame with NO electrical connector, rank Air Brake Relay Valve higher.
-- Do NOT call an axle/frame mounted ABS modulator a foot brake valve.
-- Do NOT call a firewall-mounted pedal valve an ABS modulator.
-- Do NOT fake exact OEM part numbers.
-- If unsure, give likely component family and verification steps.
-- Be practical and field-ready.
-- DO NOT read labels, logos, OEM names, engine brands, or part numbers unless they are clearly visible ON THE PART ITSELF.
-- Ignore background objects, table marks, tools, sockets, rags, boxes, straps, packaging, and shop equipment.
-- Background text is NOT proof of OEM unless user says it belongs to the part.
-- Weak OCR text must never override engine context or visual component shape.
-- If user gives engine context like PACCAR MX-13, use that context unless a confirmed visible part tag proves otherwise.
-- Do NOT claim Cummins, Detroit, CAT, PACCAR, International, Bendix, Wabco, Bosch, or any brand unless a clear logo/tag/part number is visible on the actual component.
-- If no clear part tag is visible, say: OEM not confirmed from image.
-- If a clear OEM label, barcode label, or packaging label is fully readable, confidence should be HIGH.
-- If the image clearly shows OEM branding and part description, confidence should normally be 85% or higher.
-- LOW confidence should only be used when image quality, OCR, or component identification is uncertain.
-
-RETURN FORMAT:
-
-IMPORTANT: If no readable tag is visible on the actual part, OEM must say "Not confirmed from image."
-IDENTIFIED COMPONENT:
-SYSTEM:
-CONFIDENCE:
-WHY:
-COMMON MISDIAGNOSIS:
-COMMON FAILURES:
-VERIFY BEFORE ORDER:
-NEXT STEP:`;
-try{
-  const ans = await callAI(prompt, "diesel_ai", {
-    question: q,
-    image: imageData
-  });
-
-  $("homeAiOut").textContent = ans;
-
-}catch(e){
-  $("homeAiOut").textContent = "Diesel AI error: " + e.message;
-}
-  
-}
-  const COMMON_TORQUE_HINTS = [
-  {
-    keywords:["oil pan","mx13"],
-    warning:"MX-13 oil pan bolts are small pan/cover hardware. Do NOT use high ft-lb torque. Verify exact bolt size, pan type, and OEM procedure."
-  },
-  {
-    keywords:["water pump","isx"],
-    warning:"ISX water pump job: verify ESN/CPL, pump style, gasket/O-ring, coolant, belt condition, and exact bolt torque before install."
-  },
-  {
-    keywords:["turbo","stud"],
-    warning:"Turbo/exhaust studs are high-heat hardware. Use correct OEM stud/nut, anti-seize only if procedure allows, and verify torque by engine."
-  }
-];
-
-function localDieselHints(q){
-  q = (q || "").toLowerCase();
-
-  for(const item of COMMON_TORQUE_HINTS){
-    if(item.keywords.every(k => q.includes(k))){
-      return item.warning;
-    }
-  }
-
-  return "";
-}
-
-function validatePartsResponse(txt){
-
-const banned = [
-"likely",
-"typically",
-"may fit",
-"subject to confirmation",
-"dealer verification",
-"consult dealer",
-"not verified",
-"requires verification",
-"confidence score",
-"most likely"
-];
-
-for(let b of banned){
-
-if(txt.toLowerCase().includes(b)){
-return "INVALID RESPONSE — AI USED NON-OEM LANGUAGE";
-}
-
-}
-
-return txt;
-}
-  
-/* PARTS LOOKUP */
-async function askPart(){
-  const q=$("partq")?.value.trim() || "";
-  const note=$("partNote")?.value.trim() || "";
-const intent = detectIntent(q);
-
-if(intent === "torque_specs"){
-  $("partOut").textContent =
-`TORQUE REQUEST DETECTED
-
-Checking:
-- exact engine family
-- bolt application
-- torque units
-- OEM procedure verification
-
-WARNING:
-Torque specs will NOT be guessed.
-Small bolts may use inch-pound values, not ft-lb.
-
-Consulting Diesel AI...`;
-}
-  const localHint = localDieselHints(q);
-
-if(localHint){
-  $("partOut").textContent += "\n\nLOCAL DIESEL CHECK:\n" + localHint;
-}
-  if(!q && !note){
-    $("partOut").textContent=
-`PART NUMBER UNKNOWN — NEED PART DESCRIPTION OR NAME
-
-Enter one of these:
-- Part number
-- Part name
-- What it does
-- Location on vehicle
-- Symptom`;
-    return;
-  }
-$("partOut").textContent="Searching Diesel Vector Brain...";
-
-  $("partOut").textContent="Looking up shop-safe options...";
-
-  const partYear=$("partYear")?.value || $("yearGlobal")?.value || "";
-  const partMake=$("partMake")?.value==="Use Home Vehicle" ? $("makeGlobal")?.value : $("partMake")?.value;
-  const partModel=$("partModel")?.value || $("modelGlobal")?.value || "";
-  const partType=$("partType")?.value || "Unknown";
-
-  const prompt = `
-YOU ARE OEM PART FINDER PRO.
-
-STRICT RULES:
-- NEVER GUESS
-- NEVER INVENT PARTS
-- NEVER USE:
-likely
-typically
-may fit
-possibly
-subject to confirmation
-dealer verification
-consult dealer
-not verified
-
-IF EXACT OEM DATA IS UNKNOWN:
-RESPOND:
-UNKNOWN
-
-OUTPUT FORMAT:
-
-PART IDENTIFIED:
-[part]
-
-OEM PART NUMBER:
-[number or UNKNOWN]
-
-AFTERMARKET OPTIONS:
-[verified only]
-
-GASKETS / SEALS:
-[verified only]
-
-TORQUE SPECS:
-[verified only]
-
-LABOR:
-[verified only]
-
-CONFIDENCE:
-HIGH / MEDIUM / LOW
-
-VEHICLE:
-Year: ${partYear}
-Make: ${partMake}
-Model: ${partModel}
-Engine: ${$("engine")?.value || "unknown"}
-
-PART TYPE:
-${partType}
-
-VIN:
-${$("vinGlobal")?.value || "UNKNOWN"}
-
-REQUEST:
-${q}
-
-NOTES:
-${note}
-
-SHORT ANSWERS ONLY.
-NO PARAGRAPHS.
-NO DISCLAIMERS.
-`;
-
-  try{
-    const modeToUse =
-  ($("vin")?.value || $("esnGlobal")?.value || $("cplGlobal")?.value)
-    ? "vin_oem_part_lookup"
-    : "smart_parts_brain";
-
-const ans = await callAI(prompt, modeToUse, note);
-    $("partOut").textContent=ans;
-  }catch(e){
-    $("partOut").textContent="PART LOOKUP ERROR: "+e.message;
-  }
-}
-
-async function verifyPartWeb(){
-  const q=$("partq")?.value.trim() || "";
-  const note=$("partNote")?.value.trim() || "";
-
-  if(!q && !note){
-    $("partOut").textContent="ENTER PART NUMBER, PART NAME, OR DESCRIPTION FIRST.";
-    return;
-  }
-
-  $("partOut").textContent="Verifying with Web + AI...";
-
-  try{
-    const aiPrompt = buildDieselPrompt(q, ctx(), note);
-const ans = await callAI(aiPrompt, "parts", note);
-   $("partOut").textContent =
-validatePartsResponse(ans);
-  }catch(e){
-    $("partOut").textContent="WEB VERIFY ERROR: "+e.message;
-  }
-}
-
-
-/* FILTER LOOKUP */
-async function lookupFilter(){
-  const q=$("filterq")?.value.trim() || "";
-  const note=$("filterNote")?.value.trim() || "";
-  const mode=$("filterMode")?.value || "";
-  const brand=$("filterBrand")?.value || "";
-
-  if(!q && !note){
-    $("filterOut").textContent="ENTER FILTER NUMBER, ENGINE, UNIT, OR DESCRIPTION.";
-    return;
-  }
-
-  $("filterOut").textContent="Looking up filter / fluid information...";
-
-  const prompt=
-`Professional filter and fluid lookup.
-
-Lookup Type:
-${mode}
-
-Input:
-${q}
-
-Preferred Brand:
-${brand}
-
-Vehicle:
-${ctx()}
-
-Notes:
-${note || "none"}
-
-Return:
-Filter / Fluid:
-OEM Number:
-Aftermarket Options:
-Brand Cross References:
-Capacity / Spec:
-Fits:
-Verification Needed:
-Shop Warning:
-
-Rules:
-- Do not assume filter if input is actually a part number.
-- Verify by VIN/ESN/engine family before ordering.
-- Include Fleetguard, Baldwin, Donaldson, WIX, NAPA where useful.`;
-
-  try{
-    $("filterOut").textContent=await callAI(prompt,"filters",note);
-  }catch(e){
-    $("filterOut").textContent="FILTER LOOKUP ERROR: "+e.message;
-  }
-}
-
-async function verifyFilterWeb(){
-  const q=$("filterq")?.value.trim() || "";
-  const note=$("filterNote")?.value.trim() || "";
-
-  if(!q && !note){
-    $("filterOut").textContent="ENTER FILTER NUMBER, ENGINE, UNIT, OR DESCRIPTION FIRST.";
-    return;
-  }
-
-  $("filterOut").textContent="Verifying filter with Web + AI...";
-
-  try{
-    $("filterOut").textContent=await callAI(q,"filters",note);
-  }catch(e){
-    $("filterOut").textContent="FILTER WEB ERROR: "+e.message;
-  }
-}
-
-function addFilterToWork(){
-  $("workText").value+=($("workText").value?"\n\n":"")+`FILTER LOOKUP:\n${$("filterOut").textContent}`;
-  show("work");
-}
-
- 
-
-//////////////////////////////////////////////////////
-// PASTE NEW troubleshootFault FUNCTION HERE
-//////////////////////////////////////////////////////
-function fastDieselAnswer(fault, notes){
-  const f = (fault + " " + notes).toLowerCase();
-
-  if(f.includes("egr") && f.includes("delta") && f.includes("negative")){
-    return `QUICK ANSWER:
-
-EGR delta pressure negative usually means the sensor is seeing pressure backwards, no flow, blocked tubes, reversed hoses, bad sensor signal, or wiring issue.
-
-FAST CHECKS:
-1. Inspect and clean EGR delta pressure tubes.
-2. Verify hoses are not reversed.
-3. Check sensor connector and 5V reference.
-4. Compare key-on reading to expected baseline.
-5. Command EGR and watch live data response.
-
-DO NOT REPLACE FIRST:
-Do not throw an EGR valve or cooler at it until tubes, hose routing, sensor voltage, and live data are checked.`;
-  }
-
-  if(f.includes("nox") || f.includes("conversion") || f.includes("efficiency")){
-    return `QUICK ANSWER:
-
-NOx efficiency / conversion faults usually mean the SCR system is not reducing NOx correctly.
-
-FAST CHECKS:
-1. Check DEF quality.
-2. Check DEF dosing.
-3. Compare inlet NOx vs outlet NOx.
-4. Check exhaust leaks before SCR.
-5. Verify temp sensors are reading correctly.
-6. Check for crystallization or restricted dosing valve.
-
-DO NOT REPLACE FIRST:
-Do not replace both NOx sensors until DEF quality, dosing, exhaust leaks, and temps are checked.`;
-  }
-
-  if(f.includes("no start") || f.includes("crank no start")){
-    return `QUICK ANSWER:
-
-Crank no start needs air, fuel, compression, timing, and ECM command checks.
-
-FAST CHECKS:
-1. Check battery voltage while cranking.
-2. Check fuel pressure while cranking.
-3. Check rail pressure commanded vs actual.
-4. Check cam/crank signal.
-5. Check for active engine shutdown codes.
-6. Verify primer/fuel supply side.
-
-DO NOT REPLACE FIRST:
-Do not replace injectors or ECM until fuel supply, rail pressure, and cam/crank signals are verified.`;
-  }
-
-  if(f.includes("regen") || f.includes("dpf")){
-    return `QUICK ANSWER:
-
-Regen / DPF faults usually come from soot load, failed sensors, exhaust leaks, dosing issues, or engine problems creating excess soot.
-
-FAST CHECKS:
-1. Check soot load.
-2. Check DPF differential pressure.
-3. Verify exhaust temp sensors.
-4. Check DOC/DPF inlet and outlet temps.
-5. Look for boost leaks or fuel issues.
-6. Verify regen inhibit conditions.
-
-DO NOT REPLACE FIRST:
-Do not replace the DPF until sensors, soot load, exhaust leaks, and engine cause are checked.`;
-  }
-
-  return `QUICK ANSWER:
-
-Start with basic field checks first:
-1. Verify code/fault is active.
-2. Check battery voltage and grounds.
-3. Inspect connectors and wiring.
-4. Check live data against command.
-5. Verify recent repairs did not create the issue.
-6. Test before replacing parts.
-
-AI is building the full diagnostic path below.`;
-}
-
-function saveVinRepairHistory(){
-  const vin = $("vin")?.value.trim() || "NO VIN / UNIT";
-  const fault = $("diagFault")?.value.trim() || "";
-  const notes = $("diagNotes")?.value.trim() || "";
-  const answer = $("diagAnswer")?.textContent || "";
-
-  if(!fault || !answer){
-    alert("Run a diagnostic first.");
-    return;
-  }
-
-  let history = JSON.parse(localStorage.getItem("rwd_vin_repair_history") || "[]");
-
-  history.unshift({
-    date: new Date().toLocaleString(),
-    vin,
-    vehicle: ctx(),
-    fault,
-    notes,
-    answer
-  });
-
-  localStorage.setItem("rwd_vin_repair_history", JSON.stringify(history));
-
-  alert("Saved to VIN repair history.");
-}
-async function confirmFixLearning(){
-  const vin = $("vin")?.value.trim() || "NO VIN / UNIT";
-  const fault = $("diagFault")?.value.trim() || "";
-  const notes = $("diagNotes")?.value.trim() || "";
-  const engine = $("engine")?.value || "";
-  const vehicle = ctx();
-
-  if(!fault){
-    alert("Enter or run a fault first.");
-    return;
-  }
-
-  const fix = prompt("What fixed it? Example: Cleaned blocked EGR delta tubes");
-  if(!fix) return;
-
-  const failedPart = prompt("Failed part / root cause? Example: Soot plugged delta tubes") || "";
-  const laborHours = prompt("Labor hours? Example: 1.5") || "";
-  const partsUsed = prompt("Parts used? Example: none, delta P sensor, NOx sensor") || "";
-
-  $("diagAnswer").textContent += "\n\nSaving confirmed fix to cloud repair brain...";
-
-  try{
-    const ans = await callAI(fault, "save_confirmed_fix", {
-      note: notes,
-      confirmed_fix: fix,
-      failed_part: failedPart,
-      labor_hours: laborHours,
-      parts_used: partsUsed,
-      engine,
-      vehicle_context: vehicle
-    });
-
-    alert(ans || "Confirmed fix saved to cloud.");
-  }catch(e){
-    alert("Cloud save failed: " + e.message);
-  }
-}
-  
-  async function learnedFixSearch(fault, notes){
-  try{
-    const ans = await callAI(fault, "search_confirmed_fixes", notes);
-    return ans || "";
-  }catch(e){
-    return "";
-  }
-}
-function showVinRepairHistory(){
-  const vin = $("vin")?.value.trim() || "NO VIN / UNIT";
-
-  let history = JSON.parse(
-    localStorage.getItem("rwd_vin_repair_history") || "[]"
-  );
-
-  let matches = history.filter(h => h.vin === vin);
-
-  if(!matches.length){
-    $("diagAnswer").textContent =
-`VIN REPAIR HISTORY
-
-VIN / Unit: ${vin}
-
-No saved repair history found for this truck yet.`;
-
-    return;
-  }
-
-  $("diagAnswer").textContent =
-`VIN REPAIR HISTORY
-
-VIN / Unit: ${vin}
-
-` + matches.map((h,i)=>`
-#${i+1}
-Date: ${h.date}
-
-Fault:
-${h.fault}
-
-Notes:
-${h.notes}
-
-Saved Diagnostic:
-${h.answer}
-`).join("\n----------------------\n");
-}
-  
-  async function troubleshootFault(){
-
-  let fault = $("diagFault").value.trim();
-  let notes = $("diagNotes").value.trim();
-
-  if(!fault){
-    alert("Enter a fault, symptom, or code");
-    return;
-  }
-function knownFixDatabase(fault, notes){
-  const f = (fault + " " + notes).toLowerCase();
-
-  if(f.includes("egr") && f.includes("delta") && f.includes("negative")){
-    return `
-
-KNOWN FIX DATABASE:
-DD15 / heavy diesel EGR delta pressure negative
-
-Most common confirmed causes:
-1. Blocked EGR delta pressure tubes — 42%
-2. Reversed / misrouted hoses — 27%
-3. Failed delta pressure sensor — 18%
-4. Wiring / connector / 5V reference issue — 8%
-5. EGR flow issue / valve issue — 5%
-
-FIELD NOTE:
-Always check tubes and hose routing before replacing the sensor or EGR valve.`;
-  }
-
-  if(f.includes("nox") || f.includes("conversion") || f.includes("efficiency")){
-    return `
-
-KNOWN FIX DATABASE:
-SCR / NOx efficiency faults
-
-Most common confirmed causes:
-1. DEF quality issue — 25%
-2. DEF dosing problem — 24%
-3. Exhaust leak before SCR — 18%
-4. Bad outlet NOx sensor — 15%
-5. SCR catalyst efficiency issue — 12%
-6. Temp sensor / regen condition issue — 6%
-
-FIELD NOTE:
-Compare inlet NOx vs outlet NOx before condemning sensors.`;
-  }
-
-  if(f.includes("no start") || f.includes("crank no start")){
-    return `
-
-KNOWN FIX DATABASE:
-Crank no start
-
-Most common confirmed causes:
-1. Low fuel supply pressure — 28%
-2. Rail pressure not building — 24%
-3. Cam / crank signal issue — 17%
-4. Battery voltage / ground issue — 14%
-5. Air in fuel / primer issue — 10%
-6. ECM inhibit / shutdown code — 7%
-
-FIELD NOTE:
-Verify fuel pressure and cranking voltage before chasing injectors.`;
-  }
-
-  return "";
-}
-$("diagAnswer").textContent =
-  fastDieselAnswer(fault, notes) +
-  knownFixDatabase(fault, notes) +
-  "\n\nSearching known engine patterns..." +
-  "\n\nSearching cloud repair brain..." +
-  "\n\nFULL AI DIAGNOSTIC:\nBuilding full test path...";
-
-let enginePatterns = "";
-let cloudFixes = "";
-
-try{
-  enginePatterns =
-    await callAI(fault, "engine_pattern_lookup", notes);
-}catch(e){
-  enginePatterns =
-    "\n\nENGINE PATTERN LOOKUP:\nNo engine pattern match or backend lookup failed.";
-}
-
-try{
-  cloudFixes =
-    await learnedFixSearch(fault, notes);
-}catch(e){
-  cloudFixes =
-    "\n\nCLOUD REPAIR BRAIN:\nNo cloud repair match found.";
-}
-
-$("diagAnswer").textContent =
-  fastDieselAnswer(fault, notes) +
-  knownFixDatabase(fault, notes) +
-  enginePatterns +
-  cloudFixes;
-  
-  let q = `
-You are Diesel Doc AI for Rolling Wrench Diesel.
-
-Troubleshoot this heavy diesel fault like an experienced field diesel technician.
-
-Fault / symptom:
-${fault}
-
-Vehicle context:
-${ctx()}
-
-Engine / notes:
-${notes || "none"}
-
-Return:
-1. WHAT THIS FAULT MEANS
-2. MOST LIKELY CAUSES — RANKED
-3. FIRST TESTS TO DO
-4. LIVE DATA TO WATCH
-5. WHAT NOT TO REPLACE YET
-6. COMMON MISDIAGNOSIS
-7. CONFIRM THE REPAIR
-`;
-
-  try{
-
-    $("diagAnswer").textContent =
-     await callAI(q, "smart_diagnostics_brain", notes);
-
-  }catch(e){
-
-    $("diagAnswer").textContent =
-      "AI troubleshoot failed: " + e.message;
-  }
-}
-
-/* DIESEL DIAG */
-async function runDiag(){
-  const q=$("diagq")?.value.trim() || "";
-  const note=$("diagNote")?.value.trim() || "";
-
-  if(!q){
-    $("diagOut").textContent="ENTER DIAGNOSTIC QUESTION FIRST.";
-    return;
-  }
-
-  $("diagOut").textContent="Running diagnostic...";
-
-  try{
-    $("diagOut").textContent = await callAI(q, "smart_diagnostics_brain", note);
-  }catch(e){
-    $("diagOut").textContent="DIAGNOSTIC ERROR: "+e.message;
-  }
-}
-
-
-/* QUOTE */
-function money(n){return "$"+Number(n||0).toFixed(2)}
-
-function calcQuote(){
-  const job=$("jobName")?.value || "Custom Job";
-  const invoiceNo = getNextInvoiceNumber();
-const invoiceDate = new Date().toLocaleString();
-  const h=+$("hours").value || 0;
-  const r=+$("rate").value || 0;
-  const p=+$("partsCost").value || 0;
-  const c=+$("callOut").value || 0;
-  const taxPct=+$("taxRate").value || 0;
-  const cardPct=+$("cardFee").value || 0;
-
-  const labor=h*r;
-  const subtotal=labor+p+c;
-  const tax=subtotal*(taxPct/100);
-  const card=(subtotal+tax)*(cardPct/100);
-  const total=subtotal+tax+card;
-
-  $("quoteOut").textContent=
-
-    
-    `INVOICE
-
-Invoice #: ${invoiceNo}
-Date: ${invoiceDate}
-Status: UNPAID
-
-Job: ${job}
-
-Labor:
-${h} hrs x ${money(r)} = ${money(labor)}
-
-Parts: ${money(p)}
-Service Call: ${money(c)}
-
-Subtotal: ${money(subtotal)}
-Tax (${taxPct}%): ${money(tax)}
-Card Fee (${cardPct}%): ${money(card)}
-
-TOTAL DUE: ${money(total)}
-
-Notes:
-Parts not included unless listed.
-Final invoice may change after inspection.`;
-}
-
-function clearInvoice(){
-  $("jobName").value = "";
-  $("hours").value = "1";
-  $("rate").value = "135";
-  $("partsCost").value = "0";
-  $("callOut").value = "250";
-  $("taxRate").value = "0";
-  $("cardFee").value = "0";
-
-  if($("manualHours")) $("manualHours").value = "";
-  if($("manualTimeNote")) $("manualTimeNote").value = "";
-
-  $("quoteOut").textContent = "Build invoice.";
-}
-  
-function getNextInvoiceNumber(){
-  let n = Number(localStorage.getItem("rwd_invoice_no") || "1000");
-  n++;
-  localStorage.setItem("rwd_invoice_no", String(n));
-  return "RWD-" + n;
-}
-  
-function addManualTimeToInvoice(){
-  const hrs = +$("manualHours")?.value || 0;
-  const rate = +$("rate")?.value || +$("defaultRate")?.value || 135;
-  const note = $("manualTimeNote")?.value || "Manual labor";
-
-  if(!hrs){
-    alert("Enter manual hours first.");
-    return;
-  }
-
-  $("hours").value = hrs;
-
-  const labor = hrs * rate;
-
-  $("quoteOut").textContent =
-`INVOICE MANUAL LABOR
-
-Note: ${note}
-Hours: ${hrs.toFixed(2)}
-Rate: ${money(rate)}/hr
-Labor Total: ${money(labor)}
-
-Now hit Calculate Quote to finalize total.`;
-}
-
-/* WORK ORDER */
-function addToParts(){
-  const text = $("homeAiOut")?.innerText || "";
-  if($("partq")) $("partq").value = text;
-  show("parts");
-  alert("Added to Parts Lookup");
-}
-
-function addToWorkOrder(){
-  const text = $("homeAiOut")?.innerText || "";
-  if($("workText")) $("workText").value += ($("workText").value ? "\n\n" : "") + "AI NOTES:\n" + text;
-  show("work");
-  alert("Added to Work Order");
-}
-
-function addToInvoice(){
-  const text = $("homeAiOut")?.innerText || "";
-  if($("quoteOut")) $("quoteOut").textContent = "INVOICE NOTES:\n\n" + text;
-  show("quote");
-  alert("Added to Invoice");
-}
-function copyWO(){
-  const txt=
-`${$("shopName")?.value || "Rolling Wrench Diesel"} WORK ORDER
-
-Customer:
-${$("customer")?.value || ""}
-
-Vehicle:
-${ctx()}
-
-Complaint:
-${$("complaint")?.value || ""}
-
-Parts / Materials:
-${$("partsUsed")?.value || ""}
-
-Work / Diagnosis / Parts:
-${$("workText")?.value || ""}`;
-
-  navigator.clipboard.writeText(txt);
-  $("workOut").textContent="Copied work order:\n\n"+txt;
-}
-function saveJob(){
-  let arr=JSON.parse(localStorage.getItem("mmp_jobs")||"[]");
-
-  arr.unshift({
-    date:new Date().toLocaleString(),
-    customer:$("customer")?.value || "",
-    context:ctx(),
-    complaint:$("complaint")?.value || "",
-    work:$("workText")?.value || ""
-  });
-
-  localStorage.setItem("mmp_jobs",JSON.stringify(arr));
-  $("workOut").textContent="Saved job.";
-}
-function clearWorkOrder(){
-  if(!confirm("Clear this work order and invoice?")) return;
-
-  $("customer").value = "";
-  $("complaint").value = "";
-
-  if($("partsUsed")) $("partsUsed").value = "";
-
-  $("workText").value = "";
-  $("workOut").textContent = "Work order cleared.";
-
-  lastClockBill = "";
-  localStorage.removeItem("lastInvoice");
-
-  if($("clockOutBox")){
-    $("clockOutBox").textContent =
-`Timer ready. Start a job to begin tracking.`;
-  }
-}
-
-function saveInvoice(){
-  const txt = $("quoteOut")?.textContent || "";
-
-  if(!txt.includes("INVOICE")){
-    alert("Build an invoice first.");
-    return;
-  }
-
-  let invoices = JSON.parse(localStorage.getItem("rwd_invoices") || "[]");
-
-  invoices.unshift({
-    id: Date.now(),
-    date: new Date().toLocaleString(),
-    paid: false,
-    text: txt
-  });
-
-  localStorage.setItem("rwd_invoices", JSON.stringify(invoices));
-  alert("Invoice saved.");
-  showInvoices();
-  show("invoices");
-}
-  
-
-    function showInvoices(){
-  let invoices = JSON.parse(localStorage.getItem("rwd_invoices") || "[]");
-
-  if(!invoices.length){
-    $("invoiceList").textContent = "No saved invoices.";
-    return;
-  }
-
-  let html = "";
-
-  invoices.forEach((inv, i) => {
-    html += `
-      <div style="margin-bottom:14px;padding:12px;border:1px solid ${inv.paid ? "#20b765" : "#e14b4b"};border-radius:14px;background:#111">
-        <b>${inv.paid ? "PAID" : "UNPAID"} — Invoice ${i + 1}</b><br>
-Saved: ${inv.date}<br>
-${inv.paid && inv.paidDate ? `Paid: ${inv.paidDate}<br>` : ""}
-<br>        
-
-        <pre style="white-space:pre-wrap;color:#ffd6a0">${inv.text}</pre>
-
-        <button class="secondary" style="width:100%;margin-top:8px" onclick="openInvoice(${inv.id})">
-          OPEN INVOICE
-        </button>
-
-        <button class="success" style="width:100%;margin-top:8px" onclick="markPaid(${inv.id})">
-          MARK PAID / UNPAID
-        </button>
-
-        <button class="primary" style="width:100%;margin-top:8px" onclick="sendInvoice(${inv.id})">
-        SEND TEXT INVOICE
-        </button>
-      </div>
-    `;
-  });
-
-  $("invoiceList").innerHTML = html;
-}
-
-function openInvoice(id){
-  let invoices = JSON.parse(localStorage.getItem("rwd_invoices") || "[]");
-  let inv = invoices.find(x => x.id === id);
-  if(!inv) return;
-
-  $("quoteOut").textContent = inv.text;
-  show("quote");
-}
-
-function markPaid(id){
-  let invoices = JSON.parse(localStorage.getItem("rwd_invoices") || "[]");
-
-  invoices = invoices.map(inv => {
-    if(inv.id === id){
-      const newPaid = !inv.paid;
-      const paidDate = newPaid ? new Date().toLocaleString() : "";
-
-      let updatedText = inv.text;
-
-      // REMOVE old paid stamp if it exists
-      updatedText = updatedText
-        .replace(/STATUS: PAID\n?/g, "")
-        .replace(/PAID ON: .*\n?/g, "");
-
-      // ADD new paid stamp if marking paid
-      if(newPaid){
-        updatedText =
-`STATUS: PAID
-PAID ON: ${paidDate}
-
-` + updatedText;
-      }
-
-      return {
-        ...inv,
-        paid: newPaid,
-        paidDate,
-        text: updatedText
-      };
-    }
-
-    return inv;
-  });
-
-  localStorage.setItem("rwd_invoices", JSON.stringify(invoices));
-  showInvoices();
-}
-function sendInvoice(id){
-  let invoices = JSON.parse(localStorage.getItem("rwd_invoices") || "[]");
-  let inv = invoices.find(x => x.id === id);
-  if(!inv) return;
-
-  const phone = $("profilePhone")?.value || "";
-  const msg = encodeURIComponent(inv.text);
-
-  if(phone.trim()){
-    window.location.href = `sms:${phone}&body=${msg}`;
-  }else{
-    window.location.href = `sms:&body=${msg}`;
-  }
-}
-  
-function clearInvoices(){
-  if(!confirm("Clear all saved invoices?")) return;
-  localStorage.removeItem("rwd_invoices");
-  $("invoiceList").textContent = "Saved invoices cleared.";
-}
-/* SUPPLIERS */
-function supplier(site){
-  const p=($("supplierPart")?.value || $("partq")?.value || "").trim();
-
-  if(!p){
-    alert("Enter part number or description.");
-    return;
-  }
-
-  const q=encodeURIComponent(p+" heavy duty truck part");
-
-  const urls={
-    google:`https://www.google.com/search?q=${q}`,
-    napa:`https://www.napaonline.com/en/search?text=${q}`,
-    oreilly:`https://www.oreillyauto.com/search?q=${q}`,
-    fleetpride:`https://www.fleetpride.com/search?text=${q}`
-  };
-
-  $("supplierOut").textContent="Opening supplier search for: "+p;
-  window.open(urls[site],"_blank");
-}
-
-function saveCustomerProfile(){
-  const profile = {
-    id: Date.now(),
-    date: new Date().toLocaleString(),
-    customer: $("profileCustomer")?.value || "",
-    phone: $("profilePhone")?.value || "",
-    year: $("yearGlobal")?.value || "",
-    make: $("makeGlobal")?.value || "",
-    model: $("modelGlobal")?.value || "",
-    vin: $("vin")?.value || "",
-    mileage: $("mileageGlobal")?.value || "",
-    engine: $("engine")?.value || "",
-  epa: $("epaGlobal")?.value || "",
-esn: $("esnGlobal")?.value || "",
-cpl: $("cplGlobal")?.value || "",
-  };
-
-  if(!profile.customer && !profile.vin){
-    alert("Enter customer name or VIN/unit first.");
-    return;
-  }
-
-  let profiles = JSON.parse(localStorage.getItem("rwd_customer_profiles") || "[]");
-
-  profiles = profiles.filter(p =>
-    p.customer !== profile.customer || p.vin !== profile.vin
-  );
-
-  profiles.unshift(profile);
-
-  localStorage.setItem("rwd_customer_profiles", JSON.stringify(profiles));
-
-  if($("customer")) $("customer").value = profile.customer;
-  if($("jobName")) $("jobName").value = `${profile.year} ${profile.make} ${profile.model}`.trim();
-  if($("clockJobName")) $("clockJobName").value = `${profile.year} ${profile.make} ${profile.model}`.trim();
-
-  $("vinDecodeOut").textContent =
-`CUSTOMER / VEHICLE PROFILE SAVED
-
-Customer: ${profile.customer}
-Phone: ${profile.phone}
-
-Vehicle:
-${profile.year} ${profile.make} ${profile.model}
-VIN/Unit: ${profile.vin}
-Mileage: ${profile.mileage}
-Engine: ${profile.engine}
-
-Auto-filled Work Order, Invoice, and Clock.`;
-
-
-}
-  function savePartToVehicleHistory(partData){
-
-  const vin = $("vin")?.value.trim() || "NO VIN";
-  const customer = $("profileCustomer")?.value || $("customer")?.value || "";
-  const vehicle = ctx();
-
-  let history = JSON.parse(
-    localStorage.getItem("rwd_vehicle_parts_history") || "[]"
-  );
-
-  history.unshift({
-    date: new Date().toLocaleString(),
-    vin,
-    customer,
-    vehicle,
-    part: partData
-  });
-
-  localStorage.setItem(
-    "rwd_vehicle_parts_history",
-    JSON.stringify(history)
-  );
-
-  return true;
-}
-
-function showVehiclePartsHistory(){
-
-  const vin = $("vin")?.value.trim() || "NO VIN";
-
-  let history = JSON.parse(
-    localStorage.getItem("rwd_vehicle_parts_history") || "[]"
-  );
-
-  let matches = history.filter(h => h.vin === vin);
-
-  if(!matches.length){
-
-    $("partOut").textContent =
-`VEHICLE PARTS HISTORY
-
-VIN: ${vin}
-
-No saved parts history found.`;
-
-    return;
-  }
-
-  $("partOut").textContent =
-`VEHICLE PARTS HISTORY
-
-VIN: ${vin}
-
-` + matches.map((h,i)=>`
-
-#${i+1}
-DATE:
-${h.date}
-
-CUSTOMER:
-${h.customer}
-
-PART INFO:
-${h.part}
-
-VEHICLE:
-${h.vehicle}
-
-`).join("\n----------------------\n");
-
-}
-/* VIN / UNIT */
-async function decodeVin(){
-
-  const vin = $("vin")?.value.trim() || "";
-
-  if(!vin){
-    $("vinDecodeOut").textContent =
-    "Enter VIN or Unit Number first.";
-    return;
-  }
-
-  $("vinDecodeOut").textContent =
-  "Decoding VIN...";
-
-  try{
-
-    const res = await fetch(API_URL,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        mode:"vin_decode",
-        vin:vin,
-        question:`Decode VIN ${vin}`,
-        vehicleContext:ctx()
-      })
-    });
-
-    const data = await res.json();
-
-    $("vinDecodeOut").textContent =
-`VIN DECODE RESULT
-
-${data.answer || data.vinResults || "No VIN data returned."}`;
-
-    if(data.answer){
-
-      const txt = data.answer;
-
-      const year =
-      txt.match(/Year:\s*(.*)/i)?.[1]?.trim() || "";
-
-      const make =
-      txt.match(/Make:\s*(.*)/i)?.[1]?.trim() || "";
-
-      const model =
-      txt.match(/Model:\s*(.*)/i)?.[1]?.trim() || "";
-
-      const engine =
-      txt.match(/Engine:\s*(.*)/i)?.[1]?.trim() || "";
-
-      if(year && $("yearGlobal"))
-        $("yearGlobal").value = year;
-
-      if(make && $("makeGlobal"))
-        $("makeGlobal").value = make;
-
-      if(model && $("modelGlobal"))
-        $("modelGlobal").value = model;
-
-      if(engine && $("engineGlobal"))
-        $("engineGlobal").value = engine;
-    }
-
-  }catch(e){
-
-    $("vinDecodeOut").textContent =
-    "VIN DECODE ERROR: " + e.message;
-
-  }
-}
-
-/* GPS PIN DROP */
-let currentLat=null;
-let currentLng=null;
-
-function dropPin(){
-  show("pin");
-  getLocation();
-}
-
-function getLocation(){
-  if(!navigator.geolocation){
-    $("pinOut").textContent="Geolocation not supported on this device.";
-    return;
-  }
-
-  $("pinOut").textContent="Getting current location...";
-
-  navigator.geolocation.getCurrentPosition(pos=>{
-    currentLat=pos.coords.latitude;
-    currentLng=pos.coords.longitude;
-
-    $("pinOut").textContent=
-`CURRENT LOCATION
-
-Latitude: ${currentLat}
-Longitude: ${currentLng}
-Accuracy: ${pos.coords.accuracy.toFixed(1)} meters
-
-Use Save Pin to store this job/truck location.`;
-  },err=>{
-    $("pinOut").textContent="Location error: "+err.message;
-  });
-}
-
-function openMaps(){
-  if(!currentLat || !currentLng){
-    alert("Get location first.");
-    return;
-  }
-
-  window.open(`https://maps.google.com/?q=${currentLat},${currentLng}`,"_blank");
-}
-
-function savePin(){
-  if(!currentLat || !currentLng){
-    alert("Get location first.");
-    return;
-  }
-
-  const name=$("pinName")?.value || "Unnamed Location";
-
-  let pins=JSON.parse(localStorage.getItem("mmp_pins")||"[]");
-
-  pins.unshift({
-    name,
-    lat:currentLat,
-    lng:currentLng,
-    date:new Date().toLocaleString()
-  });
-
-  localStorage.setItem("mmp_pins",JSON.stringify(pins));
-
-  $("pinOut").textContent=
-`SAVED PIN
-
-Name: ${name}
-Latitude: ${currentLat}
-Longitude: ${currentLng}`;
-}
-
-function clearPin(){
-  currentLat=null;
-  currentLng=null;
-  $("pinOut").textContent="Pin cleared.";
-}
-
-
-/* LIVE LABOR CLOCK */
-let startTime=0;
-let clockInterval=null;
-let lastClockBill="";
-function saveClockState(){
-
-const state = {
-startTime,
-lastClockBill,
-
-laborRate: $("laborRate")?.value || "",
-serviceCall: $("serviceCall")?.value || "",
-parts: $("parts")?.value || "",
-tax: $("tax")?.value || "",
-cardFee: $("cardFee")?.value || "",
-customer: $("customer")?.value || "",
-jobName: $("jobName")?.value || "",
-workPerformed: $("workPerformed")?.value || ""
-};
-
-localStorage.setItem(
-"rwd_clock_state",
-JSON.stringify(state)
-);
-
-}
-
-function loadClockState(){
-
-const raw =
-localStorage.getItem("rwd_clock_state");
-
-if(!raw) return;
-
-const state = JSON.parse(raw);
-
-startTime = state.startTime || 0;
-lastClockBill = state.lastClockBill || "";
-
-if($("laborRate"))
-$("laborRate").value = state.laborRate || "";
-
-if($("serviceCall"))
-$("serviceCall").value = state.serviceCall || "";
-
-if($("parts"))
-$("parts").value = state.parts || "";
-
-if($("tax"))
-$("tax").value = state.tax || "";
-
-if($("cardFee"))
-$("cardFee").value = state.cardFee || "";
-
-if($("customer"))
-$("customer").value = state.customer || "";
-
-if($("jobName"))
-$("jobName").value = state.jobName || "";
-
-if($("workPerformed"))
-$("workPerformed").value =
-state.workPerformed || "";
-
-if(startTime){
-clockInterval =
-setInterval(updateClockLive,1000);
-
-updateClockLive();
-}
-
-}
-function clockIn(){
-  startTime=Date.now();
-  lastClockBill="";
-
-  if(clockInterval) clearInterval(clockInterval);
-
-  clockInterval=setInterval(updateClockLive,1000);
-  updateClockLive();
-  saveClockState();
-}
-function sendToSquare(){
-  const settings=JSON.parse(localStorage.getItem("mmp_settings")||"{}");
-  const link=settings.squareLink || $("squareLink")?.value || "";
-
-  if(!link){
-    alert("Add your Square payment link in Settings first.");
-    show("settings");
-    return;
-  }
-
-  window.open(link,"_blank");
-}
-function updateClockLive(){
-  if(!startTime) return;
-
-  const now=Date.now();
-  const hours=(now-startTime)/3600000;
-
-  const rate=+$("laborRate")?.value || +$("defaultRate")?.value || 135;
-  const call=+$("serviceCall")?.value || +$("defaultServiceCall")?.value || 250;
-  const includeService = $("includeServiceCall")?.checked || false;
-
-  const labor=hours*rate;
-  const total=labor+(includeService ? call : 0);
-
-  $("clockOutBox").textContent=
-`LIVE JOB RUNNING
-
-Start Time: ${new Date(startTime).toLocaleTimeString()}
-Current Time: ${new Date().toLocaleTimeString()}
-
-Hours: ${hours.toFixed(2)}
-
-Labor @ ${money(rate)}/hr:
-${money(labor)}
-
-Service Call:
-${includeService ? money(call) : "$0.00 (In-house)"}
-
-RUNNING TOTAL:
-${money(total)}`;
-  saveClockState();
-}
-
-function clockOut(){
-  if(!startTime){
-    alert("Start job first.");
-    return;
-  }
-
-  clearInterval(clockInterval);
-
-  const hours=(Date.now()-startTime)/3600000;
-  const rate=+$("laborRate")?.value || +$("defaultRate")?.value || 135;
-  const call=+$("serviceCall")?.value || +$("defaultServiceCall")?.value || 250;
-  const includeService=$("includeServiceCall")?.checked || false;
-  const job=$("clockJobName")?.value || "Service Job";
-
-  const labor=hours*rate;
-  const total=labor+(includeService ? call : 0);
-
-  lastClockBill=
-`JOB COMPLETE
-
-Job: ${job}
-
-Total Hours: ${hours.toFixed(2)}
-Labor: ${money(labor)}
-Service Call: ${includeService ? money(call) : "$0.00 (In-house)"}
-
-FINAL TOTAL:
-${money(total)}`;
-
-  $("clockOutBox").textContent=lastClockBill;
-
-  localStorage.setItem("lastInvoice", lastClockBill);
-
-  startTime=0;
-}
-function clearClock(){
-  if(clockInterval) clearInterval(clockInterval);
-
-  startTime = 0;
-  lastClockBill = "";
-
-  localStorage.removeItem("lastInvoice");
-
-
-  
-  $("clockOutBox").textContent =
-`Timer ready. Start a job to begin tracking.`;
-}
-function addClockToWork(){
-  const txt = lastClockBill || $("clockOutBox")?.textContent || "";
-
-  if(!txt.trim()){
-    alert("No job data to send.");
-    return;
-  }
-
-  // Extract hours from clock text
-  const hrsMatch = txt.match(/Total Hours:\s*([\d.]+)/);
-  const hours = hrsMatch ? parseFloat(hrsMatch[1]) : 0;
-
-  // Extract service call
-  const callMatch = txt.match(/Service Call:\s*\$([\d.]+)/);
-  const call = callMatch ? parseFloat(callMatch[1]) : 0;
-
-  // Set invoice fields
-  if($("hours")) $("hours").value = hours.toFixed(2);
-  if($("callOut")) $("callOut").value = call;
-
-  // Auto name job
-  if($("jobName") && !$("jobName").value){
-    $("jobName").value = $("clockJobName")?.value || "Service Job";
-  }
-
-  // Go to invoice builder
-  show("quote");
-
-  alert("Clock sent to Invoice Builder ✔️\nNow hit CALCULATE INVOICE");
-}
-
-
-  function addManualTime(){
-  const hrs = +$("manualHours")?.value || 0;
-  const rate = +$("laborRate")?.value || +$("defaultRate")?.value || 135;
-  const note = $("manualTimeNote")?.value || "Manual labor time";
-
-  if(!hrs){
-    alert("Enter manual hours first.");
-    return;
-  }
-
-  const labor = hrs * rate;
-
-  const bill =
-`MANUAL LABOR ENTRY
-
-Note: ${note}
-Hours: ${hrs.toFixed(2)}
-Rate: ${money(rate)}/hr
-Labor Total: ${money(labor)}`;
-
-  $("workText").value += ($("workText").value ? "\n\n" : "") + bill;
-  $("clockOutBox").textContent = bill;
-  lastClockBill = bill;
-
-  localStorage.setItem("lastInvoice", bill);
-
-  show("work");
-}
-
-function setInHouse(){
-  if($("includeServiceCall")) $("includeServiceCall").checked=false;
-  updateClockLive();
-}
-
-function setServiceCall(){
-  if($("includeServiceCall")) $("includeServiceCall").checked=true;
-  updateClockLive();
-}
-
-
-/* SETTINGS / TEST */
-function saveSettings(){
-  const settings={
-    defaultRate:$("defaultRate")?.value || "135",
-    defaultServiceCall:$("defaultServiceCall")?.value || "250",
-    shopName:$("shopName")?.value || "Rolling Wrench Diesel",
-    squareLink:$("squareLink")?.value || ""
-  };
-
-  localStorage.setItem("mmp_settings",JSON.stringify(settings));
-
-  $("settingsOut").textContent=
-`Settings saved.
-
-Default Labor Rate: ${money(settings.defaultRate)}
-Default Service Call: ${money(settings.defaultServiceCall)}
-Shop Name: ${settings.shopName}
-Square Link: ${settings.squareLink ? "Saved" : "Not set"}`;
-}
-
-function loadSettings(){
-  const settings=JSON.parse(localStorage.getItem("mmp_settings")||"{}");
-
-  if(settings.defaultRate && $("defaultRate")) $("defaultRate").value=settings.defaultRate;
-  if(settings.defaultServiceCall && $("defaultServiceCall")) $("defaultServiceCall").value=settings.defaultServiceCall;
-  if(settings.shopName && $("shopName")) $("shopName").value=settings.shopName;
-  if(settings.squareLink && $("squareLink")) $("squareLink").value=settings.squareLink;
-
-  const saved=localStorage.getItem("lastInvoice");
-  if(saved && $("clockOutBox")) $("clockOutBox").textContent=saved;
-}
-  
-
-function testApp(){
-  let checks=[];
-
-  checks.push($("partq") ? "Parts input: OK" : "Parts input: MISSING");
-  checks.push($("filterq") ? "Filter input: OK" : "Filter input: MISSING");
-  checks.push($("clockOutBox") ? "Live clock: OK" : "Live clock: MISSING");
-  checks.push($("pinOut") ? "Pin drop: OK" : "Pin drop: MISSING");
-  checks.push(API_URL.includes("verify-part-web") ? "Backend URL: OK" : "Backend URL: CHECK");
-
-  $("settingsOut").textContent=
-`APP TEST RESULTS
-
-${checks.join("\n")}
-
-If Web + AI returns weak/no data:
-Check Supabase function logs and API keys.`;
-}
-
-
-/* SAVED JOBS */
-function showSaved(){
-  let arr=JSON.parse(localStorage.getItem("mmp_jobs")||"[]");
-
-  $("savedOut").textContent=arr.length
-    ? arr.map(j=>`${j.date}
-Customer: ${j.customer}
-
-${j.context}
-
-Complaint:
-${j.complaint}
-
-Work:
-${j.work}`).join("\n\n----------------\n\n")
-    : "No saved jobs.";
-}
-
-function clearSaved(){
-  if(confirm("Clear saved jobs?")){
-    localStorage.removeItem("mmp_jobs");
-    showSaved();
-  }
 }
 
 function toggleTopMenu(){
@@ -3562,10 +1470,198 @@ function toggleTopMenu(){
       : "flex";
 }
 
+function openAiDrawer(){
+  const drawer = $("aiDrawer");
+  if(!drawer) return;
+
+  drawer.style.display =
+    drawer.style.display === "block"
+      ? "none"
+      : "block";
+}
+
+/* =====================================================
+   3. HAPTIC FEEDBACK
+===================================================== */
+function tap(){
+  if(navigator.vibrate){
+    navigator.vibrate(35);
+  }
+}
+
+document.addEventListener("click", e=>{
+  if(e.target.closest("button")){
+    tap();
+  }
+});
+
+/* =====================================================
+   4. SHOP / BUSINESS SETTINGS
+===================================================== */
+function defaultShop(){
+  return {
+    name: "Rolling Wrench Diesel LLC",
+    owner: "",
+    phone: "260-502-6222",
+    email: "",
+    website: "www.rollingwrenchdiesel.com",
+    address: "",
+    taxId: "",
+    prefix: "RWD",
+    laborRate: "135",
+    serviceCall: "250",
+    mileageRate: "2.00",
+    partsRunRate: "2.50",
+    tax: "0",
+    cardFee: "0",
+    terms: "Payment due upon completion. Parts and labor warranty subject to shop policy."
+  };
+}
+
+function getShop(){
+  return {
+    ...defaultShop(),
+    ...JSON.parse(localStorage.getItem("shopSettings") || "{}")
+  };
+}
+
+function saveSettings(){
+  const shop = {
+    name: $("shopName")?.value || "Rolling Wrench Diesel LLC",
+    owner: $("shopOwner")?.value || "",
+    phone: $("shopPhone")?.value || "",
+    email: $("shopEmail")?.value || "",
+    website: $("shopWebsite")?.value || "",
+    address: $("shopAddress")?.value || "",
+    taxId: $("shopTaxId")?.value || "",
+    prefix: $("invoicePrefix")?.value || "RWD",
+    laborRate: $("defaultLaborRate")?.value || "135",
+    serviceCall: $("defaultServiceCall")?.value || "250",
+    mileageRate: $("mileageRateDefault")?.value || "2.00",
+    partsRunRate: $("partsRunRateDefault")?.value || "2.50",
+    tax: $("defaultTax")?.value || "0",
+    cardFee: $("defaultCardFee")?.value || "0",
+    terms: $("shopTerms")?.value || ""
+  };
+
+  localStorage.setItem("shopSettings", JSON.stringify(shop));
+  loadSettings();
+
+  if($("settingsOut")){
+    $("settingsOut").textContent = "Business settings saved.";
+  }
+}
+
+function loadSettings(){
+  const s = getShop();
+
+  setValue("shopName", s.name);
+  setValue("shopOwner", s.owner);
+  setValue("shopPhone", s.phone);
+  setValue("shopEmail", s.email);
+  setValue("shopWebsite", s.website);
+  setValue("shopAddress", s.address);
+  setValue("shopTaxId", s.taxId);
+  setValue("invoicePrefix", s.prefix);
+  setValue("defaultLaborRate", s.laborRate);
+  setValue("defaultServiceCall", s.serviceCall);
+  setValue("mileageRateDefault", s.mileageRate);
+  setValue("partsRunRateDefault", s.partsRunRate);
+  setValue("defaultTax", s.tax);
+  setValue("defaultCardFee", s.cardFee);
+  setValue("shopTerms", s.terms);
+
+  setValue("laborRate", s.laborRate);
+  setValue("serviceCall", s.serviceCall);
+  setValue("taxRate", s.tax);
+  setValue("cardFee", s.cardFee);
+  setValue("mileageRate", s.mileageRate);
+  setValue("partsRunRate", s.partsRunRate);
+
+  if($("homeShopName")){
+    $("homeShopName").textContent =
+      (s.name || "ROLLING WRENCH DIESEL").replace(" LLC","");
+  }
+
+  updateInvoiceHeader();
+}
+
+function setValue(id,val){
+  const el = $(id);
+  if(el) el.value = val || "";
+}
+
+/* =====================================================
+   5. ACTIVE TRUCK / VIN MEMORY
+===================================================== */
+function ctx(){
+  return `
+Year: ${$("yearGlobal")?.value || "unknown"}
+Make: ${$("makeGlobal")?.value || "unknown"}
+Model: ${$("modelGlobal")?.value || "unknown"}
+VIN: ${$("vinGlobal")?.value || $("invoiceVin")?.value || "none"}
+Engine: ${$("engine")?.value || "unknown"}
+EPA: ${$("epaGlobal")?.value || "unknown"}
+ESN: ${$("esnGlobal")?.value || "unknown"}
+CPL: ${$("cplGlobal")?.value || "unknown"}
+`.trim();
+}
+
+function saveActiveTruck(){
+  const truck = {
+    vin: $("vinGlobal")?.value || "",
+    year: $("yearGlobal")?.value || "",
+    make: $("makeGlobal")?.value || "",
+    model: $("modelGlobal")?.value || "",
+    engine: $("engine")?.value || "",
+    epa: $("epaGlobal")?.value || "",
+    esn: $("esnGlobal")?.value || "",
+    cpl: $("cplGlobal")?.value || ""
+  };
+
+  localStorage.setItem("activeTruck", JSON.stringify(truck));
+  updateActiveTruck();
+  alert("Active truck saved.");
+}
+
+function getActiveTruck(){
+  return JSON.parse(localStorage.getItem("activeTruck") || "{}");
+}
+
+function updateActiveTruck(){
+  const t = getActiveTruck();
+
+  if($("activeTruckName")){
+    $("activeTruckName").textContent =
+      t.make || t.model
+        ? `${t.year || ""} ${t.make || ""} ${t.model || ""}`.trim()
+        : "None";
+  }
+
+  if($("activeTruckVin")){
+    $("activeTruckVin").textContent = t.vin || "None";
+  }
+
+  if(t.vin){
+    setValue("vinGlobal", t.vin);
+    setValue("yearGlobal", t.year);
+    setValue("makeGlobal", t.make);
+    setValue("modelGlobal", t.model);
+    setValue("engine", t.engine);
+    setValue("epaGlobal", t.epa);
+    setValue("esnGlobal", t.esn);
+    setValue("cplGlobal", t.cpl);
+    setValue("invoiceTruck", `${t.year || ""} ${t.make || ""} ${t.model || ""}`.trim());
+    setValue("invoiceVin", t.vin);
+  }
+}
+
 function clearVehicleData(){
   [
     "vinGlobal",
     "vin",
+    "invoiceVin",
+    "invoiceTruck",
     "yearGlobal",
     "makeGlobal",
     "modelGlobal",
@@ -3573,496 +1669,937 @@ function clearVehicleData(){
     "epaGlobal",
     "esnGlobal",
     "cplGlobal"
-  ].forEach(id=>{
-    if($(id)) $(id).value = "";
-  });
+  ].forEach(id=>setValue(id,""));
 
   localStorage.removeItem("activeTruck");
-
+  updateActiveTruck();
   alert("Active VIN / truck cleared.");
 }
-function openAiDrawer(){
 
-  const drawer = document.getElementById("aiDrawer");
+/* =====================================================
+   6. AI / BACKEND CALLS
+===================================================== */
+async function callAI(question, mode="parts", note=""){
+  const noteText =
+    typeof note === "string"
+      ? note
+      : JSON.stringify(note || {});
 
-  if(!drawer) return;
+  const noteVin =
+    noteText.match(/[A-HJ-NPR-Z0-9]{17}/i)?.[0] || "";
 
-  if(drawer.style.display === "block"){
-    drawer.style.display = "none";
-  }else{
-    drawer.style.display = "block";
+  const noteEsn =
+    noteText.match(/\b\d{7,9}\b/)?.[0] || "";
+
+  const noteCpl =
+    noteText.match(/CPL\s*#?:?\s*(\d{3,5})/i)?.[1] || "";
+
+  const res = await fetch(API_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      part: question,
+      question,
+      note,
+      mode,
+
+      vin:
+        noteVin ||
+        $("invoiceVin")?.value ||
+        $("vinGlobal")?.value ||
+        "",
+
+      year: $("yearGlobal")?.value || "",
+      make: $("makeGlobal")?.value || "",
+      model: $("modelGlobal")?.value || "",
+      engine: $("engine")?.value || "",
+      epa: $("epaGlobal")?.value || "",
+
+      esn:
+        noteEsn ||
+        $("esnGlobal")?.value ||
+        "",
+
+      cpl:
+        noteCpl ||
+        $("cplGlobal")?.value ||
+        "",
+
+      vehicleContext: ctx()
+    })
+  });
+
+  const data = await res.json();
+
+  if(!res.ok){
+    throw new Error(data.error || JSON.stringify(data));
+  }
+
+  return data.answer || data.message || JSON.stringify(data) || "No answer returned.";
+}
+
+async function imageToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function homeAI(){
+  const q = $("homeAiAsk")?.value.trim() || "";
+  const file = $("homeAiImage")?.files?.[0];
+
+  if(!q && !file){
+    $("homeAiOut").textContent =
+      "Ask Diesel AI a diagnostic question, part lookup, VIN question, or upload a picture.";
+    return;
+  }
+
+  $("homeAiOut").textContent =
+    file ? "Diesel AI reading image..." : "Diesel AI thinking...";
+
+  let imageData = "";
+
+  if(file){
+    imageData = await imageToBase64(file);
+    imageData = imageData.split(",")[1];
+  }
+
+  const payload = {
+    question: q || "Analyze the uploaded image.",
+    image: imageData
+  };
+
+  try{
+    $("homeAiOut").textContent =
+      await callAI(q || "Analyze uploaded image", "diesel_ai", payload);
+  }catch(e){
+    $("homeAiOut").textContent = "Diesel AI error: " + e.message;
   }
 }
 
-function toggleTopMenu(){
+/* =====================================================
+   7. VIN DECODER
+===================================================== */
+async function decodeVin(){
+  const vin =
+    $("vinGlobal")?.value.trim() ||
+    $("invoiceVin")?.value.trim() ||
+    "";
 
-  const menu = document.getElementById("topMenu");
-
-  if(!menu) return;
-
-  if(menu.style.display === "flex"){
-    menu.style.display = "none";
-  }else{
-    menu.style.display = "flex";
+  if(!vin){
+    alert("Enter VIN first.");
+    return;
   }
-}  
-/* UTIL */
-function copyText(id){
-  navigator.clipboard.writeText($(id)?.textContent || "");
-  alert("Copied");
+
+  const out = $("vinOut") || $("vinDecodeOut");
+  if(out) out.textContent = "Decoding VIN...";
+
+  try{
+    const ans = await callAI(vin, "vin_decode", "");
+    if(out) out.textContent = ans;
+
+    autoFillVinFromAnswer(ans);
+  }catch(e){
+    if(out) out.textContent = "VIN ERROR: " + e.message;
+  }
 }
 
- if($("homeAiImage")){
-  $("homeAiImage").addEventListener("change", function(){
+function autoFillVinFromAnswer(txt){
+  const year = txt.match(/YEAR:\s*(.*)/i)?.[1]?.trim() || "";
+  const make = txt.match(/MAKE:\s*(.*)/i)?.[1]?.trim() || "";
+  const model = txt.match(/MODEL:\s*(.*)/i)?.[1]?.trim() || "";
+  const engine = txt.match(/ENGINE:\s*(.*)/i)?.[1]?.trim() || "";
+  const epa = txt.match(/EPA:\s*(.*)/i)?.[1]?.trim() || "";
+
+  if(year) setValue("yearGlobal", year);
+  if(make) setValue("makeGlobal", make);
+  if(model) setValue("modelGlobal", model);
+  if(engine) setValue("engine", engine);
+  if(epa) setValue("epaGlobal", epa);
+}
+
+/* =====================================================
+   8. PARTS / FILTERS / DIAGNOSTICS
+===================================================== */
+async function askPart(){
+  const q = $("partq")?.value.trim() || "";
+  const note = $("partNote")?.value.trim() || "";
+
+  if(!q && !note){
+    $("partOut").textContent = "Enter part number, part name, VIN, ESN, or description.";
+    return;
+  }
+
+  $("partOut").textContent = "Looking up part...";
+
+  const mode =
+    $("vinGlobal")?.value ||
+    $("invoiceVin")?.value ||
+    $("esnGlobal")?.value ||
+    $("cplGlobal")?.value
+      ? "vin_oem_part_lookup"
+      : "smart_parts_brain";
+
+  try{
+    $("partOut").textContent = await callAI(q || note, mode, note);
+  }catch(e){
+    $("partOut").textContent = "PART LOOKUP ERROR: " + e.message;
+  }
+}
+
+function verifyPartWeb(){
+  askPart();
+}
+
+async function lookupFilter(){
+  const q = $("filterq")?.value.trim() || "";
+  const note = $("filterNote")?.value.trim() || "";
+
+  if(!q && !note){
+    $("filterOut").textContent = "Enter filter number, engine, unit, or description.";
+    return;
+  }
+
+  $("filterOut").textContent = "Looking up filter / fluid...";
+
+  try{
+    $("filterOut").textContent = await callAI(q || note, "filters", note);
+  }catch(e){
+    $("filterOut").textContent = "FILTER ERROR: " + e.message;
+  }
+}
+
+async function verifyFilterWeb(){
+  lookupFilter();
+}
+
+async function runDiag(){
+  const q = $("diagq")?.value.trim() || "";
+  const note = $("diagNote")?.value.trim() || "";
+
+  if(!q){
+    $("diagOut").textContent = "Enter diagnostic question first.";
+    return;
+  }
+
+  $("diagOut").textContent = "Running diagnostic...";
+
+  try{
+    $("diagOut").textContent = await callAI(q, "smart_diagnostics_brain", note);
+  }catch(e){
+    $("diagOut").textContent = "DIAGNOSTIC ERROR: " + e.message;
+  }
+}
+
+async function troubleshootFault(){
+  const q = $("diagFault")?.value.trim() || $("troubleq")?.value.trim() || "";
+  const note = $("diagNotes")?.value.trim() || "";
+
+  if(!q){
+    alert("Enter fault or symptom first.");
+    return;
+  }
+
+  const out = $("diagAnswer") || $("troubleOut");
+  if(out) out.textContent = "Troubleshooting...";
+
+  try{
+    const ans = await callAI(q, "engine_pattern_lookup", note);
+    if(out) out.textContent = ans;
+  }catch(e){
+    if(out) out.textContent = "TROUBLESHOOTER ERROR: " + e.message;
+  }
+}
+
+/* aliases for newer layout */
+const askDiag = runDiag;
+const askFilter = lookupFilter;
+const askTrouble = troubleshootFault;
+
+/* =====================================================
+   9. PROFESSIONAL INVOICE / QUOTE
+===================================================== */
+function money(n){
+  return "$" + Number(n || 0).toFixed(2);
+}
+
+function updateInvoiceHeader(){
+  const s = getShop();
+
+  if($("invoiceShopName")){
+    $("invoiceShopName").textContent = s.name;
+  }
+
+  if($("invoiceShopInfo")){
+    $("invoiceShopInfo").innerHTML =
+      `${s.phone || ""}<br>${s.email || ""}<br>${s.website || ""}<br>${s.address || ""}<br>${s.taxId ? "Tax ID / EIN: " + s.taxId : ""}`;
+  }
+
+  if($("invoiceDate")){
+    $("invoiceDate").textContent = new Date().toLocaleString();
+  }
+
+  if($("invoiceNo") && !$("invoiceNo").textContent){
+    const n = Number(localStorage.getItem("invoiceCounter") || "1000") + 1;
+    localStorage.setItem("invoiceCounter", String(n));
+    $("invoiceNo").textContent = `${s.prefix || "INV"}-${n}`;
+  }
+}
+
+function setInvoiceStatus(status){
+  invoiceStatus = status;
+
+  document.querySelectorAll(".statusBtn").forEach(btn=>{
+    btn.classList.remove("active");
+    if(btn.textContent.trim() === status){
+      btn.classList.add("active");
+    }
+  });
+}
+
+function calcInvoiceTotals(){
+  const h = Number($("laborHours")?.value || $("hours")?.value || 0);
+  const r = Number($("laborRate")?.value || $("rate")?.value || 0);
+  const parts = Number($("partsCost")?.value || 0);
+  const service = Number($("serviceCall")?.value || $("callOut")?.value || 0);
+  const taxPct = Number($("taxRate")?.value || 0);
+  const cardPct = Number($("cardFee")?.value || 0);
+
+  const labor = h * r;
+  const subtotal = labor + parts + service;
+  const tax = subtotal * (taxPct / 100);
+  const card = (subtotal + tax) * (cardPct / 100);
+  const total = subtotal + tax + card;
+
+  if($("subTotal")) $("subTotal").textContent = money(subtotal);
+  if($("taxTotal")) $("taxTotal").textContent = money(tax);
+  if($("cardTotal")) $("cardTotal").textContent = money(card);
+  if($("grandTotal")) $("grandTotal").textContent = money(total);
+
+  return {labor,parts,service,subtotal,tax,card,total};
+}
+
+function buildInvoice(){
+  updateInvoiceHeader();
+  calcInvoiceTotals();
+  buildCustomerInvoice();
+}
+
+function buildCustomerInvoice(){
+  const s = getShop();
+  const t = calcInvoiceTotals();
+
+  const invoiceNo = $("invoiceNo")?.textContent || "";
+  const invoiceDate = $("invoiceDate")?.textContent || new Date().toLocaleString();
+
+  const txt =
+`${s.name}
+${s.phone}
+${s.email}
+${s.website}
+${s.address}
+${s.taxId ? "Tax ID / EIN: " + s.taxId : ""}
+
+INVOICE #: ${invoiceNo}
+DATE: ${invoiceDate}
+STATUS: ${invoiceStatus}
+
+CUSTOMER:
+${$("custName")?.value || $("customer")?.value || ""}
+${$("custPhone")?.value || ""}
+
+VEHICLE:
+${$("invoiceTruck")?.value || ctx()}
+VIN: ${$("invoiceVin")?.value || $("vinGlobal")?.value || ""}
+
+LABOR:
+${$("laborDesc")?.value || $("jobName")?.value || "Labor"}
+Labor Total: ${money(t.labor)}
+
+PARTS:
+${$("partsDesc")?.value || $("partsUsed")?.value || ""}
+Parts: ${money(t.parts)}
+
+Service Call: ${money(t.service)}
+Subtotal: ${money(t.subtotal)}
+Tax: ${money(t.tax)}
+Card Fee: ${money(t.card)}
+
+TOTAL DUE:
+${money(t.total)}
+
+TERMS:
+${s.terms}`;
+
+  if($("quoteOut")) $("quoteOut").textContent = txt;
+  return txt;
+}
+
+function buildShopInvoice(){
+  const customerCopy = buildCustomerInvoice();
+  const internalCost = Number($("internalCost")?.value || 0);
+  const t = calcInvoiceTotals();
+  const profit = t.total - internalCost;
+
+  const shopCopy =
+`${customerCopy}
+
+==============================
+SHOP COPY / INTERNAL RECORD
+==============================
+
+INTERNAL COST:
+${money(internalCost)}
+
+ESTIMATED PROFIT:
+${money(profit)}
+
+SHOP NOTES:
+${$("internalNotes")?.value || ""}
+
+STATUS:
+${invoiceStatus}
+
+PHOTO ATTACHED:
+${$("invoicePreview")?.style.display === "block" ? "YES" : "NO"}
+`;
+
+  if($("quoteOut")) $("quoteOut").textContent = shopCopy;
+  return shopCopy;
+}
+
+function saveInvoice(){
+  const text =
+    $("quoteOut")?.textContent ||
+    buildCustomerInvoice();
+
+  if(!text.trim()){
+    alert("Build invoice first.");
+    return;
+  }
+
+  const invoices = JSON.parse(localStorage.getItem("savedInvoices") || "[]");
+
+  invoices.unshift({
+    id: Date.now(),
+    no: $("invoiceNo")?.textContent || "",
+    date: $("invoiceDate")?.textContent || new Date().toLocaleString(),
+    status: invoiceStatus,
+    customer: $("custName")?.value || $("customer")?.value || "",
+    total: $("grandTotal")?.textContent || "",
+    text
+  });
+
+  localStorage.setItem("savedInvoices", JSON.stringify(invoices));
+  alert("Invoice saved.");
+}
+
+function showSavedInvoices(){
+  const invoices = JSON.parse(localStorage.getItem("savedInvoices") || "[]");
+  const out = $("savedOut") || $("invoiceList");
+
+  if(!out) return;
+
+  if(!invoices.length){
+    out.textContent = "No saved invoices.";
+    return;
+  }
+
+  out.innerHTML = invoices.map(inv=>`
+    <div style="border:1px solid ${inv.status === "PAID" ? "#20b765" : "#e14b4b"};border-radius:14px;padding:12px;margin-bottom:12px;background:#111">
+      <b>${inv.status} — ${inv.no}</b><br>
+      ${inv.date}<br>
+      Customer: ${inv.customer}<br>
+      Total: ${inv.total}<br><br>
+      <pre style="white-space:pre-wrap;color:#ffd6a0">${inv.text}</pre>
+      <button onclick="openSavedInvoice(${inv.id})" style="width:100%;margin-top:8px">OPEN</button>
+      <button onclick="toggleSavedInvoicePaid(${inv.id})" style="width:100%;margin-top:8px">MARK PAID / UNPAID</button>
+    </div>
+  `).join("");
+}
+
+function openSavedInvoice(id){
+  const invoices = JSON.parse(localStorage.getItem("savedInvoices") || "[]");
+  const inv = invoices.find(x=>x.id===id);
+  if(!inv) return;
+
+  show("quote");
+  if($("quoteOut")) $("quoteOut").textContent = inv.text;
+  setInvoiceStatus(inv.status || "UNPAID");
+}
+
+function toggleSavedInvoicePaid(id){
+  const invoices = JSON.parse(localStorage.getItem("savedInvoices") || "[]");
+
+  const updated = invoices.map(inv=>{
+    if(inv.id !== id) return inv;
+    const status = inv.status === "PAID" ? "UNPAID" : "PAID";
+    return {...inv,status};
+  });
+
+  localStorage.setItem("savedInvoices", JSON.stringify(updated));
+  showSavedInvoices();
+}
+
+function addInvoicePhotoToNotes(){
+  if($("internalNotes")){
+    $("internalNotes").value += "\nPhoto / receipt attached.";
+  }
+}
+
+function clearInvoice(){
+  [
+    "custName","custPhone","invoiceTruck","invoiceVin",
+    "laborDesc","laborHours","partsDesc","partsCost",
+    "serviceCall","internalCost","internalNotes"
+  ].forEach(id=>setValue(id,""));
+
+  if($("quoteOut")) $("quoteOut").textContent = "Invoice cleared.";
+  if($("invoicePreview")){
+    $("invoicePreview").src = "";
+    $("invoicePreview").style.display = "none";
+  }
+}
+
+/* old aliases */
+const calcQuote = buildInvoice;
+
+/* =====================================================
+   10. GPS / MILEAGE / PARTS RUN
+===================================================== */
+let tripStart = null;
+let partsStart = null;
+
+function getGpsOnce(){
+  return new Promise((resolve,reject)=>{
+    if(!navigator.geolocation){
+      reject(new Error("GPS not supported"));
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      pos=>resolve({
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+        accuracy: pos.coords.accuracy,
+        time: new Date().toLocaleString()
+      }),
+      err=>reject(err),
+      {enableHighAccuracy:true, timeout:15000}
+    );
+  });
+}
+
+function milesBetween(a,b){
+  const R = 3958.8;
+  const dLat = (b.lat - a.lat) * Math.PI / 180;
+  const dLng = (b.lng - a.lng) * Math.PI / 180;
+  const lat1 = a.lat * Math.PI / 180;
+  const lat2 = b.lat * Math.PI / 180;
+
+  const x =
+    Math.sin(dLat/2)**2 +
+    Math.cos(lat1) * Math.cos(lat2) *
+    Math.sin(dLng/2)**2;
+
+  return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
+}
+
+async function setShopLocation(){
+  try{
+    const loc = await getGpsOnce();
+    localStorage.setItem("shopLocation", JSON.stringify(loc));
+    $("pinOut").textContent = `SHOP LOCATION SAVED\nLat: ${loc.lat}\nLng: ${loc.lng}`;
+  }catch(e){
+    $("pinOut").textContent = "GPS ERROR: " + e.message;
+  }
+}
+
+async function setJobLocation(){
+  try{
+    const loc = await getGpsOnce();
+    localStorage.setItem("jobLocation", JSON.stringify(loc));
+    $("pinOut").textContent = `JOB LOCATION SAVED\nLat: ${loc.lat}\nLng: ${loc.lng}`;
+  }catch(e){
+    $("pinOut").textContent = "GPS ERROR: " + e.message;
+  }
+}
+
+async function startMileageTrip(){
+  try{
+    tripStart = await getGpsOnce();
+    localStorage.setItem("tripStart", JSON.stringify(tripStart));
+    $("pinOut").textContent = `TRIP STARTED\n${tripStart.time}\nLat: ${tripStart.lat}\nLng: ${tripStart.lng}`;
+  }catch(e){
+    $("pinOut").textContent = "GPS ERROR: " + e.message;
+  }
+}
+
+async function stopMileageTrip(){
+  try{
+    const end = await getGpsOnce();
+    const start = JSON.parse(localStorage.getItem("tripStart") || "null");
+
+    if(!start){
+      alert("Start trip first.");
+      return;
+    }
+
+    const miles = milesBetween(start,end);
+    const rate = Number($("mileageRate")?.value || getShop().mileageRate || 0);
+    const total = miles * rate;
+
+    localStorage.setItem("lastTripMiles", miles.toFixed(2));
+    localStorage.setItem("lastTripCharge", total.toFixed(2));
+
+    const txt =
+`TRIP COMPLETE
+
+Trip Miles:
+${miles.toFixed(2)} miles
+
+Mileage Rate:
+${money(rate)} / mile
+
+Travel Charge:
+${money(total)}
+
+Started:
+${start.time}
+
+Stopped:
+${end.time}`;
+
+    if($("gpsTotals")) $("gpsTotals").textContent = txt;
+    if($("pinOut")) $("pinOut").textContent = txt;
+  }catch(e){
+    $("pinOut").textContent = "GPS ERROR: " + e.message;
+  }
+}
+
+async function startPartsRun(){
+  try{
+    partsStart = await getGpsOnce();
+    localStorage.setItem("partsStart", JSON.stringify(partsStart));
+    $("pinOut").textContent = `PARTS RUN STARTED\n${partsStart.time}`;
+  }catch(e){
+    $("pinOut").textContent = "GPS ERROR: " + e.message;
+  }
+}
+
+async function stopPartsRun(){
+  try{
+    const end = await getGpsOnce();
+    const start = JSON.parse(localStorage.getItem("partsStart") || "null");
+
+    if(!start){
+      alert("Start parts run first.");
+      return;
+    }
+
+    const miles = milesBetween(start,end);
+    const rate = Number($("partsRunRate")?.value || getShop().partsRunRate || 0);
+    const total = miles * rate;
+
+    localStorage.setItem("lastPartsMiles", miles.toFixed(2));
+    localStorage.setItem("lastPartsCharge", total.toFixed(2));
+
+    const txt =
+`PARTS RUN COMPLETE
+
+Parts Run Miles:
+${miles.toFixed(2)} miles
+
+Parts Run Rate:
+${money(rate)} / mile
+
+Parts Run Charge:
+${money(total)}`;
+
+    if($("gpsTotals")) $("gpsTotals").textContent = txt;
+    if($("pinOut")) $("pinOut").textContent = txt;
+  }catch(e){
+    $("pinOut").textContent = "GPS ERROR: " + e.message;
+  }
+}
+
+function addMileageToInvoice(){
+  const trip = Number(localStorage.getItem("lastTripCharge") || 0);
+  const parts = Number(localStorage.getItem("lastPartsCharge") || 0);
+  const current = Number($("serviceCall")?.value || $("callOut")?.value || 0);
+  const newTotal = current + trip + parts;
+
+  setValue("serviceCall", newTotal.toFixed(2));
+  setValue("callOut", newTotal.toFixed(2));
+
+  alert("GPS mileage charges added to invoice.");
+}
+
+function openJobMaps(){
+  const job = JSON.parse(localStorage.getItem("jobLocation") || "null");
+
+  if(!job){
+    alert("Save job location first.");
+    return;
+  }
+
+  window.open(`https://maps.google.com/?q=${job.lat},${job.lng}`, "_blank");
+}
+
+function findNearestDealer(){
+  if(!navigator.geolocation){
+    alert("GPS not supported");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const q = "FleetPride OR Cummins Dealer OR Kenworth OR Peterbilt OR Freightliner Parts";
+    window.open(
+      `https://www.google.com/maps/search/${encodeURIComponent(q)}/@${pos.coords.latitude},${pos.coords.longitude},12z`,
+      "_blank"
+    );
+  });
+}
+
+/* old GPS aliases */
+const getLocation = setJobLocation;
+const dropPin = setJobLocation;
+
+/* =====================================================
+   11. CLOCK / LABOR
+===================================================== */
+function clockIn(){
+  startTime = Date.now();
+
+  if(clockInterval){
+    clearInterval(clockInterval);
+  }
+
+  clockInterval = setInterval(updateClockLive,1000);
+  updateClockLive();
+}
+
+function updateClockLive(){
+  if(!startTime || !$("clockOutBox")) return;
+
+  const hours = (Date.now() - startTime) / 3600000;
+  const rate = Number($("laborRate")?.value || getShop().laborRate || 0);
+  const labor = hours * rate;
+
+  $("clockOutBox").textContent =
+`LIVE JOB RUNNING
+
+Hours:
+${hours.toFixed(2)}
+
+Labor:
+${money(labor)}`;
+}
+
+function clockOut(){
+  if(!startTime){
+    alert("Start job first.");
+    return;
+  }
+
+  if(clockInterval){
+    clearInterval(clockInterval);
+  }
+
+  const hours = (Date.now() - startTime) / 3600000;
+  setValue("laborHours", hours.toFixed(2));
+  setValue("hours", hours.toFixed(2));
+
+  if($("clockOutBox")){
+    $("clockOutBox").textContent =
+`JOB COMPLETE
+
+Billable Hours:
+${hours.toFixed(2)}
+
+Sent to invoice labor hours.`;
+  }
+
+  startTime = null;
+}
+
+function resetClock(){
+  startTime = null;
+
+  if(clockInterval){
+    clearInterval(clockInterval);
+  }
+
+  if($("clockOutBox")){
+    $("clockOutBox").textContent = "Clock reset.";
+  }
+}
+
+function addClockToWork(){
+  show("quote");
+  alert("Clock hours are already sent to invoice labor hours.");
+}
+
+/* =====================================================
+   12. WORK ORDER / HISTORY
+===================================================== */
+function copyWorkOrder(){
+  const txt =
+`WORK ORDER
+
+Customer:
+${$("customer")?.value || $("custName")?.value || ""}
+
+Vehicle:
+${ctx()}
+
+Complaint:
+${$("complaint")?.value || $("woComplaint")?.value || ""}
+
+Cause:
+${$("woCause")?.value || ""}
+
+Correction:
+${$("woCorrection")?.value || $("workText")?.value || ""}`;
+
+  if($("woOut")) $("woOut").textContent = txt;
+  if($("workOut")) $("workOut").textContent = txt;
+
+  navigator.clipboard?.writeText(txt);
+}
+
+function saveJob(){
+  const jobs = JSON.parse(localStorage.getItem("savedJobs") || "[]");
+
+  jobs.unshift({
+    date: new Date().toLocaleString(),
+    customer: $("customer")?.value || $("custName")?.value || "",
+    vehicle: ctx(),
+    work: $("workText")?.value || $("woCorrection")?.value || ""
+  });
+
+  localStorage.setItem("savedJobs", JSON.stringify(jobs));
+  alert("Job saved.");
+}
+
+function showProfit(){
+  const invoices = JSON.parse(localStorage.getItem("savedInvoices") || "[]");
+  const total = invoices.reduce((sum,i)=>{
+    const n = Number(String(i.total || "0").replace("$","")) || 0;
+    return sum + n;
+  },0);
+
+  if($("profitOut")){
+    $("profitOut").textContent =
+`Saved invoices:
+${invoices.length}
+
+Gross Sales:
+${money(total)}`;
+  }
+}
+
+/* =====================================================
+   13. IMAGE PREVIEWS
+===================================================== */
+function wireImagePreview(inputId, previewId){
+  const input = $(inputId);
+  const preview = $(previewId);
+
+  if(!input || !preview) return;
+
+  input.addEventListener("change", function(){
     const file = this.files?.[0];
     if(!file) return;
-
-    const preview = $("homeAiPreview");
-    if(!preview) return;
 
     preview.src = URL.createObjectURL(file);
     preview.style.display = "block";
   });
 }
 
-
-
-  
-// SAFE CALL (won’t crash if missing)
-try{
-  if(typeof loadSettings === "function"){
-    loadSettings();
-  }
-}catch(e){
-  console.log("loadSettings skipped", e);
+/* =====================================================
+   14. UTILS / COPY / VOICE
+===================================================== */
+function copyText(id){
+  navigator.clipboard?.writeText($(id)?.textContent || "");
+  alert("Copied.");
 }
-window.addEventListener(
-"load",
-loadClockState
-);
 
+function startVoiceInput(){
+  if(!("webkitSpeechRecognition" in window)){
+    alert("Voice input not supported on this browser yet.");
+    return;
+  }
 
-  
-/* AUTO SAVE + SAFE SELF REPAIR */
+  const recognition = new webkitSpeechRecognition();
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
 
-const RWD_AUTOSAVE_KEY = "rwd_v36_autosave";
+  recognition.onresult = e=>{
+    const text = e.results[0][0].transcript;
+    const active =
+      $("homeAiAsk") ||
+      $("diagq") ||
+      $("partq");
 
-function getAllFieldData(){
-  const data = {};
-
-  document.querySelectorAll("input, textarea, select").forEach(el => {
-    if(!el.id) return;
-
-    if(el.type === "checkbox"){
-      data[el.id] = el.checked;
-    }else{
-      data[el.id] = el.value;
+    if(active){
+      active.value = text;
     }
-  });
-
-  data.activeSection =
-    document.querySelector(".section.active")?.id || "home";
-
-  data.clock = {
-    startTime: typeof startTime !== "undefined" ? startTime : 0,
-    lastClockBill: typeof lastClockBill !== "undefined" ? lastClockBill : ""
   };
 
-  data.savedAt = new Date().toLocaleString();
-
-  return data;
+  recognition.start();
 }
 
-function autoSaveEverything(){
-  try{
-    const data = getAllFieldData();
-    localStorage.setItem(RWD_AUTOSAVE_KEY, JSON.stringify(data));
-  }catch(e){
-    console.log("Auto-save failed:", e);
-  }
-}
-
-function restoreEverything(){
-  try{
-    const raw = localStorage.getItem(RWD_AUTOSAVE_KEY);
-    if(!raw) return;
-
-    const data = JSON.parse(raw);
-
-    Object.keys(data).forEach(id => {
-      const el = $(id);
-      if(!el) return;
-
-      if(el.type === "checkbox"){
-        el.checked = data[id];
-      }else{
-        el.value = data[id];
-      }
-    });
-
-    if(data.clock){
-      startTime = data.clock.startTime || startTime || 0;
-      lastClockBill = data.clock.lastClockBill || lastClockBill || "";
-    }
-
-    if(data.activeSection){
-      show(data.activeSection);
-    }
-
-  }catch(e){
-    console.log("Restore failed:", e);
-  }
-}
-
-function repairApp(){
-  try{
-    localStorage.removeItem("rwd_clock_state");
-
-    document.querySelectorAll("button").forEach(btn => {
-      btn.disabled = false;
-      btn.style.pointerEvents = "auto";
-      btn.style.opacity = "1";
-    });
-
-    if(typeof show === "function"){
-      show("home");
-    }
-
-    alert("App repair complete. Buttons reset and app returned Home.");
-  }catch(e){
-    alert("Repair failed: " + e.message);
-  }
-}
-function newJobSession(){
-
-if(!confirm(
-"Start a new job session?\n\nThis clears active fields but keeps saved invoices/history."
-)){
-return;
-}
-
-document.querySelectorAll("input, textarea, select")
-.forEach(el=>{
-
-if(!el.id) return;
-
-if(
-el.id.includes("default") ||
-el.id.includes("shopName") ||
-el.id.includes("squareLink")
-){
-return;
-}
-
-if(el.type === "checkbox"){
-el.checked = false;
-}else{
-el.value = "";
-}
-
-});
-
-if($("homeAiPreview")){
-$("homeAiPreview").style.display = "none";
-$("homeAiPreview").src = "";
-}
-
-if($("homeAiOut")){
-$("homeAiOut").textContent =
-"Tell me what you need or choose a tool below.";
-}
-
-if($("partOut")){
-$("partOut").textContent =
-"Enter part number.";
-}
-
-if($("diagAnswer")){
-$("diagAnswer").textContent =
-"Enter a fault or symptom.";
-}
-
-if($("diagOut")){
-$("diagOut").textContent =
-"Enter diagnostic question.";
-}
-
-if($("filterOut")){
-$("filterOut").textContent =
-"Enter filter number, engine, or unit.";
-}
-
-if($("quoteOut")){
-$("quoteOut").textContent =
-"Build invoice.";
-}
-
-if($("workOut")){
-$("workOut").textContent =
-"Work order ready.";
-}
-
-show("home");
-
-alert("New job session started.");
-
-}
+/* =====================================================
+   15. SAFE ERROR LOGGING
+===================================================== */
 window.addEventListener("error", function(e){
-  const report =
-`APP ERROR CAUGHT
+  localStorage.setItem("rwd_last_error",
+`APP ERROR
 
 Message:
 ${e.message}
 
-File:
-${e.filename}
-
 Line:
 ${e.lineno}
 
-Column:
-${e.colno}
-
 Time:
-${new Date().toLocaleString()}`;
-
-  localStorage.setItem("rwd_last_error", report);
-
-  console.log(report);
+${new Date().toLocaleString()}`);
 });
-function clearPartsLookup(){
 
-$("partq").value = "";
-$("partNote").value = "";
-$("partOut").textContent =
-"Enter part number.";
-
-}
-
-function clearTroubleshooter(){
-
-$("diagFault").value = "";
-$("diagNotes").value = "";
-
-$("diagAnswer").textContent =
-"Enter a fault or symptom.";
-
-}
-
-function clearDiagAI(){
-
-$("diagq").value = "";
-$("diagNote").value = "";
-
-$("diagOut").textContent =
-"Enter diagnostic question.";
-
-}
-
-function clearFilterLookup(){
-
-$("filterq").value = "";
-$("filterNote").value = "";
-
-$("filterOut").textContent =
-"Enter filter number, engine, or unit.";
-
-}
 window.addEventListener("unhandledrejection", function(e){
-  const report =
-`APP PROMISE ERROR
+  localStorage.setItem("rwd_last_promise_error",
+`PROMISE ERROR
 
 Reason:
 ${e.reason}
 
 Time:
-${new Date().toLocaleString()}`;
-
-  localStorage.setItem("rwd_last_error", report);
-
-  console.log(report);
+${new Date().toLocaleString()}`);
 });
 
-document.addEventListener("input", autoSaveEverything);
-document.addEventListener("change", autoSaveEverything);
-setInterval(autoSaveEverything, 5000);
+/* =====================================================
+   16. APP LOAD
+===================================================== */
+window.addEventListener("DOMContentLoaded", ()=>{
+  loadSettings();
+  updateActiveTruck();
+  updateInvoiceHeader();
+  setInvoiceStatus("UNPAID");
 
-window.addEventListener("load", function(){
-  restoreEverything();
-  autoSaveEverything();
+  wireImagePreview("homeAiImage","homeAiPreview");
+  wireImagePreview("invoicePhoto","invoicePreview");
 });
+</script>
 
-  function setTheme(theme){
-
-  document.body.classList.remove(
-    "theme-orange",
-    "theme-cat",
-    "theme-cummins"
-  );
-
-  document.body.classList.add("theme-" + theme);
-
-  localStorage.setItem("rwdTheme", theme);
-
-  const sel = document.getElementById("themeSelect");
-  if(sel) sel.value = theme;
-}
-
-function loadTheme(){
-
-  const saved =
-    localStorage.getItem("rwdTheme")
-    || "orange";
-
-  setTheme(saved);
-}
-
-window.addEventListener(
-  "DOMContentLoaded",
-  loadTheme
-);
-
-function showClearAiButton(){
-
-  const btn =
-    document.getElementById("clearAiBtn");
-
-  if(btn){
-    btn.classList.remove("hiddenAction");
-  }
-
-}
-
-function showNewJobButton(){
-
-  const btn =
-    document.getElementById("newJobBtn");
-
-  if(btn){
-    btn.classList.remove("hiddenAction");
-  }
-
-}
-
-function hideSessionButtons(){
-
-  const ai =
-    document.getElementById("clearAiBtn");
-
-  const job =
-    document.getElementById("newJobBtn");
-
-  if(ai){
-    ai.classList.add("hiddenAction");
-  }
-
-  if(job){
-    job.classList.add("hiddenAction");
-  }
-
-}
-
-function setTheme(theme){
-
-  document.body.classList.remove(
-    "theme-orange",
-    "theme-cat",
-    "theme-cummins"
-  );
-
-  document.body.classList.add(
-    "theme-" + theme
-  );
-
-  localStorage.setItem(
-    "rwdTheme",
-    theme
-  );
-
-  const sel =
-    document.getElementById("themeSelect");
-
-  if(sel){
-    sel.value = theme;
-  }
-
-}
-
-function loadTheme(){
-
-  const saved =
-    localStorage.getItem("rwdTheme")
-    || "orange";
-
-  setTheme(saved);
-
-}
-
-function setLayout(layout){
-
-  document.body.classList.remove(
-    "layout-grid",
-    "layout-list",
-    "layout-compact",
-    "layout-roadside"
-  );
-
-  document.body.classList.add(
-    "layout-" + layout
-  );
-
-  localStorage.setItem(
-    "rwdLayout",
-    layout
-  );
-
-  const sel =
-    document.getElementById("layoutSelect");
-
-  if(sel){
-    sel.value = layout;
-  }
-
-}
-
-function loadLayout(){
-
-  const saved =
-    localStorage.getItem("rwdLayout")
-    || "grid";
-
-  setLayout(saved);
-
-}
-
-window.addEventListener(
-  "DOMContentLoaded",
-  ()=>{
-
-    loadTheme();
-    loadLayout();
-    hideSessionButtons();
-
-  }
-);
- 
-  </script>
-
-<script src="app_integration.js"></script>
-  
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<div style="
-text-align:center;
-font-size:11px;
-color:#777;
-padding:20px;
-opacity:.8;
-">
+<div style="text-align:center;font-size:11px;color:#777;padding:20px;opacity:.8;">
 © 2026 Rolling Wrench Diesel LLC.<br>
 Mobile Mechanic Pro V36 — All Rights Reserved.
 </div>
-</body>
-</html>
   
   
   
