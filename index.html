@@ -7,1320 +7,610 @@
 
 <style>
 :root{
-  --bg:#d7d7d7;
-  --panel:#eeeeee;
-  --card:#f2f2f2;
-  --card2:#ffffff;
-  --line:#b8b8b8;
-
-  --text:#151515;
-  --muted:#555;
-
-  --orange:#e85d00;
-  --accent:#ff6500;
-  --accentGlow:#ff7b00;
-
-  --blue:#2f73e8;
-  --green:#20b765;
+  --bg:#050505;
+  --card:#101010;
+  --card2:#171717;
+  --line:#2b2b2b;
+  --text:#f5f5f5;
+  --muted:#a8a8a8;
+  --orange:#ff8a00;
+  --orange2:#d85b00;
+  --blue:#071720;
   --red:#e14b4b;
-
-  --result:#f4f4f4;
 }
-
-*{
-  box-sizing:border-box;
-}
-
+*{box-sizing:border-box}
 body{
   margin:0;
-  padding:16px 16px 105px;
-
-  font-family:Arial, Helvetica, sans-serif;
-
+  padding:16px 14px 112px;
+  font-family:Arial,Helvetica,sans-serif;
   background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,.75),
-      rgba(190,190,190,.88)
-    ),
-    repeating-linear-gradient(
-      90deg,
-      #bcbcbc 0px,
-      #eeeeee 2px,
-      #a7a7a7 4px
-    );
-
+    linear-gradient(rgba(0,0,0,.72),rgba(0,0,0,.9)),
+    url("https://www.transparenttextures.com/patterns/black-orchid.png");
   color:var(--text);
-  background-attachment:fixed;
 }
-
-.section{
-  display:none;
-}
-
-.section.active{
-  display:block;
-}
-
-/* HEADER */
+.section{display:none}
+.section.active{display:block}
 
 .header{
   position:relative;
   text-align:center;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,.88),
-      rgba(180,180,180,.92)
-    ),
-    repeating-linear-gradient(
-      90deg,
-      #d8d8d8 0px,
-      #f4f4f4 2px,
-      #bdbdbd 4px
-    );
-
-  border:1px solid #9f9f9f;
-
-  border-radius:28px;
-
-  padding:18px 16px 20px;
-
-  margin-bottom:16px;
-
-  box-shadow:
-    0 10px 28px rgba(0,0,0,.35),
-    inset 0 1px 0 rgba(255,255,255,.7);
+  padding:16px 58px 18px;
+  margin-bottom:14px;
 }
-
-.brand{
-  color:#e85d00;
-  font-size:28px;
-  font-weight:900;
-  text-transform:uppercase;
-  letter-spacing:1px;
-  line-height:1;
+.menuBtn{
+  position:absolute;left:4px;top:14px;
+  background:transparent;box-shadow:none;border:none;
+  color:var(--orange);font-size:34px;padding:4px 8px;
 }
-h1{
-  margin:4px 0 0;
-  font-size:14px;
-  color:#111;
-  font-weight:900;
-  text-transform:uppercase;
-}
-
-.subhead{
-  color:#222;
-  font-size:12px;
-  margin-top:4px;
-}
-
-/* TOP RIGHT SETTINGS */
-
 .topGear{
-  position:absolute;
-  top:13px;
-  right:13px;
-
-  width:44px;
-  height:44px;
-
-  border:none;
-  border-radius:14px;
-
-  background:#f4f4f4;
-  color:#111;
-
-  font-size:24px;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.9),
-    0 4px 12px rgba(0,0,0,.25);
-
-  z-index:50;
+  position:absolute;right:4px;top:14px;
+  background:transparent;box-shadow:none;border:none;
+  color:#fff;font-size:30px;padding:4px 8px;
 }
-
-.topMenu{
-  position:absolute;
-  top:65px;
-  right:12px;
-
-  width:220px;
-
-  background:#f5f5f5;
-  border:1px solid #aaa;
-  border-radius:18px;
-
-  padding:10px;
-
-  display:none;
-  flex-direction:column;
-  gap:8px;
-
-  z-index:70;
-
-  box-shadow:0 12px 28px rgba(0,0,0,.35);
-}
-
-.topMenu button{
-  width:100%;
-  text-align:left;
-
-  background:#fff;
-  color:#111;
-
-  border:1px solid #ccc;
-  border-radius:12px;
-
-  padding:13px;
-
-  font-weight:800;
-}
-
-/* CARDS */
-.card{
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,.88),
-      rgba(185,185,185,.94)
-    ),
-    repeating-linear-gradient(
-      90deg,
-      #d6d6d6 0px,
-      #f5f5f5 2px,
-      #bcbcbc 4px
-    );
-
-  border:1px solid #9e9e9e;
-
-  border-radius:28px;
-
-  padding:18px;
-
-  margin-bottom:18px;
-
-  box-shadow:
-    0 12px 26px rgba(0,0,0,.30),
-    inset 0 1px 0 rgba(255,255,255,.7);
-}
-
-.cardTitle{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:10px;
-}
-
-.cardTitle h2{
-  margin:0;
-  font-size:15px;
-  color:#111;
-  font-weight:900;
-  text-transform:uppercase;
-}
-
-.badge{
-  border:1px solid var(--orange);
+.brand{
   color:var(--orange);
-  border-radius:999px;
-  padding:6px 10px;
-  font-size:11px;
-  font-weight:900;
-  text-transform:uppercase;
-}
-
-/* GOOGLE STYLE AI SEARCH */
-
-.googleAiBox{
-  background:#f1f2f4;
-  border-radius:34px;
-  padding:18px;
-  margin:14px 0;
-  color:#111;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.9),
-    0 8px 20px rgba(0,0,0,.18);
-}
-
-.googleTop{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.googleBack,
-.googlePlus,
-.googleActions button{
-  background:transparent;
-  color:#111;
-  box-shadow:none;
-  border:none;
-  font-size:34px;
-  padding:0;
-}
-
-.googleTop input{
-  flex:1;
-  background:transparent;
-  border:none;
-  color:#444;
   font-size:28px;
-  outline:none;
-  padding:10px 0;
-}
-
-.googleBottom{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-top:36px;
-}
-
-.googleActions{
-  display:flex;
-  gap:24px;
-}
-
-.recentAi button{
-  width:100%;
-  background:transparent;
-  box-shadow:none;
-  border:none;
-  color:#111;
-  text-align:left;
-  font-size:20px;
-  padding:16px 0;
-}
-
-.recentAi small{
-  display:block;
-  color:#777;
-  margin-left:34px;
-  font-size:15px;
-}
-
-/* FORMS */
-
-label{
-  display:block;
   font-weight:900;
-  text-transform:uppercase;
-  font-size:11px;
-  margin:10px 0 6px;
-  color:#333;
-  letter-spacing:.4px;
+  letter-spacing:1px;
 }
-
-input,
-select,
-textarea{
-  width:100%;
-  background:#fff;
-  color:#111;
-  border:1px solid #aaa;
-  border-radius:14px;
-  padding:13px;
-  font-size:15px;
-  margin-bottom:9px;
-  outline:none;
-}
-
-textarea{
-  min-height:92px;
-  resize:vertical;
-}
-
-/* BUTTONS */
-
-button{
-  border:none;
-  border-radius:16px;
-
-  padding:14px 16px;
-
-  background:
-    linear-gradient(
-      180deg,
-      #ff7b00,
-      #d85600
-    );
-
-  color:#fff;
-
-  font-weight:900;
-  letter-spacing:.4px;
-
-  box-shadow:
-    0 5px 14px rgba(0,0,0,.25),
-    inset 0 1px 0 rgba(255,255,255,.28);
-
-  transition:.15s ease;
-}
-
-button:active{
-  transform:scale(.98);
-}
-
-.dark{
-  background:#f7f7f7;
-  color:#111;
-  border:1px solid #bbb;
-}
-
-.danger{
-  background:var(--red);
-}
-
-.back{
-  width:100%;
-  margin-bottom:10px;
-}
-
-.row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-/* HERO BUTTONS */
-
-.heroGrid,
-.quickGrid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-  margin-top:16px;
-  margin-bottom:16px;
-}
-
-.heroTool,
-.heroCard{
-
-  min-height:185px;
-
-  background:
-    linear-gradient(
-      180deg,
-      #ff8a00,
-      #cf5b00
-    );
-
-  border:2px solid #ffb347;
-
-  border-radius:22px;
-
-  padding:18px;
-
-  text-align:center;
-
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-
-  box-shadow:
-    0 0 24px rgba(255,140,0,.40),
-    inset 0 1px 0 rgba(255,255,255,.25);
-}
-.heroTool strong,
-.heroTitle{
-  display:block;
-  color:#fff;
-  font-size:20px;
-  font-weight:900;
-  line-height:1.08;
-  text-transform:uppercase;
-  margin-bottom:10px;
-}
-
-.heroTool span,
-.heroSub{
-  color:#fff;
-  font-size:12px;
-  line-height:1.35;
-  font-weight:700;
-}
-
-.heroIcon{
-  font-size:36px;
-  margin-bottom:10px;
-}
-
-/* SMALL TOOL BUTTON GRID */
-
-.grid,
-.miniGrid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  margin-top:14px;
-}
-
-.heroTool,
-.heroCard{
-
-  min-height:185px;
-
-  background:
-    linear-gradient(
-      180deg,
-      #ff8a00,
-      #cf5b00
-    );
-
-  border:2px solid #ffb347;
-
-  border-radius:22px;
-
-  padding:18px;
-
-  text-align:center;
-
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-
-  box-shadow:
-    0 0 24px rgba(255,140,0,.40),
-    inset 0 1px 0 rgba(255,255,255,.25);
-}
-
-
-.toolBtn strong,
-.heroTitle{
+.header h1{
+  margin:3px 0 0;
   font-size:14px;
   color:#fff;
-  line-height:1.1;
-  text-transform:uppercase;
-  font-weight:900;
+  letter-spacing:.5px;
 }
-
-.toolBtn span{
-  display:block;
-  color:#555;
-  font-size:10px;
-  margin-top:5px;
-  font-weight:700;
-}
-
-/* RESULTS */
-
-.result{
-  white-space:pre-wrap;
-
-  background:#f5f5f5;
-  border:1px solid #aaa;
-  border-radius:18px;
-
-  padding:15px;
-
-  color:#111;
-
-  line-height:1.4;
-  min-height:82px;
-  overflow-wrap:anywhere;
-  margin-top:10px;
-}
-
-.notice{
-  background:#fff4df;
-  border:1px solid #ffb34d;
-  color:#4b2600;
-  border-radius:14px;
-  padding:11px;
-  line-height:1.35;
-  margin:9px 0;
-  font-size:13px;
-}
-
-.small{
-  font-size:12px;
-  color:#555;
-  line-height:1.35;
-  margin-top:8px;
-}
-
-/* ACTIVE TRUCK BAR */
-
-.truckBar{
-  position:fixed;
-  left:10px;
-  right:10px;
-  bottom:78px;
-
-  background:
-    linear-gradient(
-      180deg,
-      #ff8a00,
-      #d65b00
-    );
-
-  color:#fff;
-
-  border-radius:18px;
-
-  padding:13px 16px;
-
-  font-size:12px;
-  font-weight:900;
-
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-
-  z-index:40;
-
-  box-shadow:0 8px 20px rgba(0,0,0,.35);
-}
-
-/* BOTTOM NAV */
-
-.bottomNav{
-  position:fixed;
-  left:10px;
-  right:10px;
-  bottom:10px;
-
-  background:#f4f4f4;
-  border:1px solid #aaa;
-  border-radius:24px;
-
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-
-  padding:7px 5px;
-
-  z-index:45;
-
-  box-shadow:0 10px 24px rgba(0,0,0,.28);
-}
-
-.bottomNav button{
-  background:transparent;
-  color:#444;
-  box-shadow:none;
+.topMenu{
+  display:none;
+  position:absolute;
+  top:62px;right:0;
+  background:#111;
+  border:1px solid var(--orange);
   border-radius:16px;
-  padding:6px 2px;
-  font-size:10px;
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-  align-items:center;
-  min-height:50px;
+  padding:10px;
+  z-index:90;
+  width:215px;
+  box-shadow:0 12px 30px rgba(0,0,0,.7);
+}
+.topMenu button{
+  width:100%;margin:4px 0;text-align:left;
+  background:#1b1b1b;border:1px solid #333;color:#fff;
 }
 
-.bottomNav button.active{
-  color:var(--orange);
+.searchBar{
+  display:flex;align-items:center;gap:10px;
+  background:#050505;
+  border:1px solid #777;
+  border-radius:18px;
+  padding:8px 8px 8px 14px;
+  margin-bottom:16px;
 }
-
-.navI{
-  font-size:19px;
+.searchBar span{font-size:26px;color:#ddd}
+.searchBar input{
+  flex:1;background:transparent;border:none;color:#fff;
+  font-size:15px;outline:none;padding:13px 0;
 }
-
-/* MOBILE */
-.mockSearchBar{
-  display:flex;
-  align-items:center;
-  gap:12px;
-
-  background:
-    linear-gradient(
-      180deg,
-      #f8f8f8,
-      #dcdcdc
-    );
-
-  border:1px solid #aaaaaa;
-
-  border-radius:22px;
-
-  padding:10px 12px;
-
-  margin:14px 0;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.85),
-    0 4px 14px rgba(0,0,0,.15);
-}
-
-.searchIcon{
-  font-size:24px;
-  color:#111;
-}
-
-.searchText{
-  flex:1;
-  color:#444;
-  font-size:15px;
-  font-weight:700;
-}
-
-.mockMic{
-  width:54px;
-  height:54px;
-
-  border-radius:16px;
-
-  background:
-    linear-gradient(
-      180deg,
-      #ff8a00,
-      #cf5b00
-    );
-
-  color:#fff;
-
-  font-size:24px;
-
-  padding:0;
-
-  box-shadow:
-    0 4px 14px rgba(255,120,0,.35);
+.micBtn{
+  width:58px;height:58px;border-radius:16px;
+  background:linear-gradient(180deg,var(--orange),var(--orange2));
+  color:#111;font-size:28px;border:none;
 }
 
 .aiDrawer{
   display:none;
-
-  background:
-    linear-gradient(
-      180deg,
-      #f5f5f5,
-      #d7d7d7
-    );
-
-  border:1px solid #a8a8a8;
-
-  border-radius:22px;
-
-  padding:14px;
-
+  background:#101010;
+  border:1px solid var(--orange);
+  border-radius:18px;
+  padding:12px;
   margin-bottom:14px;
-
-  box-shadow:
-    0 8px 18px rgba(0,0,0,.20);
 }
-
 .aiDrawer textarea{
-  width:100%;
-
-  min-height:100px;
-
-  border-radius:16px;
-
-  border:1px solid #aaa;
-
-  background:#fff;
-
-  color:#111;
-
-  padding:14px;
+  width:100%;min-height:105px;background:#050505;color:#fff;
+  border:1px solid #333;border-radius:14px;padding:12px;font-size:15px;
 }
-
 .aiDrawerBtns{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:10px;
-  margin-top:12px;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;
 }
-@media(max-width:390px){
-  body{
-    padding:12px 12px 105px;
-  }
 
-  .brand{
-    font-size:25px;
-  }
+.card{
+  background:rgba(10,10,10,.94);
+  border:1px solid #292929;
+  border-radius:24px;
+  padding:14px;
+  margin-bottom:15px;
+  box-shadow:0 10px 28px rgba(0,0,0,.6);
+}
+.heroGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-bottom:14px;
+}
+.heroBtn{
+  min-height:178px;
+  background:linear-gradient(180deg,#111,#050505);
+  border:1.5px solid var(--orange);
+  color:#fff;
+  border-radius:20px;
+  padding:16px 10px;
+  text-align:center;
+  box-shadow:0 0 18px rgba(255,138,0,.28), inset 0 0 18px rgba(255,138,0,.05);
+}
+.heroIcon{font-size:42px;color:var(--orange);margin-bottom:13px}
+.heroBtn strong{
+  display:block;font-size:22px;line-height:1.05;font-weight:900;
+}
+.heroBtn span{
+  display:block;color:#ddd;font-size:12px;line-height:1.35;margin-top:12px;
+}
 
-.grid,
-.miniGrid{
+.toolGrid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:10px;
-  margin-top:14px;
-} 
+}
+.toolBtn{
+  min-height:88px;
+  background:linear-gradient(180deg,#141414,#070707);
+  border:1px solid rgba(255,138,0,.55);
+  color:#fff;
+  border-radius:16px;
+  padding:9px 5px;
+  text-align:center;
+  box-shadow:0 0 12px rgba(255,138,0,.16), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.toolBtn .ico{font-size:28px;color:var(--orange);display:block;margin-bottom:7px}
+.toolBtn strong{font-size:13px;font-weight:900}
 
-  .toolBtn,
-  .miniGrid button{
-    min-height:76px;
-    font-size:11px;
-  }
+.activeTruck{
+  position:fixed;
+  left:12px;right:12px;bottom:92px;
+  background:linear-gradient(180deg,#ffb000,#ff8a00);
+  color:#111;
+  border-radius:16px;
+  padding:13px 14px;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;font-weight:900;
+  z-index:40;
+}
+.bottomNav{
+  position:fixed;left:10px;right:10px;bottom:10px;
+  background:rgba(12,12,12,.96);
+  border:1px solid #333;
+  border-radius:24px;
+  display:grid;grid-template-columns:repeat(5,1fr);
+  padding:8px 5px;
+  z-index:45;
+}
+.bottomNav button{
+  background:transparent;border:none;box-shadow:none;color:#aaa;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-size:11px;padding:6px 0;
+}
+.bottomNav button.active{color:var(--orange)}
+.navI{font-size:22px}
 
-  .googleTop input{
-    font-size:24px;
-  }
+h2{margin:0 0 12px;color:#fff}
+label{
+  display:block;font-size:12px;font-weight:900;text-transform:uppercase;
+  color:#ddd;margin:10px 0 6px;
+}
+input,select,textarea{
+  width:100%;background:#070707;color:#fff;border:1px solid #333;
+  border-radius:14px;padding:13px;font-size:15px;margin-bottom:9px;
+}
+textarea{min-height:95px}
+button{
+  background:linear-gradient(180deg,var(--orange),var(--orange2));
+  color:#fff;border:none;border-radius:16px;padding:14px;
+  font-weight:900;letter-spacing:.3px;
+  box-shadow:0 5px 14px rgba(255,100,0,.22);
+}
+button:active{transform:scale(.98)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.dark{background:#151515;border:1px solid #333;color:#fff}
+.danger{background:var(--red)}
+.result{
+  white-space:pre-wrap;background:#071720;border:1px solid #315b78;
+  color:#ffd6a0;border-radius:16px;padding:13px;min-height:85px;
+  line-height:1.35;margin-top:10px;
+}
+.back{width:100%;margin-bottom:12px}
+.small{color:var(--muted);font-size:12px;line-height:1.35}
+.footer{text-align:center;color:#777;font-size:12px;margin:25px 0}
+
+@media(max-width:390px){
+  .brand{font-size:24px}
+  .heroBtn strong{font-size:19px}
+  .toolBtn strong{font-size:12px}
 }
 </style>
 </head>
+
 <body>
 
- 
 <section id="home" class="section active">
-
   <div class="header">
-    <div class="brand">Rolling Wrench Diesel</div>
-<h1>DIESEL REPAIR</h1>
-<div class="subhead">AI ASSISTANT</div>
-    <button class="topGear" onclick="toggleTopMenu()">
-⚙️
-</button>
+    <button class="menuBtn" onclick="toggleTopMenu()">☰</button>
+    <div class="brand">DIESEL REPAIR</div>
+    <h1>AI ASSISTANT</h1>
+    <button class="topGear" onclick="toggleTopMenu()">⚙️</button>
 
-<div id="topMenu" class="topMenu">
-
-  <button onclick="show('saved')">
-    Saved Invoices
-  </button>
-
-  <button onclick="show('quote')">
-    Quotes
-  </button>
-
-  <button onclick="show('clock')">
-    Labor / Profit
-  </button>
-
-  <button onclick="showVehicleProfile()">
-    Active VIN
-  </button>
-
-  <button onclick="clearVehicleData()">
-    Clear VIN
-  </button>
-
-</div>
-    <h1>Mobile Mechanic Pro V36</h1>
-   
+    <div id="topMenu" class="topMenu">
+      <button onclick="show('invoices')">Saved Invoices</button>
+      <button onclick="show('quote')">Quotes</button>
+      <button onclick="show('profit')">Profit / Sales</button>
+      <button onclick="show('profile')">VIN Decoder</button>
+      <button onclick="clearVehicleData()">Clear VIN / Truck</button>
+      <button onclick="show('settings')">Settings</button>
+    </div>
   </div>
+
+  <div class="searchBar" onclick="openAiDrawer()">
+    <span>⌕</span>
+    <input id="homeAiAsk" placeholder="Ask AI anything about your truck..." onclick="event.stopPropagation()">
+    <button class="micBtn" onclick="event.stopPropagation(); startVoiceInput()">🎙️</button>
+  </div>
+
+  <div id="aiDrawer" class="aiDrawer">
+    <textarea id="aiDrawerText" placeholder="Type diagnostic question, part number, VIN, or upload a picture..."></textarea>
+    <div class="aiDrawerBtns">
+      <button onclick="document.getElementById('homeAiImage').click()">📷 Picture</button>
+      <button onclick="startVoiceInput()">🎤 Voice</button>
+      <button onclick="homeAI()">➜ Send</button>
+    </div>
+  </div>
+
+  <input id="homeAiImage" type="file" accept="image/*" style="display:none">
+  <img id="homeAiPreview" style="width:100%;margin-top:10px;border-radius:14px;display:none">
 
   <div class="card">
-
- <div class="mockSearchBar" onclick="openAiDrawer()">
-  <span class="searchIcon">⌕</span>
-  <span class="searchText">Ask AI anything about your truck...</span>
-
-  <button class="mockMic" onclick="event.stopPropagation(); startVoiceInput()">
-    🎤
-  </button>
-</div>
-
-<div id="aiDrawer" class="aiDrawer">
-  <textarea id="homeAiAsk" placeholder="Type diagnostic question, part number, VIN, or upload a picture..."></textarea>
-
-  <div class="aiDrawerBtns">
-    <button onclick="document.getElementById('homeAiImage').click()">📷 Picture</button>
-    <button onclick="startVoiceInput()">🎤 Voice</button>
-    <button onclick="homeAI()">➜ Send</button>
+    <div id="homeAiOut" class="result">Tell me what you need or choose a tool below.</div>
   </div>
 
+  <div class="heroGrid">
+    <button class="heroBtn" onclick="show('diag')">
+      <div class="heroIcon">⚙️</div>
+      <strong>DIESEL<br>DIAGNOSTICS</strong>
+      <span>Codes • Symptoms<br>Repair Logic</span>
+    </button>
 
- 
-
- 
-
-<input
-  id="homeAiImage"
-  type="file"
-  accept="image/*"
-  style="display:none"
->
-
-<img
-  id="homeAiPreview"
-  style="width:100%;margin-top:10px;border-radius:14px;display:none"
->
-      
-
-    <div id="homeAiOut" class="result">
-      Tell me what you need or choose a tool below.
-    </div>
-
+    <button class="heroBtn" onclick="show('parts')">
+      <div class="heroIcon">📦</div>
+      <strong>OEM PARTS<br>LOOKUP</strong>
+      <span>VIN Lookup • OEM<br>Aftermarket</span>
+    </button>
   </div>
 
-  <button
-    id="clearAiBtn"
-    class="dark hiddenAction"
-    style="width:100%;margin-top:10px"
-    onclick="clearHomeAI()"
-  >
-    CLEAR AI SESSION
-  </button>
-
-  <div class="ai-actions">
-
-    <button onclick="addToParts()">
-      Add to Parts Lookup
-    </button>
-
-    <button onclick="addToWorkOrder()">
-      Add to Work Order
-    </button>
-
-    <button onclick="addToInvoice()">
-      Add to Invoice
-    </button>
-
+  <div class="toolGrid">
+    <button class="toolBtn" onclick="show('troubleshooter')"><span class="ico">🛠️</span><strong>Troubleshooter</strong></button>
+    <button class="toolBtn" onclick="show('filters')"><span class="ico">🛢️</span><strong>Filters & Fluid</strong></button>
+    <button class="toolBtn" onclick="show('profile')"><span class="ico">🚚</span><strong>Vehicle Profile</strong></button>
+    <button class="toolBtn" onclick="show('clock')"><span class="ico">⏱️</span><strong>Labor Clock</strong></button>
+    <button class="toolBtn" onclick="show('quote')"><span class="ico">📄</span><strong>Invoice Builder</strong></button>
+    <button class="toolBtn" onclick="show('work')"><span class="ico">📝</span><strong>Work Order</strong></button>
+    <button class="toolBtn" onclick="show('pin')"><span class="ico">📍</span><strong>GPS / Pin</strong></button>
+    <button class="toolBtn" onclick="show('invoices')"><span class="ico">📁</span><strong>Saved / Invoices</strong></button>
+    <button class="toolBtn" onclick="show('settings')"><span class="ico">⚙️</span><strong>Settings</strong></button>
   </div>
 
-  <button
-    id="newJobBtn"
-    class="dark hiddenAction"
-    style="width:100%;margin-bottom:12px"
-    onclick="newJobSession()"
-  >
-    NEW JOB / CLEAR ACTIVE SESSION
-  </button>
-
-<div class="quickGrid">
-
-  <button class="heroTool" onclick="show('diag')">
-    <strong>DIESEL DIAGNOSTICS</strong>
-    <span>Fault codes • regen • no-start • live troubleshooting</span>
-  </button>
-
-  <button class="heroTool" onclick="show('parts')">
-    <strong>OEM PARTS LOOKUP</strong>
-    <span>VIN-aware part lookup • cross references • smart kits</span>
-  </button>
-
-</div>
-
-<div class="miniGrid">
-
-  <button onclick="show('troubleshooter')">
-    Troubleshooter
-  </button>
-
-  <button onclick="show('filters')">
-    Filters
-  </button>
-
-  <button onclick="show('profile')">
-    Vehicle
-  </button>
-
-  <button onclick="show('clock')">
-    Labor Clock
-  </button>
-
-  <button onclick="show('quote')">
-    Invoice
-  </button>
-
-  <button onclick="show('work')">
-    Work Order
-  </button>
-
-  <button onclick="show('pin')">
-    GPS
-  </button>
-
-  <button onclick="show('invoices')">
-    Saved
-  </button>
-
-  <button onclick="show('settings')">
-    Settings
-  </button>
-
-</div>
-<div class="miniGrid">
-
-  <button onclick="show('troubleshooter')">Troubleshooter</button>
-  <button onclick="show('filters')">Filter & Fluid</button>
-  <button onclick="show('clock')">Labor Clock</button>
-  <button onclick="show('profile')">Vehicle Profile</button>
-  <button onclick="show('pin')">GPS Pin</button>
-  <button onclick="show('invoices')">Invoices</button>
-
-</div>
-
+  <div class="footer">© 2026 Rolling Wrench Diesel LLC.<br>Mobile Mechanic Pro V36</div>
 </section>
 
+<section id="profile" class="section">
+  <button class="back dark" onclick="show('home')">← BACK</button>
+  <div class="card">
+    <h2>VIN Decoder / Active Truck</h2>
+    <label>VIN</label><input id="vinGlobal" placeholder="1XKYDP9X0NJ495838">
+    <label>Year</label><input id="yearGlobal" placeholder="2022">
+    <label>Make</label><input id="makeGlobal" placeholder="Kenworth">
+    <label>Model</label><input id="modelGlobal" placeholder="T680">
+    <label>Engine</label><input id="engine" placeholder="PACCAR MX-13">
+    <label>EPA / Emissions</label>
+    <select id="epaGlobal"><option></option><option>EPA10</option><option>GHG14</option><option>GHG17</option><option>EPA21</option></select>
+    <label>ESN</label><input id="esnGlobal" placeholder="79345678">
+    <label>CPL</label><input id="cplGlobal" placeholder="4583">
+    <div class="row">
+      <button onclick="decodeVin()">DECODE VIN</button>
+      <button onclick="saveActiveTruck()">SAVE ACTIVE TRUCK</button>
+    </div>
+    <button class="dark" onclick="clearVehicleData()" style="width:100%;margin-top:10px">CLEAR VIN / TRUCK</button>
+    <div id="vinOut" class="result">Enter VIN, then decode or save active truck.</div>
+  </div>
+</section>
 
-  
 <section id="parts" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
+  <button class="back dark" onclick="show('home')">← BACK</button>
   <div class="card">
-    <div class="cardTitle"><h2>Parts Lookup</h2><div class="badge">OEM</div></div>
-
-    <label>Year</label><input id="partYear" placeholder="2015">
-
-    <label>Make</label>
-    <select id="partMake">
-      <option>Use Home Vehicle</option><option>Freightliner</option><option>Kenworth</option><option>Peterbilt</option><option>International</option><option>Volvo</option><option>Mack</option><option>Western Star</option><option>Ford</option><option>Chevy / GMC</option><option>Dodge / RAM</option><option>Other</option>
-    </select>
-
-    <label>Model</label><input id="partModel" placeholder="Cascadia, T680, 389, ProStar">
-
-    <label>Part Type</label>
-    <select id="partType">
-      <option>Unknown / Auto Detect</option><option>Engine Component</option><option>Sensor / Electrical</option><option>EGR / DPF / DEF</option><option>Fuel System</option><option>Cooling System</option><option>Turbo / Air System</option><option>Oil System</option><option>Brake / Wheel End</option><option>Steering / King Pin</option><option>Suspension</option><option>Transmission</option><option>Hydraulic</option><option>Filter / Maintenance</option>
-    </select>
-
-    <label>Lookup Mode</label>
-    <select id="partsMode">
-      <option>Options Mode</option><option>Exact Part Number Verify</option><option>Component Name Lookup</option><option>Cross Reference Lookup</option>
-    </select>
-
-    <label>Part Number / Part Name</label>
-    <input id="partq" placeholder="K134A king pin, OEM number, rear main seal">
-
-    <label>Notes / VIN / ESN / CPL</label>
-    <textarea id="partNote" placeholder="VIN, ESN, CPL, old part number, location, symptom"></textarea>
-<label>EPA / Emissions</label>
-<select id="epaGlobal">
-  <option value="">Select EPA</option>
-  <option>EPA98</option>
-  <option>EPA04</option>
-  <option>EPA07</option>
-  <option>EPA10</option>
-  <option>GHG14</option>
-  <option>GHG17</option>
-  <option>EPA21</option>
-</select>
-
-<label>ESN / Engine Serial Number</label>
-<input id="esnGlobal" placeholder="79345678">
-
-<label>CPL</label>
-<input id="cplGlobal" placeholder="4583">
+    <h2>OEM Parts Lookup</h2>
+    <label>Part Number / Part Name</label><input id="partq" placeholder="2022 MX-13 water pump">
+    <label>Notes / VIN / ESN / CPL</label><textarea id="partNote"></textarea>
     <div class="row">
-      <button class="success" onclick="askPart()">Lookup Options</button>
-      <button class="secondary" onclick="verifyPartWeb()">Web + AI Verify</button>
- <button class="secondary" onclick="Utils.findNearestDealer()">
-  FIND NEAREST PARTS / DEALER
-</button>
+      <button onclick="askPart()">LOOKUP OPTIONS</button>
+      <button onclick="verifyPartWeb()">WEB + AI VERIFY</button>
     </div>
-
-    <div id="partOut" class="result">Enter part number.</div>
-
-    <div class="row" style="margin-top:10px">
-      <button class="primary" onclick="addPartToWork()">Add To Work Order</button>
-      <button class="dark" onclick="copyText('partOut')">Copy Result</button>
-    </div>
- <button class="success" style="width:100%;margin-top:10px"
-onclick="saveCurrentPartHistory()">
-SAVE PART TO VEHICLE HISTORY
-</button>
-
-<button class="dark" style="width:100%;margin-top:10px"
-onclick="showVehiclePartsHistory()">
-VIEW VEHICLE PARTS HISTORY
-</button>
-  </div>
-</section>
-
-<section id="troubleshooter" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
-  <div class="card">
-    <div class="cardTitle"><h2>Diagnostic Troubleshooter</h2><div class="badge">Repair Logic</div></div>
-
-    <label>Fault / Symptom / Code</label>
-    <input id="diagFault" placeholder="EGR delta pressure negative, EGR low flow, SPN/FMI">
-
-    <label>Engine / Truck Notes</label>
-    <textarea id="diagNotes" placeholder="DD15, X15, MX13, live data, repairs already done"></textarea>
-
-    <button class="success" style="width:100%" onclick="troubleshootFault()">Troubleshoot</button>
-
-    <div id="diagAnswer" class="result">Enter a fault or symptom.</div>
- <button class="primary" style="width:100%;margin-top:10px" onclick="saveVinRepairHistory()">
-  SAVE TO VIN REPAIR HISTORY
-</button>
-
-<button class="dark" style="width:100%;margin-top:10px" onclick="showVinRepairHistory()">
-  VIEW VIN REPAIR HISTORY
-</button>
-    <button class="success" style="width:100%;margin-top:10px" onclick="confirmFixLearning()">
-  CONFIRM FIX / TEACH APP
-</button>
-    <button class="danger" style="width:100%;margin-top:10px"
-onclick="clearTroubleshooter()">
-CLEAR TROUBLESHOOTER
-</button>
-  </div>
-</section>
-
-<section id="filters" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
-  <div class="card">
-    <div class="cardTitle"><h2>Filter & Fluid Lookup</h2><div class="badge">Maintenance</div></div>
-
-    <label>Lookup Type</label>
-    <select id="filterMode">
-      <option>Filter Number Lookup</option><option>Engine Filter Kit</option><option>Oil Capacity</option><option>Fuel Filters</option><option>Coolant / ELC</option><option>Hydraulic Filter</option><option>Air Filter</option><option>Cabin Filter</option>
-    </select>
-
-    <label>Filter Number / Engine / Unit</label>
-    <input id="filterq" placeholder="Baldwin, Fleetguard, Donaldson, engine model">
-
-    <label>Preferred Brand</label>
-    <select id="filterBrand">
-      <option>Any Brand</option><option>Fleetguard</option><option>Baldwin</option><option>Donaldson</option><option>WIX</option><option>NAPA Gold</option><option>OEM</option>
-    </select>
-
-    <label>Notes / VIN / ESN</label>
-    <textarea id="filterNote" placeholder="VIN, ESN, oil type, engine family, old filter numbers"></textarea>
-
-    <div class="row">
-      <button class="success" onclick="lookupFilter()">Lookup Filter</button>
-      <button class="secondary" onclick="verifyFilterWeb()">Verify Web + AI</button>
-    </div>
-
-    <div id="filterOut" class="result">Enter filter number, engine, or unit.</div>
-
-    <div class="row" style="margin-top:10px">
-      <button class="primary" onclick="addFilterToWork()">Add To Work Order</button>
-      <button class="dark" onclick="copyText('filterOut')">Copy Result</button>
-    </div>
-  </div>
-</section>
-
-<section id="pin" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
-  <div class="card">
-    <div class="cardTitle"><h2>GPS Pin Drop</h2><div class="badge">Location</div></div>
-
-    <div class="row">
-      <button class="primary" onclick="getLocation()">Get Location</button>
-      <button class="secondary" onclick="openMaps()">Open Maps</button>
-    </div>
-
-    <label>Saved Location Name</label>
-    <input id="pinName" placeholder="Customer name, job site, truck #">
-
-    <div class="row">
-      <button class="success" onclick="savePin()">Save Pin</button>
-      <button class="dark" onclick="clearPin()">Clear</button>
-    </div>
-
-    <div id="pinOut" class="result">No location captured.</div>
-  </div>
-</section>
-
-<section id="clock" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
-  <div class="card">
-    <div class="cardTitle"><h2>Live Labor Clock</h2><div class="badge">Billing</div></div>
-
-    <label>Job Name</label><input id="clockJobName" placeholder="PM Service, Brakes, No Start">
-    <label>Labor Rate ($/hr)</label><input id="laborRate" type="number" value="135">
-    <label>Service Call ($)</label><input id="serviceCall" type="number" value="250">
-
-    <label><input type="checkbox" id="includeServiceCall" checked> Include Service Call</label>
-
-    <div class="row">
-      <button class="success" onclick="clockIn()">Start Job</button>
-      <button class="primary" onclick="clockOut()">End Job</button>
-    </div>
-
-    <button class="dark" style="width:100%;margin-top:10px" onclick="clearClock()">Clear Time / Reset</button>
-
-    <div id="clockOutBox" class="result">Timer ready. Start a job to begin tracking.</div>
-
-    <button class="primary" style="width:100%;margin-top:10px" onclick="addClockToWork()">Send To Invoice</button>
-    <button class="secondary" style="width:100%;margin-top:10px" onclick="sendToSquare()">Send To Square</button>
+    <button class="dark" onclick="findNearestDealer()" style="width:100%;margin-top:10px">FIND NEAREST PARTS / DEALER</button>
+    <div id="partOut" class="result">Enter part request.</div>
   </div>
 </section>
 
 <section id="diag" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
+  <button class="back dark" onclick="show('home')">← BACK</button>
   <div class="card">
-    <div class="cardTitle"><h2>Diesel Diagnostics</h2><div class="badge">AI Assist</div></div>
-
-    <label>Symptom / Code / Question</label>
-    <textarea id="diagq" placeholder="MX-13 crank no start, SPN/FMI, regen issue"></textarea>
-
-    <label>Notes</label>
-    <textarea id="diagNote" placeholder="Codes, pressures, recent repairs"></textarea>
-
-    <button class="success" style="width:100%" onclick="runDiag()">Run Diagnostic</button>
-
+    <h2>Diesel Diagnostics</h2>
+    <label>Symptom / Code / Question</label><textarea id="diagq" placeholder="SCR conversion problem on DD15"></textarea>
+    <label>Notes</label><textarea id="diagNote" placeholder="Codes, pressures, recent repairs"></textarea>
+    <button onclick="askDiag()" style="width:100%">RUN DIAGNOSTIC</button>
     <div id="diagOut" class="result">Enter diagnostic question.</div>
+  </div>
+</section>
 
-    <div class="row" style="margin-top:10px">
-      <button class="primary" onclick="addDiagToWork()">Add To Work Order</button>
-      <button class="dark" onclick="copyText('diagOut')">Copy Result</button>
-    </div>
-    <button class="danger" style="width:100%;margin-top:10px"
-onclick="clearDiagAI()">
-CLEAR DIAGNOSTICS
-</button>
+<section id="filters" class="section">
+  <button class="back dark" onclick="show('home')">← BACK</button>
+  <div class="card">
+    <h2>Filters & Fluid</h2>
+    <label>Filter / Fluid / Engine</label><input id="filterq" placeholder="MX-13 fuel filter kit">
+    <label>Notes</label><textarea id="filterNote"></textarea>
+    <button onclick="askFilter()" style="width:100%">LOOKUP FILTER / FLUID</button>
+    <div id="filterOut" class="result">Enter filter or fluid request.</div>
+  </div>
+</section>
+
+<section id="troubleshooter" class="section">
+  <button class="back dark" onclick="show('home')">← BACK</button>
+  <div class="card">
+    <h2>Troubleshooter</h2>
+    <label>Fault / Symptom</label><textarea id="troubleq" placeholder="air valve with ABS wires near axle"></textarea>
+    <button onclick="askTrouble()" style="width:100%">TROUBLESHOOT</button>
+    <div id="troubleOut" class="result">Enter symptom.</div>
   </div>
 </section>
 
 <section id="quote" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
+  <button class="back dark" onclick="show('home')">← BACK</button>
   <div class="card">
-    <div class="cardTitle"><h2>Invoice Builder</h2><div class="badge">Pricing</div></div>
+    <h2>Invoice Builder</h2>
+    <label>Customer</label><input id="custName">
+    <label>Labor Hours</label><input id="laborHours" type="number" step="0.1">
+    <label>Labor Rate</label><input id="laborRate" type="number" value="135">
+    <label>Service Call</label><input id="serviceCall" type="number" value="250">
+    <label>Parts</label><input id="partsCost" type="number" value="0">
+    <button onclick="buildQuote()" style="width:100%">BUILD TOTAL</button>
+    <div id="quoteOut" class="result">Invoice total will show here.</div>
+  </div>
+</section>
 
-    <label>Job Name</label><input id="jobName" placeholder="Diagnostic, brakes, water pump">
-
+<section id="clock" class="section">
+  <button class="back dark" onclick="show('home')">← BACK</button>
+  <div class="card">
+    <h2>Labor Clock</h2>
     <div class="row">
-      <div><label>Labor Hours</label><input id="hours" type="number" step=".25" value="1"></div>
-      <div><label>Labor Rate</label><input id="rate" type="number" value="135"></div>
+      <button onclick="clockIn()">CLOCK IN</button>
+      <button onclick="clockOut()">CLOCK OUT</button>
     </div>
-
-    <label>Manual Labor Hours</label><input id="manualHours" type="number" step="0.25" placeholder="Example: 1.5">
-    <label>Manual Labor Note</label><input id="manualTimeNote" placeholder="PM service, diagnostic time">
-
-    <button class="secondary" style="width:100%;margin-top:10px" onclick="addManualTimeToInvoice()">Add Manual Time</button>
-
-    <div class="row">
-      <div><label>Parts $</label><input id="partsCost" type="number" value="0"></div>
-      <div><label>Service Call</label><input id="callOut" type="number" value="250"></div>
-    </div>
-
-    <div class="row">
-      <div><label>Tax %</label><input id="taxRate" type="number" value="0"></div>
-      <div><label>Card Fee %</label><input id="cardFee" type="number" value="0"></div>
-    </div>
-
-    <button class="success" style="width:100%" onclick="calcQuote()">Calculate Invoice</button>
-    <button class="dark" style="width:100%;margin-top:10px" onclick="clearInvoice()">Clear Invoice</button>
-    <button class="primary" style="width:100%;margin-top:10px" onclick="saveInvoice(); showInvoices(); show('invoices');">Save Invoice</button>
-
-    <div id="quoteOut" class="result">Build invoice.</div>
-
-    <div class="row" style="margin-top:10px">
-      <button class="primary" onclick="addQuoteToWork()">Add To Work Order</button>
-      <button class="dark" onclick="copyText('quoteOut')">Copy Invoice</button>
-    </div>
+    <button class="danger" onclick="resetClock()" style="width:100%;margin-top:10px">RESET</button>
+    <div id="clockOutBox" class="result">Clock not started.</div>
   </div>
 </section>
 
 <section id="work" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
+  <button class="back dark" onclick="show('home')">← BACK</button>
   <div class="card">
-    <div class="cardTitle"><h2>Work Order</h2><div class="badge">Record</div></div>
+    <h2>Work Order</h2>
+    <label>Complaint</label><textarea id="woComplaint"></textarea>
+    <label>Cause</label><textarea id="woCause"></textarea>
+    <label>Correction</label><textarea id="woCorrection"></textarea>
+    <button onclick="copyWorkOrder()" style="width:100%">COPY WORK ORDER</button>
+    <div id="woOut" class="result">Work order text will show here.</div>
+  </div>
+</section>
 
-    <label>Customer</label><input id="customer" placeholder="Customer name">
-    <label>Complaint</label><textarea id="complaint" placeholder="Customer complaint / reason for call"></textarea>
-    <label>Parts / Materials Used</label><textarea id="partsUsed" placeholder="Part numbers, filters, oil, supplies, prices"></textarea>
-    <label>Diagnosis / Parts / Work Performed</label><textarea id="workText" placeholder="Add parts, diagnostics, quotes, and work performed here"></textarea>
-
-    <div class="row">
-      <button class="success" onclick="copyWO()">Copy Work Order</button>
-      <button class="secondary" onclick="saveJob()">Save Job</button>
-    </div>
-
-    <button class="dark" style="width:100%;margin-top:10px" onclick="clearWorkOrder()">Clear Work Order</button>
-
-    <div id="workOut" class="result">Work order ready.</div>
+<section id="pin" class="section">
+  <button class="back dark" onclick="show('home')">← BACK</button>
+  <div class="card">
+    <h2>GPS / Pin</h2>
+    <button onclick="getLocation()" style="width:100%">GET LOCATION</button>
+    <div id="pinOut" class="result">No location yet.</div>
   </div>
 </section>
 
 <section id="invoices" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
+  <button class="back dark" onclick="show('home')">← BACK</button>
   <div class="card">
-    <div class="cardTitle"><h2>Saved Invoices</h2><div class="badge">History</div></div>
-
-    <button class="success" style="width:100%" onclick="saveInvoice()">Save Current Invoice</button>
-    <button class="secondary" style="width:100%;margin-top:10px" onclick="showInvoices()">Refresh Invoice List</button>
-    <button class="danger" style="width:100%;margin-top:10px" onclick="clearInvoices()">Clear All Saved Invoices</button>
-
-    <div id="invoiceList" class="result">No saved invoices.</div>
-  </div>
-</section>
-
-<section id="profile" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
-  <div class="card">
-    <div class="cardTitle"><h2>Customer / Vehicle Profile</h2><div class="badge">Profile</div></div>
-
-    <label>Customer Name</label><input id="profileCustomer" placeholder="Customer name">
-    <label>Customer Phone</label><input id="profilePhone" placeholder="260-000-0000">
-    <label>Year</label><input id="yearGlobal" placeholder="2015">
-
-    <label>Make</label>
-    <select id="makeGlobal">
-      <option></option><option>Freightliner</option><option>Kenworth</option><option>Peterbilt</option><option>International</option><option>Volvo</option><option>Mack</option><option>Western Star</option><option>Ford</option><option>Chevy / GMC</option><option>Dodge / RAM</option><option>Other</option>
-    </select>
-
-    <label>Model</label><input id="modelGlobal" placeholder="Cascadia, T680, 389, ProStar">
-    <label>VIN / Unit Number</label><input id="vin" placeholder="VIN / Unit / Truck #">
-    <label>Mileage</label><input id="mileageGlobal" placeholder="Mileage">
-
-    <label>Engine</label>
-    <select id="engine">
-      <option></option><option>Detroit DD15</option><option>Detroit DD13</option><option>Detroit DD16</option><option>Cummins ISX</option><option>Cummins ISX15</option><option>Cummins X15</option><option>Cummins N14</option><option>PACCAR MX-13</option><option>PACCAR MX-11</option><option>CAT C15</option><option>CAT C13</option><option>MaxxForce 13</option><option>MaxxForce DT</option><option>Other</option>
-    </select>
-
-    <div class="row">
-      <button class="secondary" onclick="decodeVin()">Decode VIN</button>
-      <button class="primary" onclick="dropPin()">GPS Pin Drop</button>
-    </div>
-
-    <div id="vinDecodeOut" class="result">Vehicle data ready.</div>
-
-    <button class="success" style="width:100%" onclick="saveCustomerProfile()">Save Profile</button>
+    <h2>Saved / Invoices</h2>
+    <div id="savedOut" class="result">Saved invoices area.</div>
   </div>
 </section>
 
 <section id="settings" class="section">
-  <button class="back dark" onclick="show('home')">← Back</button>
-
+  <button class="back dark" onclick="show('home')">← BACK</button>
   <div class="card">
-    <div class="cardTitle">
-      <h2>Settings / App Test</h2>
-      <div class="badge">System</div>
-    </div>
-
-    <label>Default Labor Rate</label>
-    <input id="defaultRate" type="number" value="135">
-
-    <label>Default Service Call</label>
-    <input id="defaultServiceCall" type="number" value="250">
-
-    <label>Shop Name</label>
-    <input id="shopName" value="Rolling Wrench Diesel">
-
-    <label>Square Payment Link</label>
-    <input id="squareLink" placeholder="Paste your Square checkout link">
-
-    <label>APP THEME</label>
-    <select id="themeSelect" onchange="setTheme(this.value)">
-      <option value="orange">Industrial Orange</option>
-      <option value="cat">CAT Yellow</option>
-      <option value="cummins">Cummins Red</option>
-    </select>
-
-    <label>APP LAYOUT</label>
-    <select id="layoutSelect" onchange="setLayout(this.value)">
-      <option value="grid">Grid Dashboard</option>
-      <option value="list">List Dashboard</option>
-      <option value="compact">Compact Pro</option>
-      <option value="roadside">Roadside Mode</option>
-    </select>
-
-    <div class="row" style="margin-top:10px">
-      <button class="success" onclick="saveSettings()">Save Settings</button>
-      <button class="secondary" onclick="testApp()">Test App</button>
-    </div>
-
-    <button class="dark" style="width:100%;margin-top:10px"
-    onclick="localStorage.clear();location.reload();">
-      Reset App Cache
-    </button>
-
-    <button class="danger" style="width:100%;margin-top:10px" onclick="repairApp()">
-      Repair App / Reset Broken Session
-    </button>
-
-    <div id="settingsOut" class="result">Settings ready.</div>
+    <h2>Settings</h2>
+    <label>Default Labor Rate</label><input id="defaultLaborRate" value="135">
+    <label>Default Service Call</label><input id="defaultServiceCall" value="250">
+    <button onclick="saveSettings()" style="width:100%">SAVE SETTINGS</button>
+    <div class="small">Settings save on this phone/browser.</div>
   </div>
 </section>
-<nav class="bottomNav">
-  <button id="nav-home" class="active" onclick="show('home')"><span class="navI">⌂</span>Home</button>
-  <button id="nav-diag" onclick="show('diag')"><span class="navI">⚙</span>Diag</button>
-  <button id="nav-parts" onclick="show('parts')"><span class="navI">🔎</span>Parts</button>
-  <button id="nav-work" onclick="show('work')"><span class="navI">▣</span>Work</button>
-  <button id="nav-more" onclick="show('settings')"><span class="navI">☰</span>More</button>
-</nav>
+
+<section id="profit" class="section">
+  <button class="back dark" onclick="show('home')">← BACK</button>
+  <div class="card">
+    <h2>Profit / Sales</h2>
+    <div class="result">Profit tracker placeholder.</div>
+  </div>
+</section>
+
+<div class="activeTruck" onclick="show('profile')">
+  <span>Active Truck: <span id="activeTruckName">None</span></span>
+  <span>VIN: <span id="activeTruckVin">None</span> ›</span>
+</div>
+
+<div class="bottomNav">
+  <button class="active" onclick="show('home')"><span class="navI">⌂</span>Home</button>
+  <button onclick="show('diag')"><span class="navI">⚙️</span>Diag</button>
+  <button onclick="show('parts')"><span class="navI">🔎</span>Parts</button>
+  <button onclick="show('work')"><span class="navI">▣</span>Work</button>
+  <button onclick="toggleTopMenu()"><span class="navI">☰</span>More</button>
+</div>
+
+<script>
+const API_URL="https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/verify-part-web";
+const $=id=>document.getElementById(id);
+
+function show(id){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  $(id)?.classList.add("active");
+  document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
+  if(id==="home") document.querySelector(".bottomNav button:nth-child(1)")?.classList.add("active");
+  if(id==="diag") document.querySelector(".bottomNav button:nth-child(2)")?.classList.add("active");
+  if(id==="parts") document.querySelector(".bottomNav button:nth-child(3)")?.classList.add("active");
+  if(id==="work") document.querySelector(".bottomNav button:nth-child(4)")?.classList.add("active");
+  window.scrollTo(0,0);
+}
+function toggleTopMenu(){
+  const m=$("topMenu"); if(!m)return;
+  m.style.display=m.style.display==="flex"?"none":"flex";
+}
+function openAiDrawer(){
+  const d=$("aiDrawer"); if(!d)return;
+  d.style.display=d.style.display==="block"?"none":"block";
+}
+
+function ctx(){
+  return `Year:${$("yearGlobal")?.value||""} Make:${$("makeGlobal")?.value||""} Model:${$("modelGlobal")?.value||""} Engine:${$("engine")?.value||""} VIN:${$("vinGlobal")?.value||""} ESN:${$("esnGlobal")?.value||""} CPL:${$("cplGlobal")?.value||""}`;
+}
+async function callAI(question,mode="parts",note=""){
+  const res=await fetch(API_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      part:question,
+      question,
+      note,
+      mode,
+      vin:$("vinGlobal")?.value||$("vin")?.value||(note.match(/[A-HJ-NPR-Z0-9]{17}/i)?.[0]||""),
+      year:$("yearGlobal")?.value||"",
+      make:$("makeGlobal")?.value||"",
+      model:$("modelGlobal")?.value||"",
+      engine:$("engine")?.value||"",
+      epa:$("epaGlobal")?.value||"",
+      esn:$("esnGlobal")?.value||(note.match(/\b\d{7,9}\b/)?.[0]||""),
+      cpl:$("cplGlobal")?.value||(note.match(/CPL\s*#?:?\s*(\d{3,5})/i)?.[1]||""),
+      vehicleContext:ctx()
+    })
+  });
+  const data=await res.json();
+  if(!res.ok) throw new Error(data.error||"AI error");
+  return data.answer||data.message||"No answer returned.";
+}
+
+async function homeAI(){
+  const q=$("aiDrawerText")?.value||$("homeAiAsk")?.value||"";
+  if(!q.trim()) return alert("Ask something first");
+  $("homeAiOut").textContent="Thinking...";
+  try{$("homeAiOut").textContent=await callAI(q,"smart_diagnostics_brain","");}
+  catch(e){$("homeAiOut").textContent="AI ERROR: "+e.message;}
+}
+async function askPart(){
+  const q=$("partq").value.trim(), note=$("partNote").value.trim();
+  if(!q)return alert("Enter part");
+  $("partOut").textContent="Looking up...";
+  const mode=($("vinGlobal")?.value||$("esnGlobal")?.value||$("cplGlobal")?.value)?"vin_oem_part_lookup":"smart_parts_brain";
+  try{$("partOut").textContent=await callAI(q,mode,note);}
+  catch(e){$("partOut").textContent="PART LOOKUP ERROR: "+e.message;}
+}
+async function verifyPartWeb(){askPart();}
+async function askDiag(){
+  const q=$("diagq").value.trim(), n=$("diagNote").value.trim();
+  $("diagOut").textContent="Thinking...";
+  try{$("diagOut").textContent=await callAI(q,"smart_diagnostics_brain",n);}
+  catch(e){$("diagOut").textContent="DIAGNOSTIC ERROR: "+e.message;}
+}
+async function askFilter(){
+  const q=$("filterq").value.trim(), n=$("filterNote").value.trim();
+  $("filterOut").textContent="Looking up...";
+  try{$("filterOut").textContent=await callAI(q,"filters",n);}
+  catch(e){$("filterOut").textContent="FILTER ERROR: "+e.message;}
+}
+async function askTrouble(){
+  const q=$("troubleq").value.trim();
+  $("troubleOut").textContent="Thinking...";
+  try{$("troubleOut").textContent=await callAI(q,"engine_pattern_lookup","");}
+  catch(e){$("troubleOut").textContent="TROUBLESHOOTER ERROR: "+e.message;}
+}
+async function decodeVin(){
+  const vin=$("vinGlobal").value.trim();
+  if(!vin)return alert("Enter VIN");
+  $("vinOut").textContent="Decoding...";
+  try{$("vinOut").textContent=await callAI(vin,"vin_decode","");}
+  catch(e){$("vinOut").textContent="VIN ERROR: "+e.message;}
+}
+function saveActiveTruck(){
+  const truck={
+    vin:$("vinGlobal").value,
+    year:$("yearGlobal").value,
+    make:$("makeGlobal").value,
+    model:$("modelGlobal").value,
+    engine:$("engine").value
+  };
+  localStorage.setItem("activeTruck",JSON.stringify(truck));
+  updateActiveTruck();
+  alert("Active truck saved.");
+}
+function updateActiveTruck(){
+  const t=JSON.parse(localStorage.getItem("activeTruck")||"{}");
+  $("activeTruckName").textContent=t.make||t.model?`${t.make||""} ${t.model||""}`.trim():"None";
+  $("activeTruckVin").textContent=t.vin||"None";
+}
+function clearVehicleData(){
+  ["vinGlobal","yearGlobal","makeGlobal","modelGlobal","engine","epaGlobal","esnGlobal","cplGlobal"].forEach(id=>{if($(id))$(id).value="";});
+  localStorage.removeItem("activeTruck");
+  updateActiveTruck();
+  alert("Active VIN / truck cleared.");
+}
+function findNearestDealer(){
+  if(!navigator.geolocation)return alert("GPS not supported");
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const q="FleetPride OR Cummins Dealer OR Kenworth OR Peterbilt OR Freightliner Parts";
+    window.open(`https://www.google.com/maps/search/${encodeURIComponent(q)}/@${pos.coords.latitude},${pos.coords.longitude},12z`,"_blank");
+  });
+}
+function buildQuote(){
+  const h=+$("laborHours").value||0, r=+$("laborRate").value||0, c=+$("serviceCall").value||0, p=+$("partsCost").value||0;
+  const total=h*r+c+p;
+  $("quoteOut").textContent=`Customer: ${$("custName").value}\nLabor: $${(h*r).toFixed(2)}\nService Call: $${c.toFixed(2)}\nParts: $${p.toFixed(2)}\nTOTAL: $${total.toFixed(2)}`;
+}
+let startTime=null;
+function clockIn(){startTime=Date.now();$("clockOutBox").textContent="Clock running...";}
+function clockOut(){if(!startTime)return;const hrs=(Date.now()-startTime)/3600000;$("clockOutBox").textContent=`Billable Hours: ${hrs.toFixed(2)}`;}
+function resetClock(){startTime=null;$("clockOutBox").textContent="Clock reset.";}
+function copyWorkOrder(){
+  const txt=`Complaint:\n${$("woComplaint").value}\n\nCause:\n${$("woCause").value}\n\nCorrection:\n${$("woCorrection").value}`;
+  $("woOut").textContent=txt;navigator.clipboard?.writeText(txt);
+}
+function getLocation(){
+  if(!navigator.geolocation)return alert("GPS not supported");
+  navigator.geolocation.getCurrentPosition(p=>{
+    $("pinOut").textContent=`Lat: ${p.coords.latitude}\nLng: ${p.coords.longitude}`;
+  });
+}
+function saveSettings(){
+  localStorage.setItem("defaultLaborRate",$("defaultLaborRate").value);
+  localStorage.setItem("defaultServiceCall",$("defaultServiceCall").value);
+  alert("Settings saved.");
+}
+function startVoiceInput(){
+  alert("Voice input placeholder. We can wire speech-to-text next.");
+}
+$("homeAiImage")?.addEventListener("change",function(){
+  const file=this.files?.[0]; if(!file)return;
+  $("homeAiPreview").src=URL.createObjectURL(file);
+  $("homeAiPreview").style.display="block";
+});
+updateActiveTruck();
+</script>
+</body>
+</html>
 
   
 
