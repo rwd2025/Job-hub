@@ -1400,7 +1400,10 @@ async function callAI(question,mode="parts",notes=""){
   question: typeof notes === "object" ? notes.question : question,
 
   // 🔥 ADD THIS LINE (VIN FIX)
-  vin: $("vin")?.value || "",
+  vin:
+  $("vinGlobal")?.value ||
+  $("vin")?.value ||
+  "",
 
   year: $("yearGlobal")?.value || $("partYear")?.value || "",
   make: $("makeGlobal")?.value || $("partMake")?.value || "",
