@@ -3344,6 +3344,131 @@ window.addEventListener(
   "DOMContentLoaded",
   loadTheme
 );
+
+function showClearAiButton(){
+
+  const btn =
+    document.getElementById("clearAiBtn");
+
+  if(btn){
+    btn.classList.remove("hiddenAction");
+  }
+
+}
+
+function showNewJobButton(){
+
+  const btn =
+    document.getElementById("newJobBtn");
+
+  if(btn){
+    btn.classList.remove("hiddenAction");
+  }
+
+}
+
+function hideSessionButtons(){
+
+  const ai =
+    document.getElementById("clearAiBtn");
+
+  const job =
+    document.getElementById("newJobBtn");
+
+  if(ai){
+    ai.classList.add("hiddenAction");
+  }
+
+  if(job){
+    job.classList.add("hiddenAction");
+  }
+
+}
+
+function setTheme(theme){
+
+  document.body.classList.remove(
+    "theme-orange",
+    "theme-cat",
+    "theme-cummins"
+  );
+
+  document.body.classList.add(
+    "theme-" + theme
+  );
+
+  localStorage.setItem(
+    "rwdTheme",
+    theme
+  );
+
+  const sel =
+    document.getElementById("themeSelect");
+
+  if(sel){
+    sel.value = theme;
+  }
+
+}
+
+function loadTheme(){
+
+  const saved =
+    localStorage.getItem("rwdTheme")
+    || "orange";
+
+  setTheme(saved);
+
+}
+
+function setLayout(layout){
+
+  document.body.classList.remove(
+    "layout-grid",
+    "layout-list",
+    "layout-compact",
+    "layout-roadside"
+  );
+
+  document.body.classList.add(
+    "layout-" + layout
+  );
+
+  localStorage.setItem(
+    "rwdLayout",
+    layout
+  );
+
+  const sel =
+    document.getElementById("layoutSelect");
+
+  if(sel){
+    sel.value = layout;
+  }
+
+}
+
+function loadLayout(){
+
+  const saved =
+    localStorage.getItem("rwdLayout")
+    || "grid";
+
+  setLayout(saved);
+
+}
+
+window.addEventListener(
+  "DOMContentLoaded",
+  ()=>{
+
+    loadTheme();
+    loadLayout();
+    hideSessionButtons();
+
+  }
+);
+ 
   </script>
 
 <script src="app_integration.js"></script>
