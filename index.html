@@ -329,7 +329,50 @@ button:active{transform:scale(.98)}
 
 .navI{font-size:19px}
 
+.quickGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:12px;
+}
 
+.heroTool{
+  background:var(--card);
+  border:1px solid var(--accent);
+  color:var(--text);
+  min-height:105px;
+  border-radius:20px;
+  text-align:left;
+  padding:16px;
+}
+
+.heroTool strong{
+  color:var(--accent);
+  display:block;
+  font-size:15px;
+  margin-bottom:8px;
+}
+
+.heroTool span{
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.3;
+}
+
+.miniGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+  margin-top:12px;
+}
+
+.miniGrid button{
+  background:var(--card2);
+  border:1px solid var(--line);
+  color:var(--text);
+  min-height:56px;
+  border-radius:15px;
+}
 /* REAL LAYOUT MODES */
 
 .layout-grid .grid{
@@ -481,97 +524,40 @@ button:active{transform:scale(.98)}
     NEW JOB / CLEAR ACTIVE SESSION
   </button>
 
-  <div class="grid">
+ <div class="quickGrid">
 
-    <button
-      class="toolBtn orange"
-      onclick="show('parts')"
-    >
-      <strong>Parts Lookup</strong>
-      <span>OEM / aftermarket</span>
-    </button>
+  <button class="heroTool" onclick="show('diag')">
+    <strong>Diesel Diagnostics</strong>
+    <span>Codes / symptoms / repair logic</span>
+  </button>
 
-    <button
-      class="toolBtn orange"
-      onclick="show('troubleshooter')"
-    >
-      <strong>Troubleshooter</strong>
-      <span>Repair logic</span>
-    </button>
+  <button class="heroTool" onclick="show('parts')">
+    <strong>Parts Lookup</strong>
+    <span>OEM / aftermarket / verify</span>
+  </button>
 
-    <button
-      class="toolBtn blue"
-      onclick="show('profile')"
-    >
-      <strong>Vehicle Profile</strong>
-      <span>Customer / VIN</span>
-    </button>
+  <button class="heroTool" onclick="show('work')">
+    <strong>Work Order</strong>
+    <span>Complaint / repair notes</span>
+  </button>
 
-    <button
-      class="toolBtn blue"
-      onclick="show('filters')"
-    >
-      <strong>Filter & Fluid</strong>
-      <span>Oil, fuel, coolant</span>
-    </button>
+  <button class="heroTool" onclick="show('quote')">
+    <strong>Quote Builder</strong>
+    <span>Labor / parts / invoice</span>
+  </button>
 
-    <button
-      class="toolBtn"
-      onclick="show('diag')"
-    >
-      <strong>Diesel Diagnostics</strong>
-      <span>Codes / symptoms</span>
-    </button>
+</div>
 
-    <button
-      class="toolBtn"
-      onclick="show('pin')"
-    >
-      <strong>GPS Pin Drop</strong>
-      <span>Save location</span>
-    </button>
+<div class="miniGrid">
 
-    <button
-      class="toolBtn"
-      onclick="show('clock')"
-    >
-      <strong>Labor Clock</strong>
-      <span>Time & dollars</span>
-    </button>
+  <button onclick="show('troubleshooter')">Troubleshooter</button>
+  <button onclick="show('filters')">Filter & Fluid</button>
+  <button onclick="show('clock')">Labor Clock</button>
+  <button onclick="show('profile')">Vehicle Profile</button>
+  <button onclick="show('pin')">GPS Pin</button>
+  <button onclick="show('invoices')">Invoices</button>
 
-    <button
-      class="toolBtn"
-      onclick="show('quote')"
-    >
-      <strong>Quote Builder</strong>
-      <span>Labor / parts</span>
-    </button>
-
-    <button
-      class="toolBtn blue"
-      onclick="show('invoices')"
-    >
-      <strong>Saved Invoices</strong>
-      <span>History</span>
-    </button>
-
-    <button
-      class="toolBtn"
-      onclick="show('work')"
-    >
-      <strong>Work Order</strong>
-      <span>Complaint / repair</span>
-    </button>
-
-    <button
-      class="toolBtn"
-      onclick="show('settings')"
-    >
-      <strong>Settings</strong>
-      <span>Rates / app test</span>
-    </button>
-
-  </div>
+</div>
 
 </section>
 
