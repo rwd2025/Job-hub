@@ -854,47 +854,57 @@ CLEAR DIAGNOSTICS
 
 <section id="settings" class="section">
   <button class="back dark" onclick="show('home')">← Back</button>
+
   <div class="card">
-    <div class="cardTitle"><h2>Settings / App Test</h2><div class="badge">System</div></div>
-
-    <label>Default Labor Rate</label><input id="defaultRate" type="number" value="135">
-    <label>Default Service Call</label><input id="defaultServiceCall" type="number" value="250">
-    <label>Shop Name</label><input id="shopName" value="Rolling Wrench Diesel">
-    <label>Square Payment Link</label><input id="squareLink" placeholder="Paste your Square checkout link">
-<label>APP THEME</label>
-
-<select id="themeSelect" onchange="setTheme(this.value)">
-  <option value="orange">Industrial Orange</option>
-  <option value="cat">CAT Yellow</option>
-  <option value="cummins">Cummins Red</option>
-</select>
-    <label>App Theme</label>
-    <div class="themeGrid">
-      <button class="themeBtn" onclick="setTheme('black')">Minimal Black</button>
-      <button class="themeBtn" onclick="setTheme('blue')">Navy Blue</button>
-      <button class="themeBtn" onclick="setTheme('orange')">Industrial Orange</button>
-      <button class="themeBtn" onclick="setTheme('gray')">Steel Gray</button>
-      <button class="themeBtn" onclick="setTheme('green')">Dark Green</button>
-      <button class="themeBtn" onclick="setTheme('light')">Light Mode</button>
+    <div class="cardTitle">
+      <h2>Settings / App Test</h2>
+      <div class="badge">System</div>
     </div>
+
+    <label>Default Labor Rate</label>
+    <input id="defaultRate" type="number" value="135">
+
+    <label>Default Service Call</label>
+    <input id="defaultServiceCall" type="number" value="250">
+
+    <label>Shop Name</label>
+    <input id="shopName" value="Rolling Wrench Diesel">
+
+    <label>Square Payment Link</label>
+    <input id="squareLink" placeholder="Paste your Square checkout link">
+
+    <label>APP THEME</label>
+    <select id="themeSelect" onchange="setTheme(this.value)">
+      <option value="orange">Industrial Orange</option>
+      <option value="cat">CAT Yellow</option>
+      <option value="cummins">Cummins Red</option>
+    </select>
+
+    <label>APP LAYOUT</label>
+    <select id="layoutSelect" onchange="setLayout(this.value)">
+      <option value="grid">Grid Dashboard</option>
+      <option value="list">List Dashboard</option>
+      <option value="compact">Compact Pro</option>
+      <option value="roadside">Roadside Mode</option>
+    </select>
 
     <div class="row" style="margin-top:10px">
       <button class="success" onclick="saveSettings()">Save Settings</button>
       <button class="secondary" onclick="testApp()">Test App</button>
     </div>
 
-  <button class="dark" style="width:100%;margin-top:10px"
-onclick="localStorage.clear();location.reload();">
-Reset App Cache
-</button>
+    <button class="dark" style="width:100%;margin-top:10px"
+    onclick="localStorage.clear();location.reload();">
+      Reset App Cache
+    </button>
 
-<button class="danger" style="width:100%;margin-top:10px" onclick="repairApp()">
-REPAIR APP / RESET BROKEN SESSION
-</button>
+    <button class="danger" style="width:100%;margin-top:10px" onclick="repairApp()">
+      Repair App / Reset Broken Session
+    </button>
+
     <div id="settingsOut" class="result">Settings ready.</div>
   </div>
 </section>
-
 <nav class="bottomNav">
   <button id="nav-home" class="active" onclick="show('home')"><span class="navI">⌂</span>Home</button>
   <button id="nav-diag" onclick="show('diag')"><span class="navI">⚙</span>Diag</button>
