@@ -357,63 +357,183 @@ button:active{transform:scale(.98)}
 </style>
 </head>
 
-
-
 <section id="home" class="section active">
 
   <div class="header">
     <div class="brand">Rolling Wrench Diesel</div>
     <h1>Mobile Mechanic Pro V36</h1>
-    <div class="subhead">Professional diesel repair and shop management.</div>
+    <div class="subhead">
+      Professional diesel repair and shop management.
+    </div>
   </div>
 
   <div class="card">
+
     <div class="cardTitle">
       <h2>What can I help you with today?</h2>
       <div class="badge">Diesel AI</div>
     </div>
 
-    <textarea id="homeAiAsk" placeholder="Build invoice, find part number, diagnose no start, save customer profile..."></textarea>
+    <textarea
+      id="homeAiAsk"
+      placeholder="Build invoice, find part number, diagnose no start, save customer profile..."
+    ></textarea>
 
     <label>Upload Photo / Diagram / Part Number</label>
-    <input id="homeAiImage" type="file" accept="image/*">
-    <img id="homeAiPreview" style="width:100%;margin-top:10px;border-radius:14px;display:none;">
 
-    <button class="success" style="width:100%" onclick="homeAI()">ASK DIESEL AI</button>
+    <input
+      id="homeAiImage"
+      type="file"
+      accept="image/*"
+    >
 
+    <img
+      id="homeAiPreview"
+      style="width:100%;margin-top:10px;border-radius:14px;display:none;"
+    >
 
- 
-    <div id="homeAiOut" class="result">Tell me what you need or choose a tool below.</div>
+    <button
+      class="success"
+      style="width:100%"
+      onclick="homeAI()"
+    >
+      ASK DIESEL AI
+    </button>
+
+    <div id="homeAiOut" class="result">
+      Tell me what you need or choose a tool below.
+    </div>
+
   </div>
-<button class="danger" style="width:100%;margin-top:10px"
-onclick="clearHomeAI()">
-CLEAR AI SESSION
-</button>
-  
+
+  <button
+    id="clearAiBtn"
+    class="dark hiddenAction"
+    style="width:100%;margin-top:10px"
+    onclick="clearHomeAI()"
+  >
+    CLEAR AI SESSION
+  </button>
+
   <div class="ai-actions">
-    <button onclick="addToParts()">Add to Parts Lookup</button>
-    <button onclick="addToWorkOrder()">Add to Work Order</button>
-    <button onclick="addToInvoice()">Add to Invoice</button>
+
+    <button onclick="addToParts()">
+      Add to Parts Lookup
+    </button>
+
+    <button onclick="addToWorkOrder()">
+      Add to Work Order
+    </button>
+
+    <button onclick="addToInvoice()">
+      Add to Invoice
+    </button>
+
   </div>
-<button class="danger" style="grid-column:1/-1"
-onclick="newJobSession()">
-NEW JOB / CLEAR ACTIVE SESSION
-</button>
+
+  <button
+    id="newJobBtn"
+    class="dark hiddenAction"
+    style="width:100%;margin-bottom:12px"
+    onclick="newJobSession()"
+  >
+    NEW JOB / CLEAR ACTIVE SESSION
+  </button>
+
   <div class="grid">
-    <button class="toolBtn orange" onclick="show('parts')"><strong>Parts Lookup</strong><span>OEM / aftermarket</span></button>
-    <button class="toolBtn orange" onclick="show('troubleshooter')"><strong>Troubleshooter</strong><span>Repair logic</span></button>
-    <button class="toolBtn blue" onclick="show('profile')"><strong>Vehicle Profile</strong><span>Customer / VIN</span></button>
-    <button class="toolBtn blue" onclick="show('filters')"><strong>Filter & Fluid</strong><span>Oil, fuel, coolant</span></button>
-    <button class="toolBtn" onclick="show('diag')"><strong>Diesel Diagnostics</strong><span>Codes / symptoms</span></button>
-    <button class="toolBtn" onclick="show('pin')"><strong>GPS Pin Drop</strong><span>Save location</span></button>
-    <button class="toolBtn" onclick="show('clock')"><strong>Labor Clock</strong><span>Time & dollars</span></button>
-    <button class="toolBtn" onclick="show('quote')"><strong>Quote Builder</strong><span>Labor / parts</span></button>
-    <button class="toolBtn blue" onclick="show('invoices')"><strong>Saved Invoices</strong><span>History</span></button>
-    <button class="toolBtn" onclick="show('work')"><strong>Work Order</strong><span>Complaint / repair</span></button>
-    <button class="toolBtn" onclick="show('settings')"><strong>Settings</strong><span>Rates / app test</span></button>
+
+    <button
+      class="toolBtn orange"
+      onclick="show('parts')"
+    >
+      <strong>Parts Lookup</strong>
+      <span>OEM / aftermarket</span>
+    </button>
+
+    <button
+      class="toolBtn orange"
+      onclick="show('troubleshooter')"
+    >
+      <strong>Troubleshooter</strong>
+      <span>Repair logic</span>
+    </button>
+
+    <button
+      class="toolBtn blue"
+      onclick="show('profile')"
+    >
+      <strong>Vehicle Profile</strong>
+      <span>Customer / VIN</span>
+    </button>
+
+    <button
+      class="toolBtn blue"
+      onclick="show('filters')"
+    >
+      <strong>Filter & Fluid</strong>
+      <span>Oil, fuel, coolant</span>
+    </button>
+
+    <button
+      class="toolBtn"
+      onclick="show('diag')"
+    >
+      <strong>Diesel Diagnostics</strong>
+      <span>Codes / symptoms</span>
+    </button>
+
+    <button
+      class="toolBtn"
+      onclick="show('pin')"
+    >
+      <strong>GPS Pin Drop</strong>
+      <span>Save location</span>
+    </button>
+
+    <button
+      class="toolBtn"
+      onclick="show('clock')"
+    >
+      <strong>Labor Clock</strong>
+      <span>Time & dollars</span>
+    </button>
+
+    <button
+      class="toolBtn"
+      onclick="show('quote')"
+    >
+      <strong>Quote Builder</strong>
+      <span>Labor / parts</span>
+    </button>
+
+    <button
+      class="toolBtn blue"
+      onclick="show('invoices')"
+    >
+      <strong>Saved Invoices</strong>
+      <span>History</span>
+    </button>
+
+    <button
+      class="toolBtn"
+      onclick="show('work')"
+    >
+      <strong>Work Order</strong>
+      <span>Complaint / repair</span>
+    </button>
+
+    <button
+      class="toolBtn"
+      onclick="show('settings')"
+    >
+      <strong>Settings</strong>
+      <span>Rates / app test</span>
+    </button>
+
   </div>
 
 </section>
+
 
   
 <section id="parts" class="section">
