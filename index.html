@@ -3,96 +3,280 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rolling Wrench Diesel | Mobile Mechanic Pro V36</title>
+<title>Mobile Mechanic Pro V36</title>
 
 <style>
+/* =====================================================
+   1. ROOT THEME
+===================================================== */
 :root{
   --bg:#050505;
-  --card:#101010;
+  --panel:#0d0d0d;
+  --card:#111;
   --card2:#171717;
-  --line:#2b2b2b;
+  --line:#303030;
   --text:#f5f5f5;
-  --muted:#a8a8a8;
-  --orange:#ff8a00;
-  --orange2:#d85b00;
-  --blue:#071720;
+  --muted:#aaa;
+  --orange:#ff7b00;
+  --orange2:#d85600;
+  --green:#20b765;
   --red:#e14b4b;
+  --blue:#2f73e8;
+  --result:#071720;
 }
+
 *{box-sizing:border-box}
+
 body{
   margin:0;
-  padding:16px 14px 112px;
+  padding:14px 14px 116px;
   font-family:Arial,Helvetica,sans-serif;
-  background:
-    linear-gradient(rgba(0,0,0,.72),rgba(0,0,0,.9)),
-    url("https://www.transparenttextures.com/patterns/black-orchid.png");
   color:var(--text);
+  background:
+    linear-gradient(rgba(0,0,0,.78),rgba(0,0,0,.92)),
+    url("https://www.transparenttextures.com/patterns/black-orchid.png");
 }
+
+/* =====================================================
+   2. GLOBAL LAYOUT
+===================================================== */
 .section{display:none}
 .section.active{display:block}
 
+.card{
+  background:rgba(10,10,10,.95);
+  border:1px solid #292929;
+  border-radius:24px;
+  padding:15px;
+  margin-bottom:15px;
+  box-shadow:0 10px 28px rgba(0,0,0,.62);
+}
+
+h2{
+  margin:0 0 12px;
+  font-size:21px;
+  color:#fff;
+}
+
+label{
+  display:block;
+  margin:10px 0 6px;
+  font-size:11px;
+  font-weight:900;
+  text-transform:uppercase;
+  color:#ddd;
+  letter-spacing:.4px;
+}
+
+input,select,textarea{
+  width:100%;
+  background:#070707;
+  color:#fff;
+  border:1px solid #333;
+  border-radius:14px;
+  padding:13px;
+  font-size:15px;
+  margin-bottom:9px;
+  outline:none;
+}
+
+textarea{
+  min-height:95px;
+  resize:vertical;
+}
+
+button{
+  background:linear-gradient(180deg,var(--orange),var(--orange2));
+  color:#fff;
+  border:none;
+  border-radius:16px;
+  padding:14px;
+  font-weight:900;
+  letter-spacing:.3px;
+  box-shadow:0 5px 14px rgba(255,100,0,.22);
+}
+
+button:active{transform:scale(.98)}
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+
+.threeRow{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+}
+
+.dark{
+  background:#151515;
+  border:1px solid #333;
+  color:#fff;
+}
+
+.danger{background:var(--red)}
+.success{background:var(--green)}
+
+.result{
+  white-space:pre-wrap;
+  background:var(--result);
+  border:1px solid #315b78;
+  color:#ffd6a0;
+  border-radius:16px;
+  padding:13px;
+  min-height:85px;
+  line-height:1.35;
+  margin-top:10px;
+  overflow-wrap:anywhere;
+}
+
+.small{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.35;
+}
+
+.backBottom{
+  position:fixed;
+  left:12px;
+  right:12px;
+  bottom:92px;
+  z-index:60;
+  display:none;
+}
+
+body.notHome .backBottom{display:block}
+
+/* =====================================================
+   3. HOME HEADER + TOP MENU
+===================================================== */
 .header{
   position:relative;
   text-align:center;
   padding:16px 58px 18px;
   margin-bottom:14px;
 }
+
 .menuBtn{
-  position:absolute;left:4px;top:14px;
-  background:transparent;box-shadow:none;border:none;
-  color:var(--orange);font-size:34px;padding:4px 8px;
+  position:absolute;
+  left:0;
+  top:14px;
+  background:transparent;
+  box-shadow:none;
+  color:var(--orange);
+  font-size:34px;
+  padding:5px 8px;
 }
+
 .topGear{
-  position:absolute;right:4px;top:14px;
-  background:transparent;box-shadow:none;border:none;
-  color:#fff;font-size:30px;padding:4px 8px;
+  position:absolute;
+  right:0;
+  top:14px;
+  background:transparent;
+  box-shadow:none;
+  color:#fff;
+  font-size:30px;
+  padding:5px 8px;
 }
+
 .brand{
   color:var(--orange);
   font-size:28px;
   font-weight:900;
   letter-spacing:1px;
 }
+
 .header h1{
   margin:3px 0 0;
   font-size:14px;
   color:#fff;
   letter-spacing:.5px;
 }
+
 .topMenu{
   display:none;
   position:absolute;
-  top:62px;right:0;
+  top:62px;
+  right:0;
+  width:230px;
   background:#111;
   border:1px solid var(--orange);
   border-radius:16px;
   padding:10px;
   z-index:90;
-  width:215px;
-  box-shadow:0 12px 30px rgba(0,0,0,.7);
-}
-.topMenu button{
-  width:100%;margin:4px 0;text-align:left;
-  background:#1b1b1b;border:1px solid #333;color:#fff;
+  box-shadow:0 12px 30px rgba(0,0,0,.75);
 }
 
+.topMenu button{
+  width:100%;
+  margin:4px 0;
+  text-align:left;
+  background:#1b1b1b;
+  border:1px solid #333;
+  color:#fff;
+}
+/* =====================================================
+   ROLLING WRENCH HEADER
+===================================================== */
+
+.brandWrap{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+
+.brandLogo{
+  width:54px;
+  height:54px;
+  object-fit:contain;
+  filter:
+    drop-shadow(0 0 10px rgba(255,120,0,.35));
+}
+
+.brandTextWrap{
+  text-align:left;
+  line-height:1;
+}
+
+.brandTop{
+  color:#fff;
+  font-size:20px;
+  font-weight:900;
+  letter-spacing:1px;
+}
+
+.brandBottom{
+  color:var(--orange);
+  font-size:24px;
+  font-weight:900;
+  letter-spacing:2px;
+}
+/* =====================================================
+   4. GOOGLE-STYLE AI SEARCH / DRAWER
+===================================================== */
 .searchBar{
-  display:flex;align-items:center;gap:10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
   background:#050505;
   border:1px solid #777;
   border-radius:18px;
   padding:8px 8px 8px 14px;
   margin-bottom:16px;
 }
-.searchBar span{font-size:26px;color:#ddd}
-.searchBar input{
-  flex:1;background:transparent;border:none;color:#fff;
-  font-size:15px;outline:none;padding:13px 0;
+
+.searchBar span{
+  font-size:26px;
+  color:#ddd;
 }
-.micBtn{
-  width:58px;height:58px;border-radius:16px;
-  background:linear-gradient(180deg,var(--orange),var(--orange2));
-  color:#111;font-size:28px;border:none;
+
+.searchBar div{
+  flex:1;
+  color:#ddd;
+  font-size:15px;
 }
 
 .aiDrawer{
@@ -103,28 +287,24 @@ body{
   padding:12px;
   margin-bottom:14px;
 }
-.aiDrawer textarea{
-  width:100%;min-height:105px;background:#050505;color:#fff;
-  border:1px solid #333;border-radius:14px;padding:12px;font-size:15px;
-}
+
 .aiDrawerBtns{
-  display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+  margin-top:10px;
 }
 
-.card{
-  background:rgba(10,10,10,.94);
-  border:1px solid #292929;
-  border-radius:24px;
-  padding:14px;
-  margin-bottom:15px;
-  box-shadow:0 10px 28px rgba(0,0,0,.6);
-}
+/* =====================================================
+   5. HOME TOOL LAYOUT
+===================================================== */
 .heroGrid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:14px;
   margin-bottom:14px;
 }
+
 .heroBtn{
   min-height:178px;
   background:linear-gradient(180deg,#111,#050505);
@@ -133,14 +313,30 @@ body{
   border-radius:20px;
   padding:16px 10px;
   text-align:center;
-  box-shadow:0 0 18px rgba(255,138,0,.28), inset 0 0 18px rgba(255,138,0,.05);
+  box-shadow:
+    0 0 18px rgba(255,138,0,.28),
+    inset 0 0 18px rgba(255,138,0,.05);
 }
-.heroIcon{font-size:42px;color:var(--orange);margin-bottom:13px}
+
+.heroIcon{
+  font-size:42px;
+  color:var(--orange);
+  margin-bottom:13px;
+}
+
 .heroBtn strong{
-  display:block;font-size:22px;line-height:1.05;font-weight:900;
+  display:block;
+  font-size:22px;
+  line-height:1.05;
+  font-weight:900;
 }
+
 .heroBtn span{
-  display:block;color:#ddd;font-size:12px;line-height:1.35;margin-top:12px;
+  display:block;
+  color:#ddd;
+  font-size:12px;
+  line-height:1.35;
+  margin-top:12px;
 }
 
 .toolGrid{
@@ -148,6 +344,7 @@ body{
   grid-template-columns:repeat(3,1fr);
   gap:10px;
 }
+
 .toolBtn{
   min-height:88px;
   background:linear-gradient(180deg,#141414,#070707);
@@ -156,148 +353,388 @@ body{
   border-radius:16px;
   padding:9px 5px;
   text-align:center;
-  box-shadow:0 0 12px rgba(255,138,0,.16), inset 0 1px 0 rgba(255,255,255,.05);
+  box-shadow:
+    0 0 12px rgba(255,138,0,.16),
+    inset 0 1px 0 rgba(255,255,255,.05);
 }
-.toolBtn .ico{font-size:28px;color:var(--orange);display:block;margin-bottom:7px}
-.toolBtn strong{font-size:13px;font-weight:900}
 
+.toolBtn .ico{
+  font-size:28px;
+  color:var(--orange);
+  display:block;
+  margin-bottom:7px;
+}
+
+.toolBtn strong{
+  font-size:12px;
+  font-weight:900;
+}
+
+/* =====================================================
+   6. ACTIVE TRUCK BAR + BOTTOM NAV
+===================================================== */
 .activeTruck{
   position:fixed;
-  left:12px;right:12px;bottom:92px;
+  left:12px;
+  right:12px;
+  bottom:92px;
   background:linear-gradient(180deg,#ffb000,#ff8a00);
   color:#111;
   border-radius:16px;
   padding:13px 14px;
-  display:flex;justify-content:space-between;align-items:center;
-  font-size:12px;font-weight:900;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:12px;
+  font-weight:900;
   z-index:40;
 }
+
+body.notHome .activeTruck{display:none}
+
 .bottomNav{
-  position:fixed;left:10px;right:10px;bottom:10px;
+  position:fixed;
+  left:10px;
+  right:10px;
+  bottom:10px;
   background:rgba(12,12,12,.96);
   border:1px solid #333;
   border-radius:24px;
-  display:grid;grid-template-columns:repeat(5,1fr);
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
   padding:8px 5px;
   z-index:45;
 }
+
 .bottomNav button{
-  background:transparent;border:none;box-shadow:none;color:#aaa;
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  font-size:11px;padding:6px 0;
+  background:transparent;
+  border:none;
+  box-shadow:none;
+  color:#aaa;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  font-size:11px;
+  padding:6px 0;
 }
+
 .bottomNav button.active{color:var(--orange)}
 .navI{font-size:22px}
 
-h2{margin:0 0 12px;color:#fff}
-label{
-  display:block;font-size:12px;font-weight:900;text-transform:uppercase;
-  color:#ddd;margin:10px 0 6px;
+/* =====================================================
+   7. PROFESSIONAL INVOICE DESIGN
+===================================================== */
+.invoiceHeader{
+  border:1px solid #333;
+  border-radius:18px;
+  padding:14px;
+  background:#080808;
+  margin-bottom:12px;
 }
-input,select,textarea{
-  width:100%;background:#070707;color:#fff;border:1px solid #333;
-  border-radius:14px;padding:13px;font-size:15px;margin-bottom:9px;
-}
-textarea{min-height:95px}
-button{
-  background:linear-gradient(180deg,var(--orange),var(--orange2));
-  color:#fff;border:none;border-radius:16px;padding:14px;
-  font-weight:900;letter-spacing:.3px;
-  box-shadow:0 5px 14px rgba(255,100,0,.22);
-}
-button:active{transform:scale(.98)}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.dark{background:#151515;border:1px solid #333;color:#fff}
-.danger{background:var(--red)}
-.result{
-  white-space:pre-wrap;background:#071720;border:1px solid #315b78;
-  color:#ffd6a0;border-radius:16px;padding:13px;min-height:85px;
-  line-height:1.35;margin-top:10px;
-}
-.back{width:100%;margin-bottom:12px}
-.small{color:var(--muted);font-size:12px;line-height:1.35}
-.footer{text-align:center;color:#777;font-size:12px;margin:25px 0}
 
+.invoiceShop{
+  font-size:20px;
+  font-weight:900;
+  color:var(--orange);
+}
+
+.invoiceMeta{
+  font-size:12px;
+  color:#bbb;
+  line-height:1.4;
+}
+
+.invoiceStatusRow{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin:12px 0;
+}
+
+.statusBtn{
+  padding:12px 4px;
+  font-size:11px;
+  border-radius:12px;
+  box-shadow:none;
+}
+
+.statusBtn.unpaid{background:#2a0a0a;color:#ff4d4d;border:1px solid #ff3c3c}
+.statusBtn.paid{background:#072313;color:#2eff88;border:1px solid #18d46b}
+.statusBtn.partial{background:#2a1f00;color:#ffcc33;border:1px solid #ffb300}
+.statusBtn.estimate{background:#0d1b2b;color:#4ea3ff;border:1px solid #347eff}
+
+.statusBtn.active{
+  outline:2px solid var(--orange);
+}
+
+.invoiceTable{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+  font-size:13px;
+}
+
+.invoiceTable th,
+.invoiceTable td{
+  border-bottom:1px solid #333;
+  padding:8px 4px;
+  text-align:left;
+}
+
+.totalBox{
+  background:#080808;
+  border:1px solid var(--orange);
+  border-radius:18px;
+  padding:14px;
+  margin-top:14px;
+}
+
+.totalLine{
+  display:flex;
+  justify-content:space-between;
+  margin:7px 0;
+}
+
+.totalDue{
+  font-size:26px;
+  color:var(--orange);
+  font-weight:900;
+}
+
+/* =====================================================
+   8. MOBILE
+===================================================== */
 @media(max-width:390px){
   .brand{font-size:24px}
   .heroBtn strong{font-size:19px}
-  .toolBtn strong{font-size:12px}
+  .toolBtn strong{font-size:11px}
 }
 </style>
 </head>
 
 <body>
 
+<!-- =====================================================
+     9. HOME SCREEN
+===================================================== -->
 <section id="home" class="section active">
+
   <div class="header">
+
+    <!-- LEFT MENU -->
     <button class="menuBtn" onclick="toggleTopMenu()">☰</button>
-    <div class="brand">DIESEL REPAIR</div>
-    <h1>AI ASSISTANT</h1>
+
+    <!-- CENTER LOGO / BRAND -->
+    <div class="brandWrap">
+
+      <img
+        src="https://i.imgur.com/YOURLOGO.png"
+        class="brandLogo"
+      >
+
+      <div class="brandTextWrap">
+        <div class="brandTop">
+          ROLLING WRENCH
+        </div>
+
+        <div class="brandBottom">
+          DIESEL
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SETTINGS -->
     <button class="topGear" onclick="toggleTopMenu()">⚙️</button>
 
+    <!-- DROPDOWN MENU -->
     <div id="topMenu" class="topMenu">
-      <button onclick="show('invoices')">Saved Invoices</button>
-      <button onclick="show('quote')">Quotes</button>
-      <button onclick="show('profit')">Profit / Sales</button>
-      <button onclick="show('profile')">VIN Decoder</button>
-      <button onclick="clearVehicleData()">Clear VIN / Truck</button>
-      <button onclick="show('settings')">Settings</button>
+
+      <button onclick="show('invoices')">
+        Saved Invoices
+      </button>
+
+      <button onclick="show('quote')">
+        Invoice / Quote
+      </button>
+
+      <button onclick="show('profit')">
+        Profit / Sales
+      </button>
+
+      <button onclick="show('profile')">
+        VIN Decoder
+      </button>
+
+      <button onclick="clearVehicleData()">
+        Clear VIN / Truck
+      </button>
+
+      <button onclick="show('settings')">
+        Settings
+      </button>
+
     </div>
+
   </div>
 
+  <!-- GOOGLE STYLE SEARCH -->
   <div class="searchBar" onclick="openAiDrawer()">
     <span>⌕</span>
-    <input id="homeAiAsk" placeholder="Ask AI anything about your truck..." onclick="event.stopPropagation()">
-    <button class="micBtn" onclick="event.stopPropagation(); startVoiceInput()">🎙️</button>
-  </div>
 
-  <div id="aiDrawer" class="aiDrawer">
-    <textarea id="aiDrawerText" placeholder="Type diagnostic question, part number, VIN, or upload a picture..."></textarea>
-    <div class="aiDrawerBtns">
-      <button onclick="document.getElementById('homeAiImage').click()">📷 Picture</button>
-      <button onclick="startVoiceInput()">🎤 Voice</button>
-      <button onclick="homeAI()">➜ Send</button>
+    <div>
+      Ask AI anything about your truck...
     </div>
   </div>
 
-  <input id="homeAiImage" type="file" accept="image/*" style="display:none">
-  <img id="homeAiPreview" style="width:100%;margin-top:10px;border-radius:14px;display:none">
+  <!-- AI DRAWER -->
+  <div id="aiDrawer" class="aiDrawer">
 
-  <div class="card">
-    <div id="homeAiOut" class="result">Tell me what you need or choose a tool below.</div>
+    <textarea
+      id="homeAiAsk"
+      placeholder="Type diagnostic question, part number, VIN, or upload a picture..."
+    ></textarea>
+
+    <div class="aiDrawerBtns">
+
+      <button onclick="document.getElementById('homeAiImage').click()">
+        📷 Picture
+      </button>
+
+      <button onclick="startVoiceInput()">
+        🎤 Voice
+      </button>
+
+      <button onclick="homeAI()">
+        ➜ Send
+      </button>
+
+    </div>
+
   </div>
 
+  <!-- IMAGE INPUT -->
+  <input
+    id="homeAiImage"
+    type="file"
+    accept="image/*"
+    style="display:none"
+  >
+
+  <!-- PREVIEW -->
+  <img
+    id="homeAiPreview"
+    style="
+      width:100%;
+      margin-top:10px;
+      border-radius:14px;
+      display:none
+    "
+  >
+
+  <!-- AI RESULT -->
+  <div class="card">
+
+    <div id="homeAiOut" class="result">
+      Tell me what you need or choose a tool below.
+    </div>
+
+  </div>
+
+  <!-- HERO BUTTONS -->
   <div class="heroGrid">
+
     <button class="heroBtn" onclick="show('diag')">
+
       <div class="heroIcon">⚙️</div>
-      <strong>DIESEL<br>DIAGNOSTICS</strong>
-      <span>Codes • Symptoms<br>Repair Logic</span>
+
+      <strong>
+        DIESEL<br>
+        DIAGNOSTICS
+      </strong>
+
+      <span>
+        Codes • Symptoms<br>
+        Repair Logic
+      </span>
+
     </button>
 
     <button class="heroBtn" onclick="show('parts')">
+
       <div class="heroIcon">📦</div>
-      <strong>OEM PARTS<br>LOOKUP</strong>
-      <span>VIN Lookup • OEM<br>Aftermarket</span>
+
+      <strong>
+        OEM PARTS<br>
+        LOOKUP
+      </strong>
+
+      <span>
+        VIN Lookup • OEM<br>
+        Aftermarket
+      </span>
+
     </button>
+
   </div>
 
+  <!-- TOOL GRID -->
   <div class="toolGrid">
-    <button class="toolBtn" onclick="show('troubleshooter')"><span class="ico">🛠️</span><strong>Troubleshooter</strong></button>
-    <button class="toolBtn" onclick="show('filters')"><span class="ico">🛢️</span><strong>Filters & Fluid</strong></button>
-    <button class="toolBtn" onclick="show('profile')"><span class="ico">🚚</span><strong>Vehicle Profile</strong></button>
-    <button class="toolBtn" onclick="show('clock')"><span class="ico">⏱️</span><strong>Labor Clock</strong></button>
-    <button class="toolBtn" onclick="show('quote')"><span class="ico">📄</span><strong>Invoice Builder</strong></button>
-    <button class="toolBtn" onclick="show('work')"><span class="ico">📝</span><strong>Work Order</strong></button>
-    <button class="toolBtn" onclick="show('pin')"><span class="ico">📍</span><strong>GPS / Pin</strong></button>
-    <button class="toolBtn" onclick="show('invoices')"><span class="ico">📁</span><strong>Saved / Invoices</strong></button>
-    <button class="toolBtn" onclick="show('settings')"><span class="ico">⚙️</span><strong>Settings</strong></button>
+
+    <button class="toolBtn" onclick="show('troubleshooter')">
+      <span class="ico">🛠️</span>
+      <strong>Troubleshooter</strong>
+    </button>
+
+    <button class="toolBtn" onclick="show('filters')">
+      <span class="ico">🛢️</span>
+      <strong>Filters & Fluid</strong>
+    </button>
+
+    <button class="toolBtn" onclick="show('profile')">
+      <span class="ico">🚚</span>
+      <strong>Vehicle Profile</strong>
+    </button>
+
+    <button class="toolBtn" onclick="show('clock')">
+      <span class="ico">⏱️</span>
+      <strong>Labor Clock</strong>
+    </button>
+
+    <button class="toolBtn" onclick="show('quote')">
+      <span class="ico">📄</span>
+      <strong>Invoice Builder</strong>
+    </button>
+
+    <button class="toolBtn" onclick="show('work')">
+      <span class="ico">📝</span>
+      <strong>Work Order</strong>
+    </button>
+
+    <button class="toolBtn" onclick="show('pin')">
+      <span class="ico">📍</span>
+      <strong>GPS / Pin</strong>
+    </button>
+
+    <button class="toolBtn" onclick="show('invoices')">
+      <span class="ico">📁</span>
+      <strong>Saved / Invoices</strong>
+    </button>
+
+    <button class="toolBtn" onclick="show('settings')">
+      <span class="ico">⚙️</span>
+      <strong>Settings</strong>
+    </button>
+
   </div>
 
-  <div class="footer">© 2026 Rolling Wrench Diesel LLC.<br>Mobile Mechanic Pro V36</div>
 </section>
 
+<!-- =====================================================
+     10. VIN / VEHICLE PROFILE
+===================================================== -->
 <section id="profile" class="section">
-  <button class="back dark" onclick="show('home')">← BACK</button>
   <div class="card">
     <h2>VIN Decoder / Active Truck</h2>
     <label>VIN</label><input id="vinGlobal" placeholder="1XKYDP9X0NJ495838">
@@ -318,8 +755,10 @@ button:active{transform:scale(.98)}
   </div>
 </section>
 
+<!-- =====================================================
+     11. PARTS LOOKUP
+===================================================== -->
 <section id="parts" class="section">
-  <button class="back dark" onclick="show('home')">← BACK</button>
   <div class="card">
     <h2>OEM Parts Lookup</h2>
     <label>Part Number / Part Name</label><input id="partq" placeholder="2022 MX-13 water pump">
@@ -333,8 +772,10 @@ button:active{transform:scale(.98)}
   </div>
 </section>
 
+<!-- =====================================================
+     12. DIAGNOSTICS
+===================================================== -->
 <section id="diag" class="section">
-  <button class="back dark" onclick="show('home')">← BACK</button>
   <div class="card">
     <h2>Diesel Diagnostics</h2>
     <label>Symptom / Code / Question</label><textarea id="diagq" placeholder="SCR conversion problem on DD15"></textarea>
@@ -344,8 +785,10 @@ button:active{transform:scale(.98)}
   </div>
 </section>
 
+<!-- =====================================================
+     13. FILTERS / FLUID
+===================================================== -->
 <section id="filters" class="section">
-  <button class="back dark" onclick="show('home')">← BACK</button>
   <div class="card">
     <h2>Filters & Fluid</h2>
     <label>Filter / Fluid / Engine</label><input id="filterq" placeholder="MX-13 fuel filter kit">
@@ -355,45 +798,94 @@ button:active{transform:scale(.98)}
   </div>
 </section>
 
+<!-- =====================================================
+     14. TROUBLESHOOTER
+===================================================== -->
 <section id="troubleshooter" class="section">
-  <button class="back dark" onclick="show('home')">← BACK</button>
   <div class="card">
     <h2>Troubleshooter</h2>
-    <label>Fault / Symptom</label><textarea id="troubleq" placeholder="air valve with ABS wires near axle"></textarea>
+    <label>Fault / Symptom</label><textarea id="troubleq"></textarea>
     <button onclick="askTrouble()" style="width:100%">TROUBLESHOOT</button>
     <div id="troubleOut" class="result">Enter symptom.</div>
   </div>
 </section>
 
+<!-- =====================================================
+     15. PROFESSIONAL INVOICE / QUOTE
+===================================================== -->
 <section id="quote" class="section">
-  <button class="back dark" onclick="show('home')">← BACK</button>
   <div class="card">
-    <h2>Invoice Builder</h2>
-    <label>Customer</label><input id="custName">
-    <label>Labor Hours</label><input id="laborHours" type="number" step="0.1">
-    <label>Labor Rate</label><input id="laborRate" type="number" value="135">
-    <label>Service Call</label><input id="serviceCall" type="number" value="250">
-    <label>Parts</label><input id="partsCost" type="number" value="0">
-    <button onclick="buildQuote()" style="width:100%">BUILD TOTAL</button>
-    <div id="quoteOut" class="result">Invoice total will show here.</div>
-  </div>
-</section>
-
-<section id="clock" class="section">
-  <button class="back dark" onclick="show('home')">← BACK</button>
-  <div class="card">
-    <h2>Labor Clock</h2>
-    <div class="row">
-      <button onclick="clockIn()">CLOCK IN</button>
-      <button onclick="clockOut()">CLOCK OUT</button>
+    <div class="invoiceHeader">
+      <div class="invoiceShop" id="invoiceShopName">SHOP NAME</div>
+      <div class="invoiceMeta" id="invoiceShopInfo"></div>
+      <div class="invoiceMeta">
+        Invoice #: <span id="invoiceNo"></span><br>
+        Date: <span id="invoiceDate"></span>
+      </div>
     </div>
-    <button class="danger" onclick="resetClock()" style="width:100%;margin-top:10px">RESET</button>
-    <div id="clockOutBox" class="result">Clock not started.</div>
+
+    <div class="invoiceStatusRow">
+      <button class="statusBtn estimate" onclick="setInvoiceStatus('ESTIMATE')">ESTIMATE</button>
+      <button class="statusBtn unpaid active" onclick="setInvoiceStatus('UNPAID')">UNPAID</button>
+      <button class="statusBtn partial" onclick="setInvoiceStatus('PARTIAL')">PARTIAL</button>
+      <button class="statusBtn paid" onclick="setInvoiceStatus('PAID')">PAID</button>
+    </div>
+
+    <label>Customer Name</label><input id="custName">
+    <label>Customer Phone</label><input id="custPhone">
+    <label>Truck / Unit</label><input id="invoiceTruck">
+    <label>VIN</label><input id="invoiceVin">
+
+    <div class="row">
+      <button onclick="document.getElementById('invoicePhoto').click()">📷 SNAP / UPLOAD</button>
+      <button onclick="addInvoicePhotoToNotes()">ADD PHOTO NOTE</button>
+    </div>
+    <input id="invoicePhoto" type="file" accept="image/*" style="display:none">
+    <img id="invoicePreview" style="width:100%;margin-top:10px;border-radius:14px;display:none">
+
+    <label>Labor Description</label><input id="laborDesc" placeholder="Diagnostics, water pump, brakes">
+    <div class="row">
+      <div><label>Labor Hours</label><input id="laborHours" type="number" step=".25" value="1"></div>
+      <div><label>Labor Rate</label><input id="laborRate" type="number" value="135"></div>
+    </div>
+
+    <label>Parts Description</label><input id="partsDesc" placeholder="Part numbers, filters, coolant">
+    <div class="row">
+      <div><label>Parts Sell $</label><input id="partsCost" type="number" value="0"></div>
+      <div><label>Service Call</label><input id="serviceCall" type="number" value="250"></div>
+    </div>
+
+    <div class="row">
+      <div><label>Tax %</label><input id="taxRate" type="number" value="0"></div>
+      <div><label>Card Fee %</label><input id="cardFee" type="number" value="0"></div>
+    </div>
+
+    <label>Internal Cost $</label><input id="internalCost" type="number" value="0">
+    <label>Shop/Internal Notes</label><textarea id="internalNotes"></textarea>
+
+    <button onclick="buildInvoice()" style="width:100%">BUILD INVOICE</button>
+
+    <div class="totalBox">
+      <div class="totalLine"><span>Subtotal</span><strong id="subTotal">$0.00</strong></div>
+      <div class="totalLine"><span>Tax</span><strong id="taxTotal">$0.00</strong></div>
+      <div class="totalLine"><span>Card Fee</span><strong id="cardTotal">$0.00</strong></div>
+      <div class="totalLine"><span>Total Due</span><strong class="totalDue" id="grandTotal">$0.00</strong></div>
+    </div>
+
+    <div class="threeRow" style="margin-top:12px">
+      <button onclick="buildCustomerInvoice()">CUSTOMER COPY</button>
+      <button onclick="buildShopInvoice()">SHOP COPY</button>
+      <button onclick="saveInvoice()">SAVE</button>
+    </div>
+
+    <div id="quoteOut" class="result">Invoice will show here.</div>
   </div>
 </section>
 
+<!-- =====================================================
+     16. WORK ORDER
+===================================================== -->
 <section id="work" class="section">
-  <button class="back dark" onclick="show('home')">← BACK</button>
   <div class="card">
     <h2>Work Order</h2>
     <label>Complaint</label><textarea id="woComplaint"></textarea>
@@ -404,81 +896,211 @@ button:active{transform:scale(.98)}
   </div>
 </section>
 
-<section id="pin" class="section">
-  <button class="back dark" onclick="show('home')">← BACK</button>
-  <div class="card">
-    <h2>GPS / Pin</h2>
-    <button onclick="getLocation()" style="width:100%">GET LOCATION</button>
-    <div id="pinOut" class="result">No location yet.</div>
-  </div>
-</section>
+<!-- =====================================================
+     17. CLOCK / GPS / SAVED / PROFIT
+===================================================== -->
+<section id="clock" class="section"><div class="card"><h2>Labor Clock</h2><div class="row"><button onclick="clockIn()">CLOCK IN</button><button onclick="clockOut()">CLOCK OUT</button></div><button class="danger" onclick="resetClock()" style="width:100%;margin-top:10px">RESET</button><div id="clockOutBox" class="result">Clock not started.</div></div></section>
+<section id="pin" class="section"><div class="card"><h2>GPS / Pin</h2><button onclick="getLocation()" style="width:100%">GET LOCATION</button><div id="pinOut" class="result">No location yet.</div></div></section>
+<section id="invoices" class="section"><div class="card"><h2>Saved Invoices</h2><button onclick="showSavedInvoices()" style="width:100%">REFRESH</button><div id="savedOut" class="result">No saved invoices.</div></div></section>
+<section id="profit" class="section"><div class="card"><h2>Profit / Sales</h2><button onclick="showProfit()" style="width:100%">CALCULATE PROFIT</button><div id="profitOut" class="result">Profit summary will show here.</div></div></section>
 
-<section id="invoices" class="section">
-  <button class="back dark" onclick="show('home')">← BACK</button>
-  <div class="card">
-    <h2>Saved / Invoices</h2>
-    <div id="savedOut" class="result">Saved invoices area.</div>
-  </div>
-</section>
-
+<!-- =====================================================
+     18. SETTINGS / BUSINESS PROFILE
+===================================================== -->
 <section id="settings" class="section">
-  <button class="back dark" onclick="show('home')">← BACK</button>
   <div class="card">
-    <h2>Settings</h2>
+    <h2>Business / Shop Settings</h2>
+
+    <label>Shop Name</label><input id="shopName" placeholder="Rolling Wrench Diesel LLC">
+    <label>Owner / Company</label><input id="shopOwner">
+    <label>Phone Number</label><input id="shopPhone">
+    <label>Email</label><input id="shopEmail">
+    <label>Website</label><input id="shopWebsite">
+    <label>Address</label><textarea id="shopAddress"></textarea>
+    <label>Tax ID / EIN</label><input id="shopTaxId">
+    <label>Invoice Prefix</label><input id="invoicePrefix" placeholder="RWD">
     <label>Default Labor Rate</label><input id="defaultLaborRate" value="135">
     <label>Default Service Call</label><input id="defaultServiceCall" value="250">
-    <button onclick="saveSettings()" style="width:100%">SAVE SETTINGS</button>
-    <div class="small">Settings save on this phone/browser.</div>
+    <label>Tax %</label><input id="defaultTax" value="0">
+    <label>Card Fee %</label><input id="defaultCardFee" value="0">
+    <label>Warranty / Terms</label><textarea id="shopTerms"></textarea>
+
+    <button onclick="saveSettings()" style="width:100%">SAVE BUSINESS SETTINGS</button>
+    <div id="settingsOut" class="result">Settings ready.</div>
   </div>
 </section>
 
-<section id="profit" class="section">
-  <button class="back dark" onclick="show('home')">← BACK</button>
-  <div class="card">
-    <h2>Profit / Sales</h2>
-    <div class="result">Profit tracker placeholder.</div>
-  </div>
-</section>
-
+<!-- =====================================================
+     19. FIXED NAVIGATION
+===================================================== -->
 <div class="activeTruck" onclick="show('profile')">
   <span>Active Truck: <span id="activeTruckName">None</span></span>
   <span>VIN: <span id="activeTruckVin">None</span> ›</span>
 </div>
 
+<button class="backBottom dark" onclick="show('home')">← BACK HOME</button>
+
 <div class="bottomNav">
   <button class="active" onclick="show('home')"><span class="navI">⌂</span>Home</button>
   <button onclick="show('diag')"><span class="navI">⚙️</span>Diag</button>
   <button onclick="show('parts')"><span class="navI">🔎</span>Parts</button>
-  <button onclick="show('work')"><span class="navI">▣</span>Work</button>
+  <button onclick="show('quote')"><span class="navI">📄</span>Invoice</button>
   <button onclick="toggleTopMenu()"><span class="navI">☰</span>More</button>
 </div>
 
 <script>
+/* =====================================================
+   20. APP CONFIG
+===================================================== */
 const API_URL="https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/verify-part-web";
 const $=id=>document.getElementById(id);
+let invoiceStatus="UNPAID";
+let startTime=null;
 
+/* =====================================================
+   21. NAVIGATION
+===================================================== */
 function show(id){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   $(id)?.classList.add("active");
+
+  document.body.classList.toggle("notHome", id !== "home");
+
   document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
   if(id==="home") document.querySelector(".bottomNav button:nth-child(1)")?.classList.add("active");
   if(id==="diag") document.querySelector(".bottomNav button:nth-child(2)")?.classList.add("active");
   if(id==="parts") document.querySelector(".bottomNav button:nth-child(3)")?.classList.add("active");
-  if(id==="work") document.querySelector(".bottomNav button:nth-child(4)")?.classList.add("active");
+  if(id==="quote") document.querySelector(".bottomNav button:nth-child(4)")?.classList.add("active");
+
   window.scrollTo(0,0);
 }
+
 function toggleTopMenu(){
-  const m=$("topMenu"); if(!m)return;
+  const m=$("topMenu");
+  if(!m)return;
   m.style.display=m.style.display==="flex"?"none":"flex";
 }
+
 function openAiDrawer(){
-  const d=$("aiDrawer"); if(!d)return;
+  const d=$("aiDrawer");
+  if(!d)return;
   d.style.display=d.style.display==="block"?"none":"block";
 }
 
+/* =====================================================
+   22. SETTINGS / SHOP PROFILE
+===================================================== */
+function getShop(){
+  return JSON.parse(localStorage.getItem("shopSettings")||"{}");
+}
+
+function saveSettings(){
+  const shop={
+    name:$("shopName").value || "Rolling Wrench Diesel LLC",
+    owner:$("shopOwner").value,
+    phone:$("shopPhone").value,
+    email:$("shopEmail").value,
+    website:$("shopWebsite").value,
+    address:$("shopAddress").value,
+    taxId:$("shopTaxId").value,
+    prefix:$("invoicePrefix").value || "RWD",
+    laborRate:$("defaultLaborRate").value || "135",
+    serviceCall:$("defaultServiceCall").value || "250",
+    tax:$("defaultTax").value || "0",
+    cardFee:$("defaultCardFee").value || "0",
+    terms:$("shopTerms").value
+  };
+
+  localStorage.setItem("shopSettings",JSON.stringify(shop));
+  loadSettings();
+  $("settingsOut").textContent="Business settings saved.";
+}
+
+function loadSettings(){
+  const s=getShop();
+
+  $("shopName").value=s.name||"Rolling Wrench Diesel LLC";
+  $("shopOwner").value=s.owner||"";
+  $("shopPhone").value=s.phone||"260-502-6222";
+  $("shopEmail").value=s.email||"";
+  $("shopWebsite").value=s.website||"www.rollingwrenchdiesel.com";
+  $("shopAddress").value=s.address||"";
+  $("shopTaxId").value=s.taxId||"";
+  $("invoicePrefix").value=s.prefix||"RWD";
+  $("defaultLaborRate").value=s.laborRate||"135";
+  $("defaultServiceCall").value=s.serviceCall||"250";
+  $("defaultTax").value=s.tax||"0";
+  $("defaultCardFee").value=s.cardFee||"0";
+  $("shopTerms").value=s.terms||"Payment due upon completion. Parts and labor warranty subject to shop policy.";
+
+  $("homeShopName").textContent=(s.name||"DIESEL REPAIR").replace(" LLC","");
+  $("invoiceShopName").textContent=s.name||"SHOP NAME";
+  $("invoiceShopInfo").innerHTML=
+    `${s.phone||""}<br>${s.email||""}<br>${s.website||""}<br>${s.address||""}<br>${s.taxId ? "Tax ID / EIN: "+s.taxId : ""}`;
+
+  $("laborRate").value=s.laborRate||"135";
+  $("serviceCall").value=s.serviceCall||"250";
+  $("taxRate").value=s.tax||"0";
+  $("cardFee").value=s.cardFee||"0";
+
+  setInvoiceNumber();
+}
+
+/* =====================================================
+   23. ACTIVE TRUCK
+===================================================== */
 function ctx(){
   return `Year:${$("yearGlobal")?.value||""} Make:${$("makeGlobal")?.value||""} Model:${$("modelGlobal")?.value||""} Engine:${$("engine")?.value||""} VIN:${$("vinGlobal")?.value||""} ESN:${$("esnGlobal")?.value||""} CPL:${$("cplGlobal")?.value||""}`;
 }
+
+function saveActiveTruck(){
+  const truck={
+    vin:$("vinGlobal").value,
+    year:$("yearGlobal").value,
+    make:$("makeGlobal").value,
+    model:$("modelGlobal").value,
+    engine:$("engine").value,
+    epa:$("epaGlobal").value,
+    esn:$("esnGlobal").value,
+    cpl:$("cplGlobal").value
+  };
+  localStorage.setItem("activeTruck",JSON.stringify(truck));
+  updateActiveTruck();
+  alert("Active truck saved.");
+}
+
+function updateActiveTruck(){
+  const t=JSON.parse(localStorage.getItem("activeTruck")||"{}");
+  $("activeTruckName").textContent=t.make||t.model?`${t.year||""} ${t.make||""} ${t.model||""}`.trim():"None";
+  $("activeTruckVin").textContent=t.vin||"None";
+
+  if(t.vin && !$("vinGlobal").value){
+    $("vinGlobal").value=t.vin||"";
+    $("yearGlobal").value=t.year||"";
+    $("makeGlobal").value=t.make||"";
+    $("modelGlobal").value=t.model||"";
+    $("engine").value=t.engine||"";
+    $("epaGlobal").value=t.epa||"";
+    $("esnGlobal").value=t.esn||"";
+    $("cplGlobal").value=t.cpl||"";
+  }
+
+  $("invoiceTruck").value=`${t.year||""} ${t.make||""} ${t.model||""}`.trim();
+  $("invoiceVin").value=t.vin||"";
+}
+
+function clearVehicleData(){
+  ["vinGlobal","yearGlobal","makeGlobal","modelGlobal","engine","epaGlobal","esnGlobal","cplGlobal","invoiceTruck","invoiceVin"].forEach(id=>{
+    if($(id))$(id).value="";
+  });
+  localStorage.removeItem("activeTruck");
+  updateActiveTruck();
+  alert("Active VIN / truck cleared.");
+}
+
+/* =====================================================
+   24. AI BACKEND
+===================================================== */
 async function callAI(question,mode="parts",note=""){
   const res=await fetch(API_URL,{
     method:"POST",
@@ -488,7 +1110,7 @@ async function callAI(question,mode="parts",note=""){
       question,
       note,
       mode,
-      vin:$("vinGlobal")?.value||$("vin")?.value||(note.match(/[A-HJ-NPR-Z0-9]{17}/i)?.[0]||""),
+      vin:$("vinGlobal")?.value||$("invoiceVin")?.value||(note.match(/[A-HJ-NPR-Z0-9]{17}/i)?.[0]||""),
       year:$("yearGlobal")?.value||"",
       make:$("makeGlobal")?.value||"",
       model:$("modelGlobal")?.value||"",
@@ -505,39 +1127,48 @@ async function callAI(question,mode="parts",note=""){
 }
 
 async function homeAI(){
-  const q=$("aiDrawerText")?.value||$("homeAiAsk")?.value||"";
+  const q=$("homeAiAsk")?.value||"";
   if(!q.trim()) return alert("Ask something first");
   $("homeAiOut").textContent="Thinking...";
   try{$("homeAiOut").textContent=await callAI(q,"smart_diagnostics_brain","");}
   catch(e){$("homeAiOut").textContent="AI ERROR: "+e.message;}
 }
+
 async function askPart(){
-  const q=$("partq").value.trim(), note=$("partNote").value.trim();
+  const q=$("partq").value.trim();
+  const note=$("partNote").value.trim();
   if(!q)return alert("Enter part");
   $("partOut").textContent="Looking up...";
   const mode=($("vinGlobal")?.value||$("esnGlobal")?.value||$("cplGlobal")?.value)?"vin_oem_part_lookup":"smart_parts_brain";
   try{$("partOut").textContent=await callAI(q,mode,note);}
   catch(e){$("partOut").textContent="PART LOOKUP ERROR: "+e.message;}
 }
-async function verifyPartWeb(){askPart();}
+
+function verifyPartWeb(){askPart();}
+
 async function askDiag(){
-  const q=$("diagq").value.trim(), n=$("diagNote").value.trim();
+  const q=$("diagq").value.trim();
+  const n=$("diagNote").value.trim();
   $("diagOut").textContent="Thinking...";
   try{$("diagOut").textContent=await callAI(q,"smart_diagnostics_brain",n);}
   catch(e){$("diagOut").textContent="DIAGNOSTIC ERROR: "+e.message;}
 }
+
 async function askFilter(){
-  const q=$("filterq").value.trim(), n=$("filterNote").value.trim();
+  const q=$("filterq").value.trim();
+  const n=$("filterNote").value.trim();
   $("filterOut").textContent="Looking up...";
   try{$("filterOut").textContent=await callAI(q,"filters",n);}
   catch(e){$("filterOut").textContent="FILTER ERROR: "+e.message;}
 }
+
 async function askTrouble(){
   const q=$("troubleq").value.trim();
   $("troubleOut").textContent="Thinking...";
   try{$("troubleOut").textContent=await callAI(q,"engine_pattern_lookup","");}
   catch(e){$("troubleOut").textContent="TROUBLESHOOTER ERROR: "+e.message;}
 }
+
 async function decodeVin(){
   const vin=$("vinGlobal").value.trim();
   if(!vin)return alert("Enter VIN");
@@ -545,29 +1176,185 @@ async function decodeVin(){
   try{$("vinOut").textContent=await callAI(vin,"vin_decode","");}
   catch(e){$("vinOut").textContent="VIN ERROR: "+e.message;}
 }
-function saveActiveTruck(){
-  const truck={
-    vin:$("vinGlobal").value,
-    year:$("yearGlobal").value,
-    make:$("makeGlobal").value,
-    model:$("modelGlobal").value,
-    engine:$("engine").value
-  };
-  localStorage.setItem("activeTruck",JSON.stringify(truck));
-  updateActiveTruck();
-  alert("Active truck saved.");
+
+/* =====================================================
+   25. INVOICE LOGIC
+===================================================== */
+function money(n){return "$"+Number(n||0).toFixed(2)}
+
+function setInvoiceNumber(){
+  const shop=getShop();
+  if(!$("invoiceNo").textContent){
+    const n=Number(localStorage.getItem("invoiceCounter")||"1000")+1;
+    localStorage.setItem("invoiceCounter",String(n));
+    $("invoiceNo").textContent=`${shop.prefix||"RWD"}-${n}`;
+  }
+  $("invoiceDate").textContent=new Date().toLocaleString();
 }
-function updateActiveTruck(){
-  const t=JSON.parse(localStorage.getItem("activeTruck")||"{}");
-  $("activeTruckName").textContent=t.make||t.model?`${t.make||""} ${t.model||""}`.trim():"None";
-  $("activeTruckVin").textContent=t.vin||"None";
+
+function setInvoiceStatus(status){
+  invoiceStatus=status;
+  document.querySelectorAll(".statusBtn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".statusBtn").forEach(b=>{
+    if(b.textContent.trim()===status)b.classList.add("active");
+  });
 }
-function clearVehicleData(){
-  ["vinGlobal","yearGlobal","makeGlobal","modelGlobal","engine","epaGlobal","esnGlobal","cplGlobal"].forEach(id=>{if($(id))$(id).value="";});
-  localStorage.removeItem("activeTruck");
-  updateActiveTruck();
-  alert("Active VIN / truck cleared.");
+
+function buildInvoice(){
+  const h=+$("laborHours").value||0;
+  const r=+$("laborRate").value||0;
+  const svc=+$("serviceCall").value||0;
+  const parts=+$("partsCost").value||0;
+  const taxPct=+$("taxRate").value||0;
+  const cardPct=+$("cardFee").value||0;
+
+  const labor=h*r;
+  const subtotal=labor+svc+parts;
+  const tax=subtotal*(taxPct/100);
+  const card=(subtotal+tax)*(cardPct/100);
+  const total=subtotal+tax+card;
+
+  $("subTotal").textContent=money(subtotal);
+  $("taxTotal").textContent=money(tax);
+  $("cardTotal").textContent=money(card);
+  $("grandTotal").textContent=money(total);
+
+  buildCustomerInvoice();
 }
+
+function buildCustomerInvoice(){
+  const s=getShop();
+  const txt=
+`${s.name||"SHOP NAME"}
+${s.phone||""}
+${s.email||""}
+${s.website||""}
+${s.address||""}
+${s.taxId ? "Tax ID / EIN: "+s.taxId : ""}
+
+INVOICE #: ${$("invoiceNo").textContent}
+DATE: ${$("invoiceDate").textContent}
+STATUS: ${invoiceStatus}
+
+CUSTOMER:
+${$("custName").value}
+${$("custPhone").value}
+
+VEHICLE:
+${$("invoiceTruck").value}
+VIN: ${$("invoiceVin").value}
+
+LABOR:
+${$("laborDesc").value}
+${$("laborHours").value} hrs x ${money($("laborRate").value)}
+
+PARTS:
+${$("partsDesc").value}
+Parts: ${money($("partsCost").value)}
+
+Service Call: ${money($("serviceCall").value)}
+Subtotal: ${$("subTotal").textContent}
+Tax: ${$("taxTotal").textContent}
+Card Fee: ${$("cardTotal").textContent}
+
+TOTAL DUE:
+${$("grandTotal").textContent}
+
+TERMS:
+${s.terms||""}`;
+
+  $("quoteOut").textContent=txt;
+}
+
+function buildShopInvoice(){
+  const internalCost=+$("internalCost").value||0;
+  const total=Number(($("grandTotal").textContent||"$0").replace("$",""))||0;
+  const profit=total-internalCost;
+
+  buildCustomerInvoice();
+
+  $("quoteOut").textContent +=
+`
+
+==============================
+SHOP COPY / INTERNAL RECORD
+==============================
+
+INTERNAL COST:
+${money(internalCost)}
+
+ESTIMATED PROFIT:
+${money(profit)}
+
+SHOP NOTES:
+${$("internalNotes").value}
+
+STATUS:
+${invoiceStatus}
+
+PHOTO ATTACHED:
+${$("invoicePreview").style.display==="block" ? "YES" : "NO"}
+`;
+}
+
+function saveInvoice(){
+  const invoices=JSON.parse(localStorage.getItem("savedInvoices")||"[]");
+  invoices.unshift({
+    id:Date.now(),
+    no:$("invoiceNo").textContent,
+    date:$("invoiceDate").textContent,
+    status:invoiceStatus,
+    customer:$("custName").value,
+    total:$("grandTotal").textContent,
+    text:$("quoteOut").textContent
+  });
+  localStorage.setItem("savedInvoices",JSON.stringify(invoices));
+  alert("Invoice saved.");
+}
+
+function showSavedInvoices(){
+  const invoices=JSON.parse(localStorage.getItem("savedInvoices")||"[]");
+  if(!invoices.length){
+    $("savedOut").textContent="No saved invoices.";
+    return;
+  }
+
+  $("savedOut").textContent=invoices.map((i,idx)=>
+`#${idx+1}
+Invoice: ${i.no}
+Date: ${i.date}
+Status: ${i.status}
+Customer: ${i.customer}
+Total: ${i.total}
+
+${i.text}`
+  ).join("\n\n-------------------------\n\n");
+}
+
+function addInvoicePhotoToNotes(){
+  $("internalNotes").value += "\nPhoto/receipt attached to invoice.";
+}
+
+/* =====================================================
+   26. CLOCK / GPS / WORK ORDER / PROFIT
+===================================================== */
+function clockIn(){startTime=Date.now();$("clockOutBox").textContent="Clock running...";}
+function clockOut(){if(!startTime)return;const hrs=(Date.now()-startTime)/3600000;$("clockOutBox").textContent=`Billable Hours: ${hrs.toFixed(2)}`;}
+function resetClock(){startTime=null;$("clockOutBox").textContent="Clock reset.";}
+
+function copyWorkOrder(){
+  const txt=`Complaint:\n${$("woComplaint").value}\n\nCause:\n${$("woCause").value}\n\nCorrection:\n${$("woCorrection").value}`;
+  $("woOut").textContent=txt;
+  navigator.clipboard?.writeText(txt);
+}
+
+function getLocation(){
+  if(!navigator.geolocation)return alert("GPS not supported");
+  navigator.geolocation.getCurrentPosition(p=>{
+    $("pinOut").textContent=`Lat: ${p.coords.latitude}\nLng: ${p.coords.longitude}`;
+  });
+}
+
 function findNearestDealer(){
   if(!navigator.geolocation)return alert("GPS not supported");
   navigator.geolocation.getCurrentPosition(pos=>{
@@ -575,39 +1362,38 @@ function findNearestDealer(){
     window.open(`https://www.google.com/maps/search/${encodeURIComponent(q)}/@${pos.coords.latitude},${pos.coords.longitude},12z`,"_blank");
   });
 }
-function buildQuote(){
-  const h=+$("laborHours").value||0, r=+$("laborRate").value||0, c=+$("serviceCall").value||0, p=+$("partsCost").value||0;
-  const total=h*r+c+p;
-  $("quoteOut").textContent=`Customer: ${$("custName").value}\nLabor: $${(h*r).toFixed(2)}\nService Call: $${c.toFixed(2)}\nParts: $${p.toFixed(2)}\nTOTAL: $${total.toFixed(2)}`;
+
+function showProfit(){
+  const invoices=JSON.parse(localStorage.getItem("savedInvoices")||"[]");
+  const total=invoices.reduce((sum,i)=>sum+(Number(String(i.total).replace("$",""))||0),0);
+  $("profitOut").textContent=`Saved invoices: ${invoices.length}\nGross Sales: ${money(total)}`;
 }
-let startTime=null;
-function clockIn(){startTime=Date.now();$("clockOutBox").textContent="Clock running...";}
-function clockOut(){if(!startTime)return;const hrs=(Date.now()-startTime)/3600000;$("clockOutBox").textContent=`Billable Hours: ${hrs.toFixed(2)}`;}
-function resetClock(){startTime=null;$("clockOutBox").textContent="Clock reset.";}
-function copyWorkOrder(){
-  const txt=`Complaint:\n${$("woComplaint").value}\n\nCause:\n${$("woCause").value}\n\nCorrection:\n${$("woCorrection").value}`;
-  $("woOut").textContent=txt;navigator.clipboard?.writeText(txt);
-}
-function getLocation(){
-  if(!navigator.geolocation)return alert("GPS not supported");
-  navigator.geolocation.getCurrentPosition(p=>{
-    $("pinOut").textContent=`Lat: ${p.coords.latitude}\nLng: ${p.coords.longitude}`;
-  });
-}
-function saveSettings(){
-  localStorage.setItem("defaultLaborRate",$("defaultLaborRate").value);
-  localStorage.setItem("defaultServiceCall",$("defaultServiceCall").value);
-  alert("Settings saved.");
-}
+
 function startVoiceInput(){
   alert("Voice input placeholder. We can wire speech-to-text next.");
 }
+
+/* =====================================================
+   27. IMAGE PREVIEWS
+===================================================== */
 $("homeAiImage")?.addEventListener("change",function(){
   const file=this.files?.[0]; if(!file)return;
   $("homeAiPreview").src=URL.createObjectURL(file);
   $("homeAiPreview").style.display="block";
 });
+
+$("invoicePhoto")?.addEventListener("change",function(){
+  const file=this.files?.[0]; if(!file)return;
+  $("invoicePreview").src=URL.createObjectURL(file);
+  $("invoicePreview").style.display="block";
+});
+
+/* =====================================================
+   28. LOAD APP
+===================================================== */
+loadSettings();
 updateActiveTruck();
+setInvoiceStatus("UNPAID");
 </script>
 </body>
 </html>
