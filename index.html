@@ -1692,7 +1692,12 @@ NO DISCLAIMERS.
 `;
 
   try{
-    const ans=await callAI(prompt,"smart_parts_brain",note);
+    const modeToUse =
+  ($("vin")?.value || $("esnGlobal")?.value || $("cplGlobal")?.value)
+    ? "vin_oem_part_lookup"
+    : "smart_parts_brain";
+
+const ans = await callAI(prompt, modeToUse, note);
     $("partOut").textContent=ans;
   }catch(e){
     $("partOut").textContent="PART LOOKUP ERROR: "+e.message;
