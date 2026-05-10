@@ -1400,18 +1400,23 @@ async function callAI(question,mode="parts",notes=""){
   question: typeof notes === "object" ? notes.question : question,
 
   // 🔥 ADD THIS LINE (VIN FIX)
-  vin:
+ vin:
   $("vinGlobal")?.value ||
   $("vin")?.value ||
-  "",
+  (notes.match(/[A-HJ-NPR-Z0-9]{17}/i)?.[0] || ""),
 
-  year: $("yearGlobal")?.value || $("partYear")?.value || "",
-  make: $("makeGlobal")?.value || $("partMake")?.value || "",
-  model: $("modelGlobal")?.value || $("partModel")?.value || "",
-  engine: $("engine")?.value || "",
+year: $("yearGlobal")?.value || $("partYear")?.value || "",
+make: $("makeGlobal")?.value || $("partMake")?.value || "",
+model: $("modelGlobal")?.value || $("partModel")?.value || "",
+engine: $("engine")?.value || "",
 epa: $("epaGlobal")?.value || "",
-esn: $("esnGlobal")?.value || "",
-cpl: $("cplGlobal")?.value || "",
+esn:
+  $("esnGlobal")?.value ||
+  (notes.match(/\b\d{7,9}\b/)?.[0] || ""),
+
+cpl:
+  $("cplGlobal")?.value ||
+  (notes.match(/CPL\s*#?:?\s*(\d{3,5})/i)?.[1] || ""),
       mode,
   vehicleContext: ctx()
 })
