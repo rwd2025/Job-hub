@@ -967,18 +967,13 @@ body.notHome .activeTruck{display:none}
 </div>
 
 
-<script>
   
 
 
-<!-- =====================================================
-     MAIN SCRIPT — MOBILE MECHANIC PRO V36
-     CLEAN CONTROLLER
-===================================================== -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-
+<script>
 /* =====================================================
    1. APP CONFIG
 ===================================================== */
@@ -2320,7 +2315,7 @@ window.addEventListener("DOMContentLoaded", ()=>{
   setInvoiceStatus("UNPAID");
 
   wireImagePreview("homeAiImage","homeAiPreview");
-  wireImagePreview("invoicePhoto","invoicePreview");
+ wireInvoicePhotos();
 });
 </script>
 
