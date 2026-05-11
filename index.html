@@ -1448,31 +1448,46 @@ alert(JSON.stringify({
 
   const data = await res.json();
 
-  $("partOut").innerHTML = `
-<div class="profit-card">
 
-<div style="font-size:18px;font-weight:800;color:var(--orange);margin-bottom:10px;">
+$("partOut").innerHTML = `
+<div class="oracleCard">
+
+<div class="oracleTitle">
 ORACLE VERIFIED PART LOOKUP
 </div>
 
-<div><b>PART:</b> ${data.data?.oem_part || q}</div>
+<div class="oracleRow">
+<b>PART:</b><br>
+${data.data?.oem_part || "UNKNOWN"}
+</div>
 
-<div><b>FITMENT VERIFIED:</b>
+<div class="oracleRow">
+<b>ENGINE:</b><br>
+${data.data?.engine || "UNKNOWN"}
+</div>
+
+<div class="oracleRow">
+<b>YEAR:</b><br>
+${data.data?.year || "UNKNOWN"}
+</div>
+
+<div class="oracleRow">
+<b>FITMENT VERIFIED:</b><br>
 ${data.data?.verified_fitment ? "YES" : "NO"}
 </div>
 
-<div><b>SOURCE:</b>
+<div class="oracleRow">
+<b>SOURCE:</b><br>
 ${data.source || "oracle"}
 </div>
 
-<div style="margin-top:12px;">
+<div class="oracleRow">
 <b>NOTES:</b><br>
 ${(data.data?.notes || []).join("<br>")}
 </div>
 
 </div>
 `;
-
 }catch(e){
 
   $("partOut").textContent =
