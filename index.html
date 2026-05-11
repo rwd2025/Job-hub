@@ -843,17 +843,17 @@ body.notHome .activeTruck{display:none}
 
 <button class="danger" onclick="clearInvoice()" style="width:100%;margin-top:10px">
   CLEAR INVOICE
-</button>
-  <input
+   <input
   id="invoicePhoto"
   type="file"
   accept="image/*"
   multiple
+  capture="environment"
   style="display:none"
 >
 
-<div id="invoicePhotoList" class="result">
-No invoice photos attached.
+<div id="invoicePhotoList" class="result" style="margin-top:12px">
+  No invoice photos attached.
 </div>
     <label>Labor Description</label><input id="laborDesc" placeholder="Diagnostics, water pump, brakes">
     <div class="row">
@@ -2174,6 +2174,17 @@ function clearInvoice(){
     $("invoicePreview").src = "";
     $("invoicePreview").style.display = "none";
   }
+invoicePhotos = [];
+
+if($("invoicePhotoList")){
+  $("invoicePhotoList").textContent =
+    "No invoice photos attached.";
+}
+
+if($("invoicePhoto")){
+  $("invoicePhoto").value = "";
+}
+   
 }
 
 /* old aliases */
