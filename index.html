@@ -1487,7 +1487,7 @@ const res = await fetch(
 
 const data = await res.json();
 
-alert(JSON.stringify(data,null,2));
+
 
      
 $("partOut").innerHTML = `
@@ -1504,17 +1504,18 @@ ${data?.data?.oem_part || "UNKNOWN"}
 
 <div class="oracleRow">
 <b>ENGINE:</b><br>
-${data?.data?.engine || "UNKNOWN"}
+${data.data?.engine || "UNKNOWN"}
 </div>
 
 <div class="oracleRow">
 <b>YEAR:</b><br>
-${data?.data?.year || "UNKNOWN"}
+${data.data?.year || "UNKNOWN"}
 </div>
+
 
 <div class="oracleRow">
 <b>FITMENT VERIFIED:</b><br>
-${data?.data?.verified_fitment ? "YES" : "NO"}
+${data.data?.verified_fitment ? "YES" : "NO"}
 </div>
 
 <div class="oracleRow">
