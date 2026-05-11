@@ -1424,7 +1424,13 @@ async function askPart(){
     "";
 
   // NEW ORACLE API CALL
-const res = await fetch(
+alert(JSON.stringify({
+  vin: vin || null,
+  esn: esn || null,
+  cpl: cpl || null,
+  part_query: (q || note || "").trim()
+}, null, 2));
+     const res = await fetch(
   "https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/oracle-parts-search",
   {
     method:"POST",
