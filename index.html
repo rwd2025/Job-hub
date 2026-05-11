@@ -1492,32 +1492,32 @@ ORACLE VERIFIED PART LOOKUP
 
 <div class="oracleRow">
 <b>PART:</b><br>
-${data.data?.oem_part || "UNKNOWN"}
+${data?.data?.oem_part || "UNKNOWN"}
 </div>
 
 <div class="oracleRow">
 <b>ENGINE:</b><br>
-${data.data?.engine || "UNKNOWN"}
+${data?.data?.engine || "UNKNOWN"}
 </div>
 
 <div class="oracleRow">
 <b>YEAR:</b><br>
-${data.data?.year || "UNKNOWN"}
+${data?.data?.year || "UNKNOWN"}
 </div>
 
 <div class="oracleRow">
 <b>FITMENT VERIFIED:</b><br>
-${data.data?.verified_fitment ? "YES" : "NO"}
+${data?.data?.verified_fitment ? "YES" : "NO"}
 </div>
 
 <div class="oracleRow">
 <b>SOURCE:</b><br>
-${data.source || "oracle"}
+${data?.source || "oracle"}
 </div>
 
 <div class="oracleRow">
 <b>NOTES:</b><br>
-${(data.data?.notes || []).join("<br>")}
+${(data?.data?.notes || []).join("<br>")}
 </div>
 
 </div>
