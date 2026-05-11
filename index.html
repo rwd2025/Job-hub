@@ -1459,25 +1459,37 @@ async function askPart(){
 
   // NEW ORACLE API CALL
 
-     const res = await fetch(
-  "https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/oracle-parts-search",
+  const SUPABASE_ANON =
+"https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/oracle-parts-search";
+
+const SUPABASE_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4cGtxd2NtdnRxdnViaWJicmVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzk4NjQsImV4cCI6MjA5MjgxNTg2NH0.afiaSFqkRFEXW5nPQVRXKZcpKkS6iF3T_hTQC2P15HQ";
+
+const res = await fetch(
+  SUPABASE_ANON,
   {
     method:"POST",
+
     headers:{
-      "Content-Type":"application/json"
+      "Content-Type":"application/json",
+      "apikey":SUPABASE_KEY,
+      "Authorization":"Bearer " + SUPABASE_KEY
     },
+
     body: JSON.stringify({
       vin: vin || null,
       esn: esn || null,
       cpl: cpl || null,
-      part_query: (q || note || "").trim()
+      part_query:(q || note || "").trim()
     })
   }
 );
 
-  const data = await res.json();
-alert(JSON.stringify(data, null, 2));
+const data = await res.json();
 
+alert(JSON.stringify(data,null,2));
+
+     
 $("partOut").innerHTML = `
 <div class="oracleCard">
 
