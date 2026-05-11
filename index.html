@@ -1385,7 +1385,6 @@ async function homeAI(){
 ===================================================== */
 
    async function decodeVin(){
-
   const vin =
     $("vinGlobal")?.value.trim() ||
     $("invoiceVin")?.value.trim() ||
@@ -1397,105 +1396,52 @@ async function homeAI(){
   }
 
   const out = $("vinOut") || $("vinDecodeOut");
-
-  if(out){
-    out.textContent = "Decoding VIN...";
-  }
+  if(out) out.textContent = "Decoding VIN...";
 
   try{
-
-  const res = await fetch(
-"https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/oracle-parts-search",
-{
-
+    const res = await fetch(API_URL,{
       method:"POST",
-
       headers:{
         "Content-Type":"application/json",
-        "apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4cGtxd2NtdnRxdnViaWJicmVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzk4NjQsImV4cCI6MjA5MjgxNTg2NH0.afiaSFqkRFEXW5nPQVRXKZcpKkS6iF3T_hTQC2P15HQ",
-"Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4cGtxd2NtdnRxdnViaWJicmVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzk4NjQsImV4cCI6MjA5MjgxNTg2NH0.afiaSFqkRFEXW5nPQVRXKZcpKkS6iF3T_hTQC2P15HQ"
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY
       },
-
       body:JSON.stringify({
-        vin: vin,
-        esn: $("esnGlobal")?.value || null,
-        cpl: $("cplGlobal")?.value || null,
-        part_query: "VIN decode"
+        vin:vin,
+        esn:$("esnGlobal")?.value || null,
+        cpl:$("cplGlobal")?.value || null,
+        part_query:"VIN decode"
       })
-
     });
 
-const data = await res.json();
+    const data = await res.json();
 
-const year =
+    let year = data?.data?.year || "UNKNOWN";
+    let make = data?.data?.make || "UNKNOWN";
+    let model = data?.data?.model || "UNKNOWN";
+    let engine = data?.data?.engine || "UNKNOWN";
 
-  data.data?.year || "UNKNOWN";
-
-const make =
-
-  data.data?.make || "UNKNOWN";
-
-const model =
-
-  data.data?.model || "UNKNOWN";
-
-const engine =
-
-  data.data?.engine || "UNKNOWN";
-}
-
-$("yearGlobal").value = year;
-$("makeGlobal").value = make;
-$("modelGlobal").value = model;
-$("engineGlobal").value = engine;
-
-if(out){
-out.innerHTML = `
-
-<div class="oracleCard">
-
-<div class="oracleTitle">
-VIN DECODE SUCCESS
-</div>
-
-<div class="oracleRow">
-<b>VIN:</b><br>
-${vin}
-</div>
-
-<div class="oracleRow">
-<b>YEAR:</b><br>
-${year}
-</div>
-
-<div class="oracleRow">
-<b>MAKE:</b><br>
-${make}
-</div>
-
-<div class="oracleRow">
-<b>MODEL:</b><br>
-${model}
-</div>
-
-<div class="oracleRow">
-<b>ENGINE:</b><br>
-${engine}
-</div>
-
-</div>
-`;
-}
-
-  }catch(e){
+    setValue("yearGlobal", year);
+    setValue("makeGlobal", make);
+    setValue("modelGlobal", model);
+    setValue("engine", engine);
 
     if(out){
-      out.textContent =
-        "VIN ERROR: " + e.message;
+      out.innerHTML = `
+<div class="oracleCard">
+  <div class="oracleTitle">VIN DECODE SUCCESS</div>
+
+  <div class="oracleRow"><b>VIN:</b><br>${vin}</div>
+  <div class="oracleRow"><b>YEAR:</b><br>${year}</div>
+  <div class="oracleRow"><b>MAKE:</b><br>${make}</div>
+  <div class="oracleRow"><b>MODEL:</b><br>${model}</div>
+  <div class="oracleRow"><b>ENGINE:</b><br>${engine}</div>
+</div>`;
     }
 
+  }catch(e){
+    if(out) out.textContent = "VIN ERROR: " + e.message;
   }
-
 }
 
 function autoFillVinFromAnswer(txt){
