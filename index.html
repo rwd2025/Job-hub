@@ -1425,22 +1425,23 @@ async function homeAI(){
 
     });
 
-    const data = await res.json();
+const data = await res.json();
 
- if($("yearGlobal")){
-  $("yearGlobal").value = year;
-}
+const year =
 
-if($("makeGlobal")){
-  $("makeGlobal").value = make;
-}
+  data.data?.year || "UNKNOWN";
 
-if($("modelGlobal")){
-  $("modelGlobal").value = model;
-}
+const make =
 
-if($("engineGlobal")){
-  $("engineGlobal").value = engine;
+  data.data?.make || "UNKNOWN";
+
+const model =
+
+  data.data?.model || "UNKNOWN";
+
+const engine =
+
+  data.data?.engine || "UNKNOWN";
 }
 
 $("yearGlobal").value = year;
