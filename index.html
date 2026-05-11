@@ -1433,12 +1433,12 @@ async function askPart(){
         "apikey":SUPABASE_KEY,
         "Authorization":"Bearer " + SUPABASE_KEY
       },
-      body:JSON.stringify({
-        vin,
-        esn,
-        cpl,
-        part_query:q || note
-      })
+      body: JSON.stringify({
+  vin: vin || null,
+  esn: esn || null,
+  cpl: cpl || null,
+  part_query: (q || note || "").trim()
+})
     }
   );
 
