@@ -1334,7 +1334,7 @@ async function callAI(question, mode="parts", note=""){
     throw new Error(data.error || JSON.stringify(data));
   }
 
-  return data.answer || data.message || JSON.stringify(data) || "No answer returned.";
+  return data;
 }
 
 async function imageToBase64(file){
