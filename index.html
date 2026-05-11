@@ -1458,12 +1458,7 @@ async function askPart(){
     "";
 
   // NEW ORACLE API CALL
-alert(JSON.stringify({
-  vin: vin || null,
-  esn: esn || null,
-  cpl: cpl || null,
-  part_query: (q || note || "").trim()
-}, null, 2));
+
      const res = await fetch(
   "https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/oracle-parts-search",
   {
@@ -1481,7 +1476,7 @@ alert(JSON.stringify({
 );
 
   const data = await res.json();
-
+alert(JSON.stringify(data, null, 2));
 
 $("partOut").innerHTML = `
 <div class="oracleCard">
