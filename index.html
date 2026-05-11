@@ -1427,17 +1427,21 @@ async function homeAI(){
 
     const data = await res.json();
 
-  const year =
-  data.data?.year || "UNKNOWN";
+ if($("yearGlobal")){
+  $("yearGlobal").value = year;
+}
 
-const make =
-  data.data?.make || "UNKNOWN";
+if($("makeGlobal")){
+  $("makeGlobal").value = make;
+}
 
-const model =
-  data.data?.model || "UNKNOWN";
+if($("modelGlobal")){
+  $("modelGlobal").value = model;
+}
 
-const engine =
-  data.data?.engine || "UNKNOWN";
+if($("engineGlobal")){
+  $("engineGlobal").value = engine;
+}
 
 $("yearGlobal").value = year;
 $("makeGlobal").value = make;
