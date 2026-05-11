@@ -1383,6 +1383,7 @@ async function homeAI(){
    7. VIN DECODER
 ===================================================== */
 async function decodeVin(){
+
   const vin =
     $("vinGlobal")?.value.trim() ||
     $("invoiceVin")?.value.trim() ||
@@ -1394,16 +1395,100 @@ async function decodeVin(){
   }
 
   const out = $("vinOut") || $("vinDecodeOut");
-  if(out) out.textContent = "Decoding VIN...";
+
+  if(out){
+    out.textContent = "Decoding VIN...";
+  }
 
   try{
-    const ans = await callAI(vin, "vin_decode", "");
-    if(out) out.textContent = ans;
 
-    autoFillVinFromAnswer(ans);
+    const res = await fetch(SUPABASE_ANON,{
+
+      method:"POST",
+
+      headers:{
+        "Content-Type":"application/json",
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY
+      },
+
+      body:JSON.stringify({
+        vin: vin,
+        esn: $("esnGlobal")?.value || null,
+        cpl: $("cplGlobal")?.value || null,
+        part_query: "VIN decode"
+      })
+
+    });
+
+    const data = await res.json();
+
+    const year =
+      data?.data?.year ||
+      $("yearGlobal")?.value ||
+      "UNKNOWN";
+
+    const engine =
+      data?.data?.engine ||
+      $("engineGlobal")?.value ||
+      "UNKNOWN";
+
+    const make =
+      $("makeGlobal")?.value ||
+      "Kenworth";
+
+    const model =
+      $("modelGlobal")?.value ||
+      "UNKNOWN";
+
+    if($("yearGlobal")) $("yearGlobal").value = year;
+    if($("engineGlobal")) $("engineGlobal").value = engine;
+    if($("makeGlobal")) $("makeGlobal").value = make;
+    if($("modelGlobal")) $("modelGlobal").value = model;
+
+    if(out){
+
+      out.innerHTML = `
+      <div class="oracleCard">
+
+        <div class="oracleTitle">
+          VIN DECODE SUCCESS
+        </div>
+
+        <div class="oracleRow">
+          <b>VIN:</b><br>${vin}
+        </div>
+
+        <div class="oracleRow">
+          <b>YEAR:</b><br>${year}
+        </div>
+
+        <div class="oracleRow">
+          <b>MAKE:</b><br>${make}
+        </div>
+
+        <div class="oracleRow">
+          <b>MODEL:</b><br>${model}
+        </div>
+
+        <div class="oracleRow">
+          <b>ENGINE:</b><br>${engine}
+        </div>
+
+      </div>
+      `;
+
+    }
+
   }catch(e){
-    if(out) out.textContent = "VIN ERROR: " + e.message;
+
+    if(out){
+      out.textContent =
+        "VIN ERROR: " + e.message;
+    }
+
   }
+
 }
 
 function autoFillVinFromAnswer(txt){
