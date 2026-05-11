@@ -1403,14 +1403,16 @@ async function homeAI(){
 
   try{
 
-    const res = await fetch(SUPABASE_ANON,{
+  const res = await fetch(
+"https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/oracle-parts-search",
+{
 
       method:"POST",
 
       headers:{
         "Content-Type":"application/json",
-        "apikey":SUPABASE_KEY,
-        "Authorization":"Bearer " + SUPABASE_KEY
+        "apikey":"",
+"Authorization":"Bearer PASTE_YOUR_ANON_KEY_HERE"
       },
 
       body:JSON.stringify({
