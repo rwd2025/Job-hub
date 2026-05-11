@@ -1009,51 +1009,32 @@ body.notHome .activeTruck{display:none}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
 <script>
-/* =====================================================
-   1. APP CONFIG
-===================================================== */
 const SUPABASE_URL = "https://uxpkqwcmvtqvubibbrek.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4cGtxd2NtdnRxdnViaWJicmVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzk4NjQsImV4cCI6MjA5MjgxNTg2NH0.afiaSFqkRFEXW5nPQVRXKZcpKkS6iF3T_hTQC2P15HQ";
 const API_URL = "https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/oracle-parts-search";
 
-const supabaseClient = window.supabase
-  ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-  : null;
-
-const $ = (id) => document.getElementById(id);
+const $ = id => document.getElementById(id);
 
 let invoiceStatus = "UNPAID";
 let startTime = null;
 let clockInterval = null;
+let invoicePhotos = [];
 
-/* =====================================================
-   2. NAVIGATION
-===================================================== */
+function setValue(id,val){
+  const el = $(id);
+  if(el) el.value = val || "";
+}
+
 function show(id){
-  document.querySelectorAll(".section").forEach(s=>{
-    s.classList.remove("active");
-  });
-
-  const target = $(id);
-  if(target) target.classList.add("active");
-
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  if($(id)) $(id).classList.add("active");
   document.body.classList.toggle("notHome", id !== "home");
 
-  document.querySelectorAll(".bottomNav button").forEach(b=>{
-    b.classList.remove("active");
-  });
+  document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
 
-  const navMap = {
-    home: 1,
-    diag: 2,
-    parts: 3,
-    quote: 4,
-    work: 4
-  };
-
-  const navIndex = navMap[id];
-  if(navIndex){
-    const btn = document.querySelector(`.bottomNav button:nth-child(${navIndex})`);
+  const map = {home:1, diag:2, parts:3, quote:4};
+  if(map[id]){
+    const btn = document.querySelector(`.bottomNav button:nth-child(${map[id]})`);
     if(btn) btn.classList.add("active");
   }
 
@@ -1062,138 +1043,14 @@ function show(id){
 
 function toggleTopMenu(){
   const menu = $("topMenu");
-  if(!menu) return;
-
-  menu.style.display =
-    menu.style.display === "flex"
-      ? "none"
-      : "flex";
+  if(menu) menu.style.display = menu.style.display === "flex" ? "none" : "flex";
 }
 
 function openAiDrawer(){
   const drawer = $("aiDrawer");
-  if(!drawer) return;
-
-  drawer.style.display =
-    drawer.style.display === "block"
-      ? "none"
-      : "block";
+  if(drawer) drawer.style.display = drawer.style.display === "block" ? "none" : "block";
 }
 
-/* =====================================================
-   3. HAPTIC FEEDBACK
-===================================================== */
-function tap(){
-  if(navigator.vibrate){
-    navigator.vibrate(35);
-  }
-}
-
-document.addEventListener("click", e=>{
-  if(e.target.closest("button")){
-    tap();
-  }
-});
-
-/* =====================================================
-   4. SHOP / BUSINESS SETTINGS
-===================================================== */
-function defaultShop(){
-  return {
-    name: "Rolling Wrench Diesel LLC",
-    owner: "",
-    phone: "260-502-6222",
-    email: "",
-    website: "www.rollingwrenchdiesel.com",
-    address: "",
-    taxId: "",
-    prefix: "RWD",
-    laborRate: "135",
-    serviceCall: "250",
-    mileageRate: "2.00",
-    partsRunRate: "2.50",
-    tax: "0",
-    cardFee: "0",
-    terms: "Payment due upon completion. Parts and labor warranty subject to shop policy."
-  };
-}
-
-function getShop(){
-  return {
-    ...defaultShop(),
-    ...JSON.parse(localStorage.getItem("shopSettings") || "{}")
-  };
-}
-
-function saveSettings(){
-  const shop = {
-    name: $("shopName")?.value || "Rolling Wrench Diesel LLC",
-    owner: $("shopOwner")?.value || "",
-    phone: $("shopPhone")?.value || "",
-    email: $("shopEmail")?.value || "",
-    website: $("shopWebsite")?.value || "",
-    address: $("shopAddress")?.value || "",
-    taxId: $("shopTaxId")?.value || "",
-    prefix: $("invoicePrefix")?.value || "RWD",
-    laborRate: $("defaultLaborRate")?.value || "135",
-    serviceCall: $("defaultServiceCall")?.value || "250",
-    mileageRate: $("mileageRateDefault")?.value || "2.00",
-    partsRunRate: $("partsRunRateDefault")?.value || "2.50",
-    tax: $("defaultTax")?.value || "0",
-    cardFee: $("defaultCardFee")?.value || "0",
-    terms: $("shopTerms")?.value || ""
-  };
-
-  localStorage.setItem("shopSettings", JSON.stringify(shop));
-  loadSettings();
-
-  if($("settingsOut")){
-    $("settingsOut").textContent = "Business settings saved.";
-  }
-}
-
-function loadSettings(){
-  const s = getShop();
-
-  setValue("shopName", s.name);
-  setValue("shopOwner", s.owner);
-  setValue("shopPhone", s.phone);
-  setValue("shopEmail", s.email);
-  setValue("shopWebsite", s.website);
-  setValue("shopAddress", s.address);
-  setValue("shopTaxId", s.taxId);
-  setValue("invoicePrefix", s.prefix);
-  setValue("defaultLaborRate", s.laborRate);
-  setValue("defaultServiceCall", s.serviceCall);
-  setValue("mileageRateDefault", s.mileageRate);
-  setValue("partsRunRateDefault", s.partsRunRate);
-  setValue("defaultTax", s.tax);
-  setValue("defaultCardFee", s.cardFee);
-  setValue("shopTerms", s.terms);
-
-  setValue("laborRate", s.laborRate);
-  setValue("serviceCall", s.serviceCall);
-  setValue("taxRate", s.tax);
-  setValue("cardFee", s.cardFee);
-  setValue("mileageRate", s.mileageRate);
-  setValue("partsRunRate", s.partsRunRate);
-
-  if($("homeShopName")){
-    $("homeShopName").textContent =
-      (s.name || "ROLLING WRENCH DIESEL").replace(" LLC","");
-  }
-
-  updateInvoiceHeader();
-}
-
-function setValue(id,val){
-  const el = $(id);
-  if(el) el.value = val || "";
-}
-
-/* =====================================================
-   5. ACTIVE TRUCK / VIN MEMORY
-===================================================== */
 function ctx(){
   return `
 Year: ${$("yearGlobal")?.value || "unknown"}
@@ -1207,16 +1064,77 @@ CPL: ${$("cplGlobal")?.value || "unknown"}
 `.trim();
 }
 
+function defaultShop(){
+  return {
+    name:"Rolling Wrench Diesel LLC",
+    phone:"260-502-6222",
+    website:"www.rollingwrenchdiesel.com",
+    prefix:"RWD",
+    laborRate:"135",
+    serviceCall:"250",
+    tax:"0",
+    cardFee:"0",
+    terms:"Payment due upon completion. Parts and labor warranty subject to shop policy."
+  };
+}
+
+function getShop(){
+  return {...defaultShop(), ...JSON.parse(localStorage.getItem("shopSettings") || "{}")};
+}
+
+function saveSettings(){
+  const shop = {
+    name:$("shopName")?.value || "Rolling Wrench Diesel LLC",
+    owner:$("shopOwner")?.value || "",
+    phone:$("shopPhone")?.value || "",
+    email:$("shopEmail")?.value || "",
+    website:$("shopWebsite")?.value || "",
+    address:$("shopAddress")?.value || "",
+    taxId:$("shopTaxId")?.value || "",
+    prefix:$("invoicePrefix")?.value || "RWD",
+    laborRate:$("defaultLaborRate")?.value || "135",
+    serviceCall:$("defaultServiceCall")?.value || "250",
+    tax:$("defaultTax")?.value || "0",
+    cardFee:$("defaultCardFee")?.value || "0",
+    terms:$("shopTerms")?.value || ""
+  };
+
+  localStorage.setItem("shopSettings", JSON.stringify(shop));
+  loadSettings();
+  if($("settingsOut")) $("settingsOut").textContent = "Business settings saved.";
+}
+
+function loadSettings(){
+  const s = getShop();
+
+  setValue("shopName", s.name);
+  setValue("shopPhone", s.phone);
+  setValue("shopWebsite", s.website);
+  setValue("invoicePrefix", s.prefix);
+  setValue("defaultLaborRate", s.laborRate);
+  setValue("defaultServiceCall", s.serviceCall);
+  setValue("defaultTax", s.tax);
+  setValue("defaultCardFee", s.cardFee);
+  setValue("shopTerms", s.terms);
+
+  setValue("laborRate", s.laborRate);
+  setValue("serviceCall", s.serviceCall);
+  setValue("taxRate", s.tax);
+  setValue("cardFee", s.cardFee);
+
+  updateInvoiceHeader();
+}
+
 function saveActiveTruck(){
   const truck = {
-    vin: $("vinGlobal")?.value || "",
-    year: $("yearGlobal")?.value || "",
-    make: $("makeGlobal")?.value || "",
-    model: $("modelGlobal")?.value || "",
-    engine: $("engine")?.value || "",
-    epa: $("epaGlobal")?.value || "",
-    esn: $("esnGlobal")?.value || "",
-    cpl: $("cplGlobal")?.value || ""
+    vin:$("vinGlobal")?.value || "",
+    year:$("yearGlobal")?.value || "",
+    make:$("makeGlobal")?.value || "",
+    model:$("modelGlobal")?.value || "",
+    engine:$("engine")?.value || "",
+    epa:$("epaGlobal")?.value || "",
+    esn:$("esnGlobal")?.value || "",
+    cpl:$("cplGlobal")?.value || ""
   };
 
   localStorage.setItem("activeTruck", JSON.stringify(truck));
@@ -1233,14 +1151,10 @@ function updateActiveTruck(){
 
   if($("activeTruckName")){
     $("activeTruckName").textContent =
-      t.make || t.model
-        ? `${t.year || ""} ${t.make || ""} ${t.model || ""}`.trim()
-        : "None";
+      t.make || t.model ? `${t.year || ""} ${t.make || ""} ${t.model || ""}`.trim() : "None";
   }
 
-  if($("activeTruckVin")){
-    $("activeTruckVin").textContent = t.vin || "None";
-  }
+  if($("activeTruckVin")) $("activeTruckVin").textContent = t.vin || "None";
 
   if(t.vin){
     setValue("vinGlobal", t.vin);
@@ -1257,89 +1171,54 @@ function updateActiveTruck(){
 }
 
 function clearVehicleData(){
-  [
-    "vinGlobal",
-    "vin",
-    "invoiceVin",
-    "invoiceTruck",
-    "yearGlobal",
-    "makeGlobal",
-    "modelGlobal",
-    "engine",
-    "epaGlobal",
-    "esnGlobal",
-    "cplGlobal"
-  ].forEach(id=>setValue(id,""));
+  ["vinGlobal","invoiceVin","invoiceTruck","yearGlobal","makeGlobal","modelGlobal","engine","epaGlobal","esnGlobal","cplGlobal"]
+    .forEach(id=>setValue(id,""));
 
   localStorage.removeItem("activeTruck");
   updateActiveTruck();
   alert("Active VIN / truck cleared.");
 }
 
-/* =====================================================
-   6. AI / BACKEND CALLS
-===================================================== */
 async function callAI(question, mode="parts", note=""){
-  const noteText =
-    typeof note === "string"
-      ? note
-      : JSON.stringify(note || {});
-
-  const noteVin =
-    noteText.match(/[A-HJ-NPR-Z0-9]{17}/i)?.[0] || "";
-
-  const noteEsn =
-    noteText.match(/\b\d{7,9}\b/)?.[0] || "";
-
-  const noteCpl =
-    noteText.match(/CPL\s*#?:?\s*(\d{3,5})/i)?.[1] || "";
+  const noteText = typeof note === "string" ? note : JSON.stringify(note || {});
+  const noteVin = noteText.match(/[A-HJ-NPR-Z0-9]{17}/i)?.[0] || "";
+  const noteEsn = noteText.match(/\b\d{7,9}\b/)?.[0] || "";
+  const noteCpl = noteText.match(/CPL\s*#?:?\s*(\d{3,5})/i)?.[1] || "";
 
   const res = await fetch(API_URL,{
     method:"POST",
     headers:{
-  "Content-Type":"application/json",
-  "apikey":SUPABASE_KEY,
-  "Authorization":"Bearer " + SUPABASE_KEY
-},
+      "Content-Type":"application/json",
+      "apikey":SUPABASE_KEY,
+      "Authorization":"Bearer " + SUPABASE_KEY
+    },
     body:JSON.stringify({
+      part_query: question,
       part: question,
       question,
       note,
       mode,
 
-      vin:
-        noteVin ||
-        $("invoiceVin")?.value ||
-        $("vinGlobal")?.value ||
-        "",
-
+      vin: noteVin || $("invoiceVin")?.value || $("vinGlobal")?.value || "",
       year: $("yearGlobal")?.value || "",
       make: $("makeGlobal")?.value || "",
       model: $("modelGlobal")?.value || "",
       engine: $("engine")?.value || "",
       epa: $("epaGlobal")?.value || "",
-
-      esn:
-        noteEsn ||
-        $("esnGlobal")?.value ||
-        "",
-
-      cpl:
-        noteCpl ||
-        $("cplGlobal")?.value ||
-        "",
-
+      esn: noteEsn || $("esnGlobal")?.value || "",
+      cpl: noteCpl || $("cplGlobal")?.value || "",
       vehicleContext: ctx()
     })
   });
 
   const data = await res.json();
 
-  if(!res.ok){
-    throw new Error(data.error || JSON.stringify(data));
-  }
+  if(!res.ok) throw new Error(data.error || JSON.stringify(data));
 
-  return data;
+  if(data.answer) return data.answer;
+  if(data.message) return data.message;
+  if(data.data) return JSON.stringify(data.data,null,2);
+  return JSON.stringify(data,null,2);
 }
 
 async function imageToBase64(file){
@@ -1356,43 +1235,31 @@ async function homeAI(){
   const file = $("homeAiImage")?.files?.[0];
 
   if(!q && !file){
-    $("homeAiOut").textContent =
-      "Ask Diesel AI a diagnostic question, part lookup, VIN question, or upload a picture.";
+    $("homeAiOut").textContent = "Ask Diesel AI a diagnostic question, part lookup, VIN question, or upload a picture.";
     return;
   }
 
-  $("homeAiOut").textContent =
-    file ? "Diesel AI reading image..." : "Diesel AI thinking...";
+  $("homeAiOut").textContent = file ? "Diesel AI reading image..." : "Diesel AI thinking...";
 
-  let imageData = "";
+  let payload = q;
 
   if(file){
-    imageData = await imageToBase64(file);
-    imageData = imageData.split(",")[1];
+    const imageData = await imageToBase64(file);
+    payload = {
+      question:q || "Analyze uploaded image",
+      image:imageData.split(",")[1]
+    };
   }
 
-  const payload = {
-    question: q || "Analyze the uploaded image.",
-    image: imageData
-  };
-
   try{
-    $("homeAiOut").textContent =
-      await callAI(q || "Analyze uploaded image", "diesel_ai", payload);
+    $("homeAiOut").textContent = await callAI(q || "Analyze uploaded image", "diesel_ai", payload);
   }catch(e){
     $("homeAiOut").textContent = "Diesel AI error: " + e.message;
   }
 }
 
-/* =====================================================
-   7. VIN DECODER
-===================================================== */
-
-   async function decodeVin(){
-  const vin =
-    $("vinGlobal")?.value.trim() ||
-    $("invoiceVin")?.value.trim() ||
-    "";
+async function decodeVin(){
+  const vin = $("vinGlobal")?.value.trim() || $("invoiceVin")?.value.trim() || "";
 
   if(!vin){
     alert("Enter VIN first.");
@@ -1411,7 +1278,7 @@ async function homeAI(){
         "Authorization":"Bearer " + SUPABASE_KEY
       },
       body:JSON.stringify({
-        vin:vin,
+        vin,
         esn:$("esnGlobal")?.value || null,
         cpl:$("cplGlobal")?.value || null,
         part_query:"VIN decode"
@@ -1432,14 +1299,19 @@ async function homeAI(){
 
     if(out){
       out.innerHTML = `
-<div class="oracleCard">
+<div class="oracleCard compactVin">
   <div class="oracleTitle">VIN DECODE SUCCESS</div>
-
-  <div class="oracleRow"><b>VIN:</b><br>${vin}</div>
-  <div class="oracleRow"><b>YEAR:</b><br>${year}</div>
-  <div class="oracleRow"><b>MAKE:</b><br>${make}</div>
-  <div class="oracleRow"><b>MODEL:</b><br>${model}</div>
-  <div class="oracleRow"><b>ENGINE:</b><br>${engine}</div>
+  <div class="vinGrid">
+    <div><b>VIN</b><span>${vin}</span></div>
+    <div><b>YEAR</b><span>${year}</span></div>
+    <div><b>MAKE</b><span>${make}</span></div>
+    <div><b>MODEL</b><span>${model}</span></div>
+    <div><b>ENGINE</b><span>${engine}</span></div>
+    <div><b>ESN</b><span>${$("esnGlobal")?.value || "Add ESN"}</span></div>
+    <div><b>CPL</b><span>${$("cplGlobal")?.value || "Add CPL"}</span></div>
+    <div><b>VERIFY</b><span>${data?.data?.verified_fitment ? "VIN/ESN/CPL" : "VIN only"}</span></div>
+  </div>
+  <div class="oracleNote">Saved into active truck fields. Use it for parts, filters, diagnostics, and quotes.</div>
 </div>`;
     }
 
@@ -1448,23 +1320,6 @@ async function homeAI(){
   }
 }
 
-function autoFillVinFromAnswer(txt){
-  const year = txt.match(/YEAR:\s*(.*)/i)?.[1]?.trim() || "";
-  const make = txt.match(/MAKE:\s*(.*)/i)?.[1]?.trim() || "";
-  const model = txt.match(/MODEL:\s*(.*)/i)?.[1]?.trim() || "";
-  const engine = txt.match(/ENGINE:\s*(.*)/i)?.[1]?.trim() || "";
-  const epa = txt.match(/EPA:\s*(.*)/i)?.[1]?.trim() || "";
-
-  if(year) setValue("yearGlobal", year);
-  if(make) setValue("makeGlobal", make);
-  if(model) setValue("modelGlobal", model);
-  if(engine) setValue("engine", engine);
-  if(epa) setValue("epaGlobal", epa);
-}
-
-/* =====================================================
-   8. PARTS / FILTERS / DIAGNOSTICS
-===================================================== */
 async function askPart(){
   const q = $("partq")?.value.trim() || "";
   const note = $("partNote")?.value.trim() || "";
@@ -1476,114 +1331,44 @@ async function askPart(){
 
   $("partOut").textContent = "Looking up part...";
 
-  const mode =
-    $("vinGlobal")?.value ||
-    $("invoiceVin")?.value ||
-    $("esnGlobal")?.value ||
-    $("cplGlobal")?.value
-      ? "vin_oem_part_lookup"
-      : "smart_parts_brain";
-
   try{
+    const res = await fetch(API_URL,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY
+      },
+      body:JSON.stringify({
+        vin:$("vinGlobal")?.value || $("invoiceVin")?.value || null,
+        esn:$("esnGlobal")?.value || null,
+        cpl:$("cplGlobal")?.value || null,
+        part_query:(q || note).trim()
+      })
+    });
 
-  const vin =
-    $("vinGlobal")?.value ||
-    $("invoiceVin")?.value ||
-    "";
+    const data = await res.json();
 
-  const esn =
-    $("esnGlobal")?.value ||
-    "";
+    $("partOut").innerHTML = `
+<div class="oracleCard compactVin">
+  <div class="oracleTitle">ORACLE VERIFIED PART LOOKUP</div>
+  <div class="vinGrid">
+    <div><b>PART</b><span>${data?.data?.oem_part || "UNKNOWN"}</span></div>
+    <div><b>ENGINE</b><span>${data?.data?.engine || "UNKNOWN"}</span></div>
+    <div><b>YEAR</b><span>${data?.data?.year || "UNKNOWN"}</span></div>
+    <div><b>FITMENT</b><span>${data?.data?.verified_fitment ? "YES" : "NO"}</span></div>
+    <div><b>SOURCE</b><span>${data?.source || "oracle"}</span></div>
+    <div><b>VIN</b><span>${data?.data?.vin || "No VIN"}</span></div>
+  </div>
+  <div class="oracleNote">${(data?.data?.notes || []).join("<br>")}</div>
+</div>`;
 
-  const cpl =
-    $("cplGlobal")?.value ||
-    "";
-
-  // NEW ORACLE API CALL
-
-  const SUPABASE_ANON =
-"https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/oracle-parts-search";
-
-const SUPABASE_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4cGtxd2NtdnRxdnViaWJicmVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzk4NjQsImV4cCI6MjA5MjgxNTg2NH0.afiaSFqkRFEXW5nPQVRXKZcpKkS6iF3T_hTQC2P15HQ";
-
-const res = await fetch(
-  SUPABASE_ANON,
-  {
-    method:"POST",
-
-    headers:{
-      "Content-Type":"application/json",
-      "apikey":SUPABASE_KEY,
-      "Authorization":"Bearer " + SUPABASE_KEY
-    },
-
-    body: JSON.stringify({
-      vin: vin || null,
-      esn: esn || null,
-      cpl: cpl || null,
-      part_query:(q || note || "").trim()
-    })
+  }catch(e){
+    $("partOut").textContent = "ORACLE SEARCH ERROR: " + e.message;
   }
-);
-
-const data = await res.json();
-
-
-
-     
-$("partOut").innerHTML = `
-<div class="oracleCard">
-
-<div class="oracleTitle">
-ORACLE VERIFIED PART LOOKUP
-</div>
-
-<div class="oracleRow">
-<b>PART:</b><br>
-${data?.data?.oem_part || "UNKNOWN"}
-</div>
-
-<div class="oracleRow">
-<b>ENGINE:</b><br>
-${data.data?.engine || "UNKNOWN"}
-</div>
-
-<div class="oracleRow">
-<b>YEAR:</b><br>
-${data.data?.year || "UNKNOWN"}
-</div>
-
-
-<div class="oracleRow">
-<b>FITMENT VERIFIED:</b><br>
-${data.data?.verified_fitment ? "YES" : "NO"}
-</div>
-
-<div class="oracleRow">
-<b>SOURCE:</b><br>
-${data?.source || "oracle"}
-</div>
-
-<div class="oracleRow">
-<b>NOTES:</b><br>
-${(data?.data?.notes || []).join("<br>")}
-</div>
-
-</div>
-`;
-}catch(e){
-
-  $("partOut").textContent =
-    "ORACLE SEARCH ERROR: " + e.message;
-
 }
 
-}
-
-function verifyPartWeb(){
-  askPart();
-}
+function verifyPartWeb(){ askPart(); }
 
 async function lookupFilter(){
   const q = $("filterq")?.value.trim() || "";
@@ -1601,10 +1386,6 @@ async function lookupFilter(){
   }catch(e){
     $("filterOut").textContent = "FILTER ERROR: " + e.message;
   }
-}
-
-async function verifyFilterWeb(){
-  lookupFilter();
 }
 
 async function runDiag(){
@@ -1626,52 +1407,38 @@ async function runDiag(){
 }
 
 async function troubleshootFault(){
-  const q = $("diagFault")?.value.trim() || $("troubleq")?.value.trim() || "";
-  const note = $("diagNotes")?.value.trim() || "";
-
+  const q = $("troubleq")?.value.trim() || "";
   if(!q){
     alert("Enter fault or symptom first.");
     return;
   }
 
-  const out = $("diagAnswer") || $("troubleOut");
-  if(out) out.textContent = "Troubleshooting...";
+  $("troubleOut").textContent = "Troubleshooting...";
 
   try{
-    const ans = await callAI(q, "engine_pattern_lookup", note);
-    if(out) out.textContent = ans;
+    $("troubleOut").textContent = await callAI(q, "engine_pattern_lookup", "");
   }catch(e){
-    if(out) out.textContent = "TROUBLESHOOTER ERROR: " + e.message;
+    $("troubleOut").textContent = "TROUBLESHOOTER ERROR: " + e.message;
   }
 }
 
-/* aliases for newer layout */
 const askDiag = runDiag;
 const askFilter = lookupFilter;
 const askTrouble = troubleshootFault;
 
-/* =====================================================
-   9. PROFESSIONAL INVOICE / QUOTE
-===================================================== */
-function money(n){
-  return "$" + Number(n || 0).toFixed(2);
-}
+function money(n){ return "$" + Number(n || 0).toFixed(2); }
 
 function updateInvoiceHeader(){
   const s = getShop();
 
-  if($("invoiceShopName")){
-    $("invoiceShopName").textContent = s.name;
-  }
+  if($("invoiceShopName")) $("invoiceShopName").textContent = s.name;
 
   if($("invoiceShopInfo")){
     $("invoiceShopInfo").innerHTML =
       `${s.phone || ""}<br>${s.email || ""}<br>${s.website || ""}<br>${s.address || ""}<br>${s.taxId ? "Tax ID / EIN: " + s.taxId : ""}`;
   }
 
-  if($("invoiceDate")){
-    $("invoiceDate").textContent = new Date().toLocaleString();
-  }
+  if($("invoiceDate")) $("invoiceDate").textContent = new Date().toLocaleString();
 
   if($("invoiceNo") && !$("invoiceNo").textContent){
     const n = Number(localStorage.getItem("invoiceCounter") || "1000") + 1;
@@ -1682,20 +1449,17 @@ function updateInvoiceHeader(){
 
 function setInvoiceStatus(status){
   invoiceStatus = status;
-
   document.querySelectorAll(".statusBtn").forEach(btn=>{
     btn.classList.remove("active");
-    if(btn.textContent.trim() === status){
-      btn.classList.add("active");
-    }
+    if(btn.textContent.trim() === status) btn.classList.add("active");
   });
 }
 
 function calcInvoiceTotals(){
-  const h = Number($("laborHours")?.value || $("hours")?.value || 0);
-  const r = Number($("laborRate")?.value || $("rate")?.value || 0);
+  const h = Number($("laborHours")?.value || 0);
+  const r = Number($("laborRate")?.value || 0);
   const parts = Number($("partsCost")?.value || 0);
-  const service = Number($("serviceCall")?.value || $("callOut")?.value || 0);
+  const service = Number($("serviceCall")?.value || 0);
   const taxPct = Number($("taxRate")?.value || 0);
   const cardPct = Number($("cardFee")?.value || 0);
 
@@ -1723,23 +1487,18 @@ function buildCustomerInvoice(){
   const s = getShop();
   const t = calcInvoiceTotals();
 
-  const invoiceNo = $("invoiceNo")?.textContent || "";
-  const invoiceDate = $("invoiceDate")?.textContent || new Date().toLocaleString();
-
   const txt =
 `${s.name}
 ${s.phone}
-${s.email}
-${s.website}
-${s.address}
-${s.taxId ? "Tax ID / EIN: " + s.taxId : ""}
+${s.email || ""}
+${s.website || ""}
 
-INVOICE #: ${invoiceNo}
-DATE: ${invoiceDate}
+INVOICE #: ${$("invoiceNo")?.textContent || ""}
+DATE: ${$("invoiceDate")?.textContent || new Date().toLocaleString()}
 STATUS: ${invoiceStatus}
 
 CUSTOMER:
-${$("custName")?.value || $("customer")?.value || ""}
+${$("custName")?.value || ""}
 ${$("custPhone")?.value || ""}
 
 VEHICLE:
@@ -1747,11 +1506,11 @@ ${$("invoiceTruck")?.value || ctx()}
 VIN: ${$("invoiceVin")?.value || $("vinGlobal")?.value || ""}
 
 LABOR:
-${$("laborDesc")?.value || $("jobName")?.value || "Labor"}
+${$("laborDesc")?.value || "Labor"}
 Labor Total: ${money(t.labor)}
 
 PARTS:
-${$("partsDesc")?.value || $("partsUsed")?.value || ""}
+${$("partsDesc")?.value || ""}
 Parts: ${money(t.parts)}
 
 Service Call: ${money(t.service)}
@@ -1763,7 +1522,7 @@ TOTAL DUE:
 ${money(t.total)}
 
 TERMS:
-${s.terms}`;
+${s.terms || ""}`;
 
   if($("quoteOut")) $("quoteOut").textContent = txt;
   return txt;
@@ -1773,54 +1532,32 @@ function buildShopInvoice(){
   const customerCopy = buildCustomerInvoice();
   const internalCost = Number($("internalCost")?.value || 0);
   const t = calcInvoiceTotals();
-  const profit = t.total - internalCost;
 
   const shopCopy =
 `${customerCopy}
 
-==============================
-SHOP COPY / INTERNAL RECORD
-==============================
+SHOP COPY
+Internal Cost: ${money(internalCost)}
+Estimated Profit: ${money(t.total - internalCost)}
 
-INTERNAL COST:
-${money(internalCost)}
-
-ESTIMATED PROFIT:
-${money(profit)}
-
-SHOP NOTES:
-${$("internalNotes")?.value || ""}
-
-STATUS:
-${invoiceStatus}
-
-PHOTO ATTACHED:
-${$("invoicePreview")?.style.display === "block" ? "YES" : "NO"}
-`;
+Notes:
+${$("internalNotes")?.value || ""}`;
 
   if($("quoteOut")) $("quoteOut").textContent = shopCopy;
   return shopCopy;
 }
 
 function saveInvoice(){
-  const text =
-    $("quoteOut")?.textContent ||
-    buildCustomerInvoice();
-
-  if(!text.trim()){
-    alert("Build invoice first.");
-    return;
-  }
+  const text = $("quoteOut")?.textContent || buildCustomerInvoice();
 
   const invoices = JSON.parse(localStorage.getItem("savedInvoices") || "[]");
-
   invoices.unshift({
-    id: Date.now(),
-    no: $("invoiceNo")?.textContent || "",
-    date: $("invoiceDate")?.textContent || new Date().toLocaleString(),
-    status: invoiceStatus,
-    customer: $("custName")?.value || $("customer")?.value || "",
-    total: $("grandTotal")?.textContent || "",
+    id:Date.now(),
+    no:$("invoiceNo")?.textContent || "",
+    date:$("invoiceDate")?.textContent || new Date().toLocaleString(),
+    status:invoiceStatus,
+    customer:$("custName")?.value || "",
+    total:$("grandTotal")?.textContent || "",
     text
   });
 
@@ -1830,8 +1567,7 @@ function saveInvoice(){
 
 function showSavedInvoices(){
   const invoices = JSON.parse(localStorage.getItem("savedInvoices") || "[]");
-  const out = $("savedOut") || $("invoiceList");
-
+  const out = $("savedOut");
   if(!out) return;
 
   if(!invoices.length){
@@ -1840,124 +1576,54 @@ function showSavedInvoices(){
   }
 
   out.innerHTML = invoices.map(inv=>`
-    <div style="border:1px solid ${inv.status === "PAID" ? "#20b765" : "#e14b4b"};border-radius:14px;padding:12px;margin-bottom:12px;background:#111">
+    <div style="border:1px solid #444;border-radius:14px;padding:12px;margin-bottom:12px;background:#111">
       <b>${inv.status} — ${inv.no}</b><br>
       ${inv.date}<br>
       Customer: ${inv.customer}<br>
       Total: ${inv.total}<br><br>
       <pre style="white-space:pre-wrap;color:#ffd6a0">${inv.text}</pre>
-      <button onclick="openSavedInvoice(${inv.id})" style="width:100%;margin-top:8px">OPEN</button>
-      <button onclick="toggleSavedInvoicePaid(${inv.id})" style="width:100%;margin-top:8px">MARK PAID / UNPAID</button>
     </div>
   `).join("");
 }
 
-function openSavedInvoice(id){
-  const invoices = JSON.parse(localStorage.getItem("savedInvoices") || "[]");
-  const inv = invoices.find(x=>x.id===id);
-  if(!inv) return;
-
-  show("quote");
-  if($("quoteOut")) $("quoteOut").textContent = inv.text;
-  setInvoiceStatus(inv.status || "UNPAID");
-}
-
-function toggleSavedInvoicePaid(id){
-  const invoices = JSON.parse(localStorage.getItem("savedInvoices") || "[]");
-
-  const updated = invoices.map(inv=>{
-    if(inv.id !== id) return inv;
-    const status = inv.status === "PAID" ? "UNPAID" : "PAID";
-    return {...inv,status};
-  });
-
-  localStorage.setItem("savedInvoices", JSON.stringify(updated));
-  showSavedInvoices();
-}
-
-function addInvoicePhotoToNotes(){
-  if($("internalNotes")){
-    $("internalNotes").value += "\nPhoto / receipt attached.";
-  }
-}
-
 function clearInvoice(){
-  [
-    "custName","custPhone","invoiceTruck","invoiceVin",
-    "laborDesc","laborHours","partsDesc","partsCost",
-    "serviceCall","internalCost","internalNotes"
-  ].forEach(id=>setValue(id,""));
+  ["custName","custPhone","invoiceTruck","invoiceVin","laborDesc","laborHours","partsDesc","partsCost","serviceCall","internalCost","internalNotes"]
+    .forEach(id=>setValue(id,""));
 
+  invoicePhotos = [];
+  if($("invoicePhotoList")) $("invoicePhotoList").textContent = "No invoice photos attached.";
   if($("quoteOut")) $("quoteOut").textContent = "Invoice cleared.";
-  if($("invoicePreview")){
-    $("invoicePreview").src = "";
-    $("invoicePreview").style.display = "none";
+}
+
+function showProfit(){
+  const invoices = JSON.parse(localStorage.getItem("savedInvoices") || "[]");
+  const total = invoices.reduce((sum,i)=>sum + (Number(String(i.total || "0").replace("$","")) || 0),0);
+
+  if($("profitOut")){
+    $("profitOut").textContent =
+`Saved invoices:
+${invoices.length}
+
+Gross Sales:
+${money(total)}`;
   }
-invoicePhotos = [];
-
-if($("invoicePhotoList")){
-  $("invoicePhotoList").textContent =
-    "No invoice photos attached.";
 }
-
-if($("invoicePhoto")){
-  $("invoicePhoto").value = "";
-}
-   
-}
-
-/* old aliases */
-const calcQuote = buildInvoice;
-
-/* =====================================================
-   10. GPS / MILEAGE / PARTS RUN
-===================================================== */
-let tripStart = null;
-let partsStart = null;
 
 function getGpsOnce(){
   return new Promise((resolve,reject)=>{
-    if(!navigator.geolocation){
-      reject(new Error("GPS not supported"));
-      return;
-    }
+    if(!navigator.geolocation) return reject(new Error("GPS not supported"));
 
     navigator.geolocation.getCurrentPosition(
       pos=>resolve({
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude,
-        accuracy: pos.coords.accuracy,
-        time: new Date().toLocaleString()
+        lat:pos.coords.latitude,
+        lng:pos.coords.longitude,
+        accuracy:pos.coords.accuracy,
+        time:new Date().toLocaleString()
       }),
       err=>reject(err),
       {enableHighAccuracy:true, timeout:15000}
     );
   });
-}
-
-function milesBetween(a,b){
-  const R = 3958.8;
-  const dLat = (b.lat - a.lat) * Math.PI / 180;
-  const dLng = (b.lng - a.lng) * Math.PI / 180;
-  const lat1 = a.lat * Math.PI / 180;
-  const lat2 = b.lat * Math.PI / 180;
-
-  const x =
-    Math.sin(dLat/2)**2 +
-    Math.cos(lat1) * Math.cos(lat2) *
-    Math.sin(dLng/2)**2;
-
-  return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
-}
-
-async function setShopLocation(){
-  try{
-    const loc = await getGpsOnce();
-    localStorage.setItem("shopLocation", JSON.stringify(loc));
-    $("pinOut").textContent = `SHOP LOCATION SAVED\nLat: ${loc.lat}\nLng: ${loc.lng}`;
-  }catch(e){
-    $("pinOut").textContent = "GPS ERROR: " + e.message;
-  }
 }
 
 async function setJobLocation(){
@@ -1970,156 +1636,20 @@ async function setJobLocation(){
   }
 }
 
-async function startMileageTrip(){
-  try{
-    tripStart = await getGpsOnce();
-    localStorage.setItem("tripStart", JSON.stringify(tripStart));
-    $("pinOut").textContent = `TRIP STARTED\n${tripStart.time}\nLat: ${tripStart.lat}\nLng: ${tripStart.lng}`;
-  }catch(e){
-    $("pinOut").textContent = "GPS ERROR: " + e.message;
-  }
-}
-
-async function stopMileageTrip(){
-  try{
-    const end = await getGpsOnce();
-    const start = JSON.parse(localStorage.getItem("tripStart") || "null");
-
-    if(!start){
-      alert("Start trip first.");
-      return;
-    }
-
-    const miles = milesBetween(start,end);
-    const rate = Number($("mileageRate")?.value || getShop().mileageRate || 0);
-    const total = miles * rate;
-
-    localStorage.setItem("lastTripMiles", miles.toFixed(2));
-    localStorage.setItem("lastTripCharge", total.toFixed(2));
-
-    const txt =
-`TRIP COMPLETE
-
-Trip Miles:
-${miles.toFixed(2)} miles
-
-Mileage Rate:
-${money(rate)} / mile
-
-Travel Charge:
-${money(total)}
-
-Started:
-${start.time}
-
-Stopped:
-${end.time}`;
-
-    if($("gpsTotals")) $("gpsTotals").textContent = txt;
-    if($("pinOut")) $("pinOut").textContent = txt;
-  }catch(e){
-    $("pinOut").textContent = "GPS ERROR: " + e.message;
-  }
-}
-
-async function startPartsRun(){
-  try{
-    partsStart = await getGpsOnce();
-    localStorage.setItem("partsStart", JSON.stringify(partsStart));
-    $("pinOut").textContent = `PARTS RUN STARTED\n${partsStart.time}`;
-  }catch(e){
-    $("pinOut").textContent = "GPS ERROR: " + e.message;
-  }
-}
-
-async function stopPartsRun(){
-  try{
-    const end = await getGpsOnce();
-    const start = JSON.parse(localStorage.getItem("partsStart") || "null");
-
-    if(!start){
-      alert("Start parts run first.");
-      return;
-    }
-
-    const miles = milesBetween(start,end);
-    const rate = Number($("partsRunRate")?.value || getShop().partsRunRate || 0);
-    const total = miles * rate;
-
-    localStorage.setItem("lastPartsMiles", miles.toFixed(2));
-    localStorage.setItem("lastPartsCharge", total.toFixed(2));
-
-    const txt =
-`PARTS RUN COMPLETE
-
-Parts Run Miles:
-${miles.toFixed(2)} miles
-
-Parts Run Rate:
-${money(rate)} / mile
-
-Parts Run Charge:
-${money(total)}`;
-
-    if($("gpsTotals")) $("gpsTotals").textContent = txt;
-    if($("pinOut")) $("pinOut").textContent = txt;
-  }catch(e){
-    $("pinOut").textContent = "GPS ERROR: " + e.message;
-  }
-}
-
-function addMileageToInvoice(){
-  const trip = Number(localStorage.getItem("lastTripCharge") || 0);
-  const parts = Number(localStorage.getItem("lastPartsCharge") || 0);
-  const current = Number($("serviceCall")?.value || $("callOut")?.value || 0);
-  const newTotal = current + trip + parts;
-
-  setValue("serviceCall", newTotal.toFixed(2));
-  setValue("callOut", newTotal.toFixed(2));
-
-  alert("GPS mileage charges added to invoice.");
-}
-
-function openJobMaps(){
-  const job = JSON.parse(localStorage.getItem("jobLocation") || "null");
-
-  if(!job){
-    alert("Save job location first.");
-    return;
-  }
-
-  window.open(`https://maps.google.com/?q=${job.lat},${job.lng}`, "_blank");
-}
+const getLocation = setJobLocation;
 
 function findNearestDealer(){
-  if(!navigator.geolocation){
-    alert("GPS not supported");
-    return;
-  }
+  if(!navigator.geolocation) return alert("GPS not supported");
 
   navigator.geolocation.getCurrentPosition(pos=>{
     const q = "FleetPride OR Cummins Dealer OR Kenworth OR Peterbilt OR Freightliner Parts";
-    window.open(
-      `https://www.google.com/maps/search/${encodeURIComponent(q)}/@${pos.coords.latitude},${pos.coords.longitude},12z`,
-      "_blank"
-    );
+    window.open(`https://www.google.com/maps/search/${encodeURIComponent(q)}/@${pos.coords.latitude},${pos.coords.longitude},12z`, "_blank");
   });
 }
 
-/* old GPS aliases */
-const getLocation = setJobLocation;
-const dropPin = setJobLocation;
-
-/* =====================================================
-   11. CLOCK / LABOR
-===================================================== */
 function clockIn(){
   startTime = Date.now();
-
-  if(clockInterval){
-    clearInterval(clockInterval);
-  }
-
+  if(clockInterval) clearInterval(clockInterval);
   clockInterval = setInterval(updateClockLive,1000);
   updateClockLive();
 }
@@ -2129,7 +1659,6 @@ function updateClockLive(){
 
   const hours = (Date.now() - startTime) / 3600000;
   const rate = Number($("laborRate")?.value || getShop().laborRate || 0);
-  const labor = hours * rate;
 
   $("clockOutBox").textContent =
 `LIVE JOB RUNNING
@@ -2138,22 +1667,16 @@ Hours:
 ${hours.toFixed(2)}
 
 Labor:
-${money(labor)}`;
+${money(hours * rate)}`;
 }
 
 function clockOut(){
-  if(!startTime){
-    alert("Start job first.");
-    return;
-  }
+  if(!startTime) return alert("Start job first.");
 
-  if(clockInterval){
-    clearInterval(clockInterval);
-  }
+  if(clockInterval) clearInterval(clockInterval);
 
   const hours = (Date.now() - startTime) / 3600000;
   setValue("laborHours", hours.toFixed(2));
-  setValue("hours", hours.toFixed(2));
 
   if($("clockOutBox")){
     $("clockOutBox").textContent =
@@ -2170,81 +1693,32 @@ Sent to invoice labor hours.`;
 
 function resetClock(){
   startTime = null;
-
-  if(clockInterval){
-    clearInterval(clockInterval);
-  }
-
-  if($("clockOutBox")){
-    $("clockOutBox").textContent = "Clock reset.";
-  }
+  if(clockInterval) clearInterval(clockInterval);
+  if($("clockOutBox")) $("clockOutBox").textContent = "Clock reset.";
 }
 
-function addClockToWork(){
-  show("quote");
-  alert("Clock hours are already sent to invoice labor hours.");
-}
-
-/* =====================================================
-   12. WORK ORDER / HISTORY
-===================================================== */
 function copyWorkOrder(){
   const txt =
 `WORK ORDER
 
 Customer:
-${$("customer")?.value || $("custName")?.value || ""}
+${$("custName")?.value || ""}
 
 Vehicle:
 ${ctx()}
 
 Complaint:
-${$("complaint")?.value || $("woComplaint")?.value || ""}
+${$("woComplaint")?.value || ""}
 
 Cause:
 ${$("woCause")?.value || ""}
 
 Correction:
-${$("woCorrection")?.value || $("workText")?.value || ""}`;
+${$("woCorrection")?.value || ""}`;
 
   if($("woOut")) $("woOut").textContent = txt;
-  if($("workOut")) $("workOut").textContent = txt;
-
   navigator.clipboard?.writeText(txt);
 }
-
-function saveJob(){
-  const jobs = JSON.parse(localStorage.getItem("savedJobs") || "[]");
-
-  jobs.unshift({
-    date: new Date().toLocaleString(),
-    customer: $("customer")?.value || $("custName")?.value || "",
-    vehicle: ctx(),
-    work: $("workText")?.value || $("woCorrection")?.value || ""
-  });
-
-  localStorage.setItem("savedJobs", JSON.stringify(jobs));
-  alert("Job saved.");
-}
-
-function showProfit(){
-  const invoices = JSON.parse(localStorage.getItem("savedInvoices") || "[]");
-  const total = invoices.reduce((sum,i)=>{
-    const n = Number(String(i.total || "0").replace("$","")) || 0;
-    return sum + n;
-  },0);
-
-  if($("profitOut")){
-    $("profitOut").textContent =
-`Saved invoices:
-${invoices.length}
-
-Gross Sales:
-${money(total)}`;
-  }
-}
-
-let invoicePhotos = [];
 
 async function readFileBase64(file){
   return new Promise((resolve,reject)=>{
@@ -2266,39 +1740,26 @@ function renderInvoicePhotos(){
 
   box.innerHTML = invoicePhotos.map((p,i)=>`
     PHOTO ${i+1}: ${p.name}<br>
-    Added: ${p.added}<br>
     <img src="${p.data}" style="width:100%;border-radius:14px;margin:8px 0">
   `).join("<hr>");
 }
 
 async function readInvoicePhotos(){
-  if(!invoicePhotos.length){
-    alert("Add invoice photo first.");
-    return;
-  }
+  if(!invoicePhotos.length) return alert("Add invoice photo first.");
 
-  $("quoteOut").textContent = "Reading invoice photos for part numbers...";
+  $("quoteOut").textContent = "Reading invoice photos...";
 
   try{
     const latest = invoicePhotos[invoicePhotos.length - 1];
 
     const ans = await callAI(
-      "Read this invoice/receipt/part label photo. Extract part numbers, supplier, description, quantity, price, and anything useful for invoice line items.",
+      "Read this invoice/receipt/part label photo. Extract part numbers, supplier, description, quantity, price, and useful invoice line items.",
       "invoice_photo_ocr",
-      {
-        image: latest.data.split(",")[1],
-        question: "Extract invoice/receipt/part numbers from photo"
-      }
+      {image:latest.data.split(",")[1]}
     );
 
-    if($("internalNotes")){
-      $("internalNotes").value += "\n\nPHOTO OCR RESULT:\n" + ans;
-    }
-
-    if($("partsDesc")){
-      $("partsDesc").value += ($("partsDesc").value ? "\n" : "") + ans;
-    }
-
+    if($("internalNotes")) $("internalNotes").value += "\n\nPHOTO OCR:\n" + ans;
+    if($("partsDesc")) $("partsDesc").value += "\n" + ans;
     $("quoteOut").textContent = ans;
 
   }catch(e){
@@ -2312,29 +1773,21 @@ function wireInvoicePhotos(){
 
   input.addEventListener("change", async function(){
     const files = Array.from(this.files || []);
-
     for(const file of files){
-      const base64 = await readFileBase64(file);
-
       invoicePhotos.push({
         name:file.name,
         type:file.type,
-        data:base64,
+        data:await readFileBase64(file),
         added:new Date().toLocaleString()
       });
     }
-
     renderInvoicePhotos();
   });
 }
-   
-/* =====================================================
-   13. IMAGE PREVIEWS
-===================================================== */
+
 function wireImagePreview(inputId, previewId){
   const input = $(inputId);
   const preview = $(previewId);
-
   if(!input || !preview) return;
 
   input.addEventListener("change", function(){
@@ -2346,14 +1799,6 @@ function wireImagePreview(inputId, previewId){
   });
 }
 
-/* =====================================================
-   14. UTILS / COPY / VOICE
-===================================================== */
-function copyText(id){
-  navigator.clipboard?.writeText($(id)?.textContent || "");
-  alert("Copied.");
-}
-
 function startVoiceInput(){
   if(!("webkitSpeechRecognition" in window)){
     alert("Voice input not supported on this browser yet.");
@@ -2362,55 +1807,16 @@ function startVoiceInput(){
 
   const recognition = new webkitSpeechRecognition();
   recognition.lang = "en-US";
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-
   recognition.onresult = e=>{
-    const text = e.results[0][0].transcript;
-    const active =
-      $("homeAiAsk") ||
-      $("diagq") ||
-      $("partq");
-
-    if(active){
-      active.value = text;
-    }
+    if($("homeAiAsk")) $("homeAiAsk").value = e.results[0][0].transcript;
   };
-
   recognition.start();
 }
 
-/* =====================================================
-   15. SAFE ERROR LOGGING
-===================================================== */
-window.addEventListener("error", function(e){
-  localStorage.setItem("rwd_last_error",
-`APP ERROR
-
-Message:
-${e.message}
-
-Line:
-${e.lineno}
-
-Time:
-${new Date().toLocaleString()}`);
+window.addEventListener("error", e=>{
+  localStorage.setItem("rwd_last_error", `APP ERROR\n${e.message}\nLine: ${e.lineno}`);
 });
 
-window.addEventListener("unhandledrejection", function(e){
-  localStorage.setItem("rwd_last_promise_error",
-`PROMISE ERROR
-
-Reason:
-${e.reason}
-
-Time:
-${new Date().toLocaleString()}`);
-});
-
-/* =====================================================
-   16. APP LOAD
-===================================================== */
 window.addEventListener("DOMContentLoaded", ()=>{
   loadSettings();
   updateActiveTruck();
@@ -2418,10 +1824,9 @@ window.addEventListener("DOMContentLoaded", ()=>{
   setInvoiceStatus("UNPAID");
 
   wireImagePreview("homeAiImage","homeAiPreview");
- wireInvoicePhotos();
+  wireInvoicePhotos();
 });
 </script>
-
 <div style="text-align:center;font-size:11px;color:#777;padding:20px;opacity:.8;">
 © 2026 Rolling Wrench Diesel LLC.<br>
 Mobile Mechanic Pro V36 — All Rights Reserved.
