@@ -1862,10 +1862,71 @@ async function askPart(){
       : "smart_parts_brain";
 
   try{
-    $("partOut").textContent = await callAI(q || note, mode, note);
-  }catch(e){
-    $("partOut").textContent = "PART LOOKUP ERROR: " + e.message;
-  }
+
+  const vin =
+    $("vinGlobal")?.value ||
+    $("invoiceVin")?.value ||
+    "";
+
+  const esn =
+    $("esnGlobal")?.value ||
+    "";
+
+  const cpl =
+    $("cplGlobal")?.value ||
+    "";
+
+  // NEW ORACLE API CALL
+  const res = await fetch(
+    "https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/oracle-parts-search",
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY
+      },
+      body:JSON.stringify({
+        vin,
+        esn,
+        cpl,
+        part_query:q || note
+      })
+    }
+  );
+
+  const data = await res.json();
+
+  $("partOut").innerHTML = `
+<div class="profit-card">
+
+<div style="font-size:18px;font-weight:800;color:var(--orange);margin-bottom:10px;">
+ORACLE VERIFIED PART LOOKUP
+</div>
+
+<div><b>PART:</b> ${data.data?.oem_part || q}</div>
+
+<div><b>FITMENT VERIFIED:</b>
+${data.data?.verified_fitment ? "YES" : "NO"}
+</div>
+
+<div><b>SOURCE:</b>
+${data.source || "oracle"}
+</div>
+
+<div style="margin-top:12px;">
+<b>NOTES:</b><br>
+${(data.data?.notes || []).join("<br>")}
+</div>
+
+</div>
+`;
+
+}catch(e){
+
+  $("partOut").textContent =
+    "ORACLE SEARCH ERROR: " + e.message;
+
 }
 
 function verifyPartWeb(){
