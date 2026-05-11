@@ -1424,23 +1424,21 @@ async function askPart(){
     "";
 
   // NEW ORACLE API CALL
-  const res = await fetch(
-    "https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/oracle-parts-search",
-    {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "apikey":SUPABASE_KEY,
-        "Authorization":"Bearer " + SUPABASE_KEY
-      },
-      body: JSON.stringify({
-  vin: vin || null,
-  esn: esn || null,
-  cpl: cpl || null,
-  part_query: (q || note || "").trim()
-})
-    }
-  );
+const res = await fetch(
+  "https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/oracle-parts-search",
+  {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body: JSON.stringify({
+      vin: vin || null,
+      esn: esn || null,
+      cpl: cpl || null,
+      part_query: (q || note || "").trim()
+    })
+  }
+);
 
   const data = await res.json();
 
