@@ -1426,62 +1426,60 @@ async function homeAI(){
 
     const data = await res.json();
 
-    const year =
-      data?.data?.year ||
-      $("yearGlobal")?.value ||
-      "UNKNOWN";
+  const year =
+  data.data?.year || "UNKNOWN";
 
-    const engine =
-      data?.data?.engine ||
-      $("engineGlobal")?.value ||
-      "UNKNOWN";
+const make =
+  data.data?.make || "UNKNOWN";
 
-    const make =
-      $("makeGlobal")?.value ||
-      "Kenworth";
+const model =
+  data.data?.model || "UNKNOWN";
 
-    const model =
-      $("modelGlobal")?.value ||
-      "UNKNOWN";
+const engine =
+  data.data?.engine || "UNKNOWN";
 
-    if($("yearGlobal")) $("yearGlobal").value = year;
-    if($("engineGlobal")) $("engineGlobal").value = engine;
-    if($("makeGlobal")) $("makeGlobal").value = make;
-    if($("modelGlobal")) $("modelGlobal").value = model;
+$("yearGlobal").value = year;
+$("makeGlobal").value = make;
+$("modelGlobal").value = model;
+$("engineGlobal").value = engine;
 
-    if(out){
+if(out){
+out.innerHTML = `
 
-      out.innerHTML = `
-      <div class="oracleCard">
+<div class="oracleCard">
 
-        <div class="oracleTitle">
-          VIN DECODE SUCCESS
-        </div>
+<div class="oracleTitle">
+VIN DECODE SUCCESS
+</div>
 
-        <div class="oracleRow">
-          <b>VIN:</b><br>${vin}
-        </div>
+<div class="oracleRow">
+<b>VIN:</b><br>
+${vin}
+</div>
 
-        <div class="oracleRow">
-          <b>YEAR:</b><br>${year}
-        </div>
+<div class="oracleRow">
+<b>YEAR:</b><br>
+${year}
+</div>
 
-        <div class="oracleRow">
-          <b>MAKE:</b><br>${make}
-        </div>
+<div class="oracleRow">
+<b>MAKE:</b><br>
+${make}
+</div>
 
-        <div class="oracleRow">
-          <b>MODEL:</b><br>${model}
-        </div>
+<div class="oracleRow">
+<b>MODEL:</b><br>
+${model}
+</div>
 
-        <div class="oracleRow">
-          <b>ENGINE:</b><br>${engine}
-        </div>
+<div class="oracleRow">
+<b>ENGINE:</b><br>
+${engine}
+</div>
 
-      </div>
-      `;
-
-    }
+</div>
+`;
+}
 
   }catch(e){
 
