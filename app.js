@@ -307,9 +307,7 @@ async function askPart(){
   }catch(e){
     $("partOut").textContent = "ORACLE SEARCH ERROR: " + e.message;
   }
-}
 async function getRepairKit(component){
-
   const { data, error } = await supabase
     .from("repair_kits")
     .select("*")
@@ -354,16 +352,15 @@ ${data.repair_notes}
 `;
 }
 
-async function testRepairKit(){
 window.testRepairKit = async function(){
-
   alert("Button works");
 
   const result = await getRepairKit("Water Pump");
 
   alert(result);
-
 };
+
+
   async function runDoctorSearch(){
   const q = $("doctorAsk")?.value.trim() || "";
   if(!q){
