@@ -305,7 +305,8 @@ async function askPart(){
 
     renderOracleCard("partOut","ORACLE VERIFIED PART LOOKUP",data);
   }catch(e){
-    $("partOut").textContent = "ORACLE SEARCH ERROR: " + e.message;
+    $("partOut").textContent = "ORACLE SEARCH ERROR: " + }
+ }
   }
 async function getRepairKit(component){
   const { data, error } = await supabase
