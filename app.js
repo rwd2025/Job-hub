@@ -355,13 +355,16 @@ ${data.repair_notes}
 }
 
 async function testRepairKit(){
+window.testRepairKit = async function(){
+
+  alert("Button works");
 
   const result = await getRepairKit("Water Pump");
 
   alert(result);
 
-}
-async function runDoctorSearch(){
+};
+  async function runDoctorSearch(){
   const q = $("doctorAsk")?.value.trim() || "";
   if(!q){
     $("doctorOut").textContent = "Ask Diesel Doctor a question first.";
