@@ -308,7 +308,59 @@ async function askPart(){
     $("partOut").textContent = "ORACLE SEARCH ERROR: " + e.message;
   }
 }
+async function getRepairKit(component){
 
+  const { data, error } = await supabase
+    .from("repair_kits")
+    .select("*")
+    .ilike("component_name", `%${component}%`)
+    .limit(1)
+    .single();
+
+  if(error || !data){
+    return "No repair kit found.";
+  }
+
+  return `
+🔧 COMPONENT:
+${data.component_name}
+
+🚛 ENGINE:
+${data.engine_family}
+
+📦 OEM PART:
+${data.oem_part_number}
+
+🧰 GASKETS:
+${data.gasket_set}
+
+🛑 SEALS:
+${data.seals}
+
+⭕ O-RINGS:
+${data.o_rings}
+
+⚙️ HARDWARE:
+${data.hardware}
+
+⏱ LABOR HOURS:
+${data.labor_hours}
+
+📏 TORQUE NOTES:
+${data.torque_specs}
+
+📝 REPAIR NOTES:
+${data.repair_notes}
+`;
+}
+
+async function testRepairKit(){
+
+  const result = await getRepairKit("Water Pump");
+
+  alert(result);
+
+}
 async function runDoctorSearch(){
   const q = $("doctorAsk")?.value.trim() || "";
   if(!q){
