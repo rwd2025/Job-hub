@@ -1,0 +1,611 @@
+:root{
+  --bg:#03080c;
+  --panel:#071018;
+  --panel2:#0b151d;
+  --card:#101820;
+  --line:#2e3a42;
+  --neon:#39ff14;
+  --orange:#ff7b00;
+  --text:#ffffff;
+  --muted:#aeb8bf;
+  --warn:#ffd27f;
+  --red:#ff3b30;
+}
+
+*{box-sizing:border-box}
+
+html,body{
+  margin:0;
+  background:
+    radial-gradient(circle at top,#10202a 0%,#03080c 45%,#010203 100%);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+  min-height:100vh;
+  padding-bottom:110px;
+}
+
+.appShell{
+  width:100%;
+  max-width:1180px;
+  margin:0 auto;
+  padding:18px;
+}
+
+.topBar{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:10px 0 22px;
+}
+
+.iconBtn{
+  width:54px;
+  height:54px;
+  border:1px solid var(--line);
+  background:#071018;
+  color:#fff;
+  font-size:26px;
+  border-radius:14px;
+}
+
+.brandBlock{
+  flex:1;
+  min-width:0;
+}
+
+.brandMain{
+  font-size:34px;
+  font-weight:900;
+  letter-spacing:2px;
+  line-height:1;
+  white-space:nowrap;
+}
+
+.brandMain span{color:var(--text)}
+.brandSub{
+  color:var(--muted);
+  margin-top:8px;
+  letter-spacing:3px;
+  font-size:14px;
+}
+
+.topStatus{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#fff;
+  font-weight:700;
+  border-right:1px solid var(--line);
+  padding-right:18px;
+}
+
+.onlineDot{
+  display:inline-block;
+  width:11px;
+  height:11px;
+  background:var(--neon);
+  border-radius:50%;
+  box-shadow:0 0 12px var(--neon);
+}
+
+.sideMenu{
+  position:fixed;
+  top:0;
+  left:0;
+  width:min(330px,88vw);
+  height:100vh;
+  background:#071018;
+  border-right:2px solid var(--orange);
+  z-index:50;
+  padding:24px;
+  display:none;
+  flex-direction:column;
+  gap:12px;
+  box-shadow:0 0 50px #000;
+}
+
+.sideMenu.open{display:flex}
+
+.sideMenu button{
+  text-align:left;
+  background:#101820;
+  border:1px solid var(--line);
+  color:#fff;
+  padding:16px;
+  border-radius:14px;
+  font-size:17px;
+  font-weight:800;
+}
+
+.truckCard{
+  display:flex;
+  gap:20px;
+  align-items:stretch;
+  background:linear-gradient(180deg,#101820,#081018);
+  border:1px solid #40515c;
+  border-radius:20px;
+  padding:18px;
+  margin-bottom:34px;
+}
+
+.truckImage{
+  width:175px;
+  min-height:120px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#050a0e;
+  border:1px solid #32434e;
+  border-radius:14px;
+  font-size:70px;
+}
+
+.truckData{
+  flex:1;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+.dataCell{
+  border-left:1px solid #283944;
+  padding-left:14px;
+  min-width:0;
+}
+
+.dataCell small{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:6px;
+}
+
+.dataCell strong{
+  font-size:17px;
+  overflow-wrap:anywhere;
+}
+
+.changeTruckBtn{
+  border:1px solid var(--neon);
+  background:#071018;
+  color:var(--neon);
+  border-radius:10px;
+  font-weight:900;
+}
+
+.screen{
+  display:none;
+}
+
+.screen.active{
+  display:block;
+}
+
+.heroTitle{
+  text-align:center;
+  color:#fff;
+  font-size:36px;
+  letter-spacing:4px;
+  font-style:italic;
+  text-shadow:0 0 24px rgba(57,255,20,.4);
+}
+
+.heroTitle::first-letter,
+.screenTitle{
+  color:var(--orange);
+}
+
+.searchPanel{
+  display:flex;
+  gap:16px;
+  align-items:stretch;
+  border:2px solid var(--neon);
+  background:#071018;
+  box-shadow:0 0 25px rgba(57,255,20,.35);
+  border-radius:18px;
+  padding:18px;
+  margin:26px auto 28px;
+}
+
+.searchBox{
+  flex:1;
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+}
+
+.searchBox span{
+  font-size:32px;
+  color:var(--muted);
+  padding-top:8px;
+}
+
+textarea,input{
+  width:100%;
+  background:#05090c;
+  border:1px solid #39464e;
+  border-radius:14px;
+  color:#fff;
+  padding:16px;
+  font-size:17px;
+  outline:none;
+}
+
+textarea{
+  min-height:105px;
+  resize:vertical;
+}
+
+.searchPanel textarea{
+  min-height:74px;
+  border:none;
+  background:transparent;
+  padding:10px 0;
+  font-size:20px;
+}
+
+.searchBtn,
+button{
+  cursor:pointer;
+}
+
+.searchBtn,
+.buttonRow button,
+main > button,
+.resultBox button,
+.schematicBox button,
+.fileLabel{
+  background:linear-gradient(#ff9500,#f26a00);
+  color:#fff;
+  border:none;
+  border-radius:14px;
+  padding:16px 22px;
+  font-size:16px;
+  font-weight:900;
+  letter-spacing:.5px;
+}
+
+.secondaryBtn{
+  width:100%;
+  margin:10px 0;
+  background:#141414;
+  border:1px solid #454545;
+}
+
+.toolGrid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:16px;
+}
+
+.toolCard{
+  min-height:245px;
+  background:linear-gradient(180deg,#111b23,#070c11);
+  border:1px solid #3c4b55;
+  border-radius:18px;
+  color:#fff;
+  padding:22px 14px;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  box-shadow:inset 0 0 22px rgba(255,255,255,.02);
+}
+
+.toolCard:hover{
+  border-color:var(--neon);
+  box-shadow:0 0 18px rgba(57,255,20,.2);
+}
+
+.toolIcon{
+  font-size:54px;
+  color:var(--neon);
+}
+
+.toolCard h2{
+  font-size:22px;
+  line-height:1.12;
+  margin:8px 0;
+}
+
+.toolCard p{
+  color:#cbd3d8;
+  font-size:14px;
+  line-height:1.35;
+  margin:0;
+}
+
+.toolCard span{
+  font-size:28px;
+}
+
+.toolCard em{
+  display:inline-block;
+  color:#ffe600;
+  border:1px solid #425000;
+  border-radius:6px;
+  padding:5px 7px;
+  font-style:normal;
+  font-size:11px;
+  font-weight:900;
+}
+
+.locked{
+  opacity:.93;
+}
+
+.statusGrid{
+  margin:30px 0 20px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  background:#071018;
+  border:1px solid #3b4b55;
+  border-radius:18px;
+  padding:18px;
+}
+
+.statusGrid div{
+  border-left:1px solid #2a3a44;
+  padding-left:14px;
+}
+
+.statusGrid b{
+  display:block;
+  color:#d7dde0;
+  margin-bottom:10px;
+}
+
+.statusGrid span{
+  display:block;
+  color:var(--neon);
+  font-weight:900;
+  font-size:18px;
+}
+
+.statusGrid small{
+  color:var(--muted);
+}
+
+.screenTitle{
+  font-size:34px;
+  letter-spacing:2px;
+  margin:10px 0 20px;
+}
+
+label{
+  display:block;
+  color:#dce3e6;
+  font-weight:900;
+  letter-spacing:1px;
+  font-size:13px;
+  margin-bottom:14px;
+}
+
+label input,
+label textarea{
+  margin-top:8px;
+  font-weight:400;
+  letter-spacing:0;
+}
+
+.formGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.buttonRow{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin:12px 0;
+}
+
+.resultBox{
+  background:#061720;
+  border:1px solid #1973a7;
+  border-radius:18px;
+  color:#ffd7a0;
+  padding:22px;
+  margin:18px 0;
+  font-size:17px;
+  line-height:1.45;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+
+.miniResult{
+  min-height:72px;
+}
+
+.oracleCard{
+  background:#07141d;
+  border:1px solid #0d5f8f;
+  border-radius:22px;
+  padding:16px;
+  color:#fff;
+}
+
+.oracleTitle{
+  color:var(--orange);
+  font-size:22px;
+  font-weight:900;
+  margin-bottom:14px;
+}
+
+.vinGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.vinGrid div{
+  background:#051018;
+  border:1px solid #164b6b;
+  border-radius:14px;
+  padding:10px;
+}
+
+.vinGrid b{
+  display:block;
+  color:#ffcf8a;
+  font-size:11px;
+  margin-bottom:5px;
+}
+
+.vinGrid span{
+  display:block;
+  color:#fff;
+  font-size:14px;
+  line-height:1.25;
+}
+
+.oracleNote{
+  margin-top:12px;
+  color:#ffd6a0;
+  font-size:13px;
+}
+
+.previewImg{
+  max-width:100%;
+  border-radius:16px;
+  display:none;
+  margin:12px 0;
+}
+
+.fileLabel{
+  display:inline-block;
+  margin:8px 0;
+}
+
+.fileLabel input{
+  display:none;
+}
+
+.schematicBox{
+  background:#071018;
+  border:1px solid #3e4f58;
+  border-radius:18px;
+  padding:16px;
+}
+
+.xrayHeader{
+  color:var(--neon);
+  font-weight:900;
+  margin-bottom:12px;
+}
+
+.demoSchematic{
+  width:100%;
+  background:#0a1117;
+  border:1px solid var(--neon);
+  border-radius:14px;
+}
+
+.demoSchematic rect{
+  fill:#121b22;
+  stroke:#3e4e57;
+}
+
+.demoSchematic text{
+  fill:#fff;
+  font-size:34px;
+  font-weight:900;
+}
+
+.neonPulse{
+  fill:rgba(57,255,20,.2);
+  stroke:var(--neon);
+  stroke-width:4;
+  filter:drop-shadow(0 0 10px var(--neon));
+  animation:pulse 1.6s infinite;
+}
+
+.delay{animation-delay:.4s}
+.delay2{animation-delay:.8s}
+
+@keyframes pulse{
+  0%{opacity:1}
+  50%{opacity:.35}
+  100%{opacity:1}
+}
+
+#part-hud{
+  background:#111;
+  color:#fff;
+  padding:15px;
+  border-radius:10px;
+  margin:14px 0;
+  border-left:5px solid var(--neon);
+}
+
+.bottomNav{
+  position:fixed;
+  left:50%;
+  bottom:12px;
+  transform:translateX(-50%);
+  width:min(1120px,calc(100vw - 20px));
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  background:#071018;
+  border:1px solid #3d4b55;
+  border-radius:18px;
+  overflow:hidden;
+  z-index:30;
+  box-shadow:0 0 30px rgba(0,0,0,.7);
+}
+
+.bottomNav button{
+  background:transparent;
+  border:none;
+  border-right:1px solid #1e2b33;
+  color:#cbd3d8;
+  padding:14px 6px;
+  font-size:22px;
+  font-weight:900;
+}
+
+.bottomNav button span{
+  display:block;
+  font-size:12px;
+  margin-top:4px;
+  letter-spacing:.7px;
+}
+
+.bottomNav button.active{
+  background:linear-gradient(180deg,rgba(57,255,20,.22),rgba(57,255,20,.06));
+  color:#fff;
+  box-shadow:inset 0 0 18px rgba(57,255,20,.25);
+}
+
+@media(max-width:900px){
+  .topStatus{display:none}
+  .brandMain{font-size:24px}
+  .brandSub{font-size:11px}
+  .truckCard{display:block}
+  .truckImage{width:100%;min-height:95px;margin-bottom:12px}
+  .truckData{grid-template-columns:1fr 1fr}
+  .toolGrid{grid-template-columns:1fr 1fr}
+  .statusGrid{grid-template-columns:1fr 1fr}
+}
+
+@media(max-width:520px){
+  .appShell{padding:14px}
+  .brandMain{font-size:21px}
+  .iconBtn{width:46px;height:46px;font-size:22px}
+  .searchPanel{display:block}
+  .searchBtn{width:100%;margin-top:12px}
+  .toolGrid{gap:12px}
+  .toolCard{min-height:178px;padding:16px 10px}
+  .toolIcon{font-size:38px}
+  .toolCard h2{font-size:18px}
+  .toolCard p{font-size:12px}
+  .formGrid,.buttonRow,.statusGrid{grid-template-columns:1fr}
+  .vinGrid{grid-template-columns:1fr}
+  .bottomNav button{font-size:19px;padding:12px 3px}
+  .bottomNav button span{font-size:10px}
+}
