@@ -304,7 +304,11 @@ async function askPart(){
     });
 
     renderOracleCard("partOut","ORACLE VERIFIED PART LOOKUP",data);
-    const repair = await getRepairKit(q);
+    const repair = await getRepairKit(
+  data?.data?.oem_part ||
+  data?.data?.part ||
+  q
+);
 
 if(repair && repair !== "No repair kit found."){
 
