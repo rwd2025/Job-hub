@@ -14,19 +14,43 @@ function safeText(value){
   return String(value ?? "").replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c]));
 }
 
+let currentScreen = "home";
+const screenHistory = [];
+
 function showScreen(id){
+  if(!$(id)) return;
+  if(currentScreen && currentScreen !== id) screenHistory.push(currentScreen);
+  currentScreen = id;
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  if($(id)) $(id).classList.add("active");
+  $(id).classList.add("active");
 
   document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
 
-  const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1};
+  const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1,timeClock:5};
   const index = map[id] || 1;
   const btn = document.querySelector(`.bottomNav button:nth-child(${index})`);
   if(btn) btn.classList.add("active");
 
   $("sideMenu")?.classList.remove("open");
   window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function goBack(){
+  const last = screenHistory.pop();
+  if(last){
+    const prev = currentScreen;
+    currentScreen = last;
+    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+    if($(last)) $(last).classList.add("active");
+    document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
+    const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1,timeClock:5};
+    const btn = document.querySelector(`.bottomNav button:nth-child(${map[last] || 1})`);
+    if(btn) btn.classList.add("active");
+    window.scrollTo({top:0,behavior:"smooth"});
+    screenHistory.push(prev);
+  }else{
+    showScreen("home");
+  }
 }
 
 function toggleSideMenu(){ $("sideMenu")?.classList.toggle("open"); }
@@ -265,6 +289,89 @@ function renderRepairKit(targetId, kits){
   }
 }
 
+
+function clearPartFields(){
+  setValue("partq","");
+  setValue("partNote","");
+  if($("partOut")) $("partOut").textContent = "Enter a part, VIN, ESN, CPL, or description.";
+}
+
+function getSavedParts(){
+  return JSON.parse(localStorage.getItem("savedParts") || "[]");
+}
+
+function saveCurrentPart(){
+  const q = $("partq")?.value.trim() || "";
+  const note = $("partNote")?.value.trim() || "";
+  const out = $("partOut")?.innerText.trim() || "";
+  if(!q && !out){ alert("Lookup or enter a part first."); return; }
+  const list = getSavedParts();
+  list.unshift({
+    query:q || "Saved part",
+    note,
+    result:out.slice(0,900),
+    truck:getActiveTruck(),
+    saved_at:new Date().toLocaleString()
+  });
+  localStorage.setItem("savedParts", JSON.stringify(list.slice(0,50)));
+  renderSavedParts();
+  alert("Part saved.");
+}
+
+function renderSavedParts(){
+  const box = $("savedPartsOut");
+  if(!box) return;
+  const list = getSavedParts();
+  if(!list.length){ box.textContent = "Saved parts will appear here."; return; }
+  box.innerHTML = `<div class="smartCardTitle"><span>SAVED PARTS</span><span class="badge good">${list.length}</span></div>` +
+    list.slice(0,5).map((p,i)=>`<div class="smartNote"><b>${i+1}. ${safeText(p.query)}</b><br>${safeText(p.saved_at)}<br>${safeText(p.note || "")}</div>`).join("");
+}
+
+function getClock(){
+  return JSON.parse(localStorage.getItem("jobClock") || "{}");
+}
+function saveClock(c){ localStorage.setItem("jobClock", JSON.stringify(c)); }
+function clockIn(){
+  const c = getClock();
+  c.start = new Date().toISOString();
+  c.stop = null;
+  saveClock(c);
+  renderClock();
+}
+function clockOut(){
+  const c = getClock();
+  if(!c.start){ alert("Clock in first."); return; }
+  c.stop = new Date().toISOString();
+  saveClock(c);
+  renderClock();
+}
+function resetClock(){
+  if(!confirm("Reset job clock?")) return;
+  localStorage.removeItem("jobClock");
+  renderClock();
+}
+function clockHours(c){
+  if(!c.start) return 0;
+  const start = new Date(c.start);
+  const stop = c.stop ? new Date(c.stop) : new Date();
+  return Math.max(0,(stop-start)/36e5);
+}
+function renderClock(){
+  const c = getClock();
+  const h = clockHours(c);
+  const rate = Number($("laborRate")?.value || getShop().laborRate || 135);
+  if($("clockStart")) $("clockStart").textContent = c.start ? new Date(c.start).toLocaleString() : "--";
+  if($("clockStop")) $("clockStop").textContent = c.stop ? new Date(c.stop).toLocaleString() : "--";
+  if($("clockHours")) $("clockHours").textContent = h.toFixed(2);
+  if($("clockLabor")) $("clockLabor").textContent = money(h * rate);
+}
+function sendClockToInvoice(){
+  const c = getClock();
+  const h = clockHours(c);
+  setValue("laborHours", h.toFixed(2));
+  showScreen("invoice");
+}
+
 async function runDoctorSearch(){
   const q = $("doctorAsk")?.value.trim() || "";
   if(!q){ $("doctorOut").textContent = "Ask Diesel Doctor a question first."; return; }
@@ -327,4 +434,4 @@ function startVoiceInput(){
 const VoiceNavigator = {active:false,toggle(){this.active=!this.active; const btn=$("voice-toggle"); if(btn) btn.textContent=`VOICE: ${this.active ? "ON" : "OFF"}`; if(this.active) this.speak("Diesel Doctor Voice Navigator active. Backend feature coming soon.");},speak(text){if(!("speechSynthesis" in window)) return; const msg = new SpeechSynthesisUtterance(text); msg.rate=.9; window.speechSynthesis.speak(msg);}};
 
 window.addEventListener("error",e=>{ localStorage.setItem("diesel_doctor_last_error",`${e.message} line ${e.lineno}`); });
-window.addEventListener("DOMContentLoaded",()=>{ loadSettings(); loadActiveTruckIntoFields(); updateActiveTruckBar(); wireImagePreview(); });
+window.addEventListener("DOMContentLoaded",()=>{ loadSettings(); loadActiveTruckIntoFields(); updateActiveTruckBar(); wireImagePreview(); renderSavedParts(); renderClock(); setInterval(renderClock,30000); });

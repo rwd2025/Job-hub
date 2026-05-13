@@ -1,20 +1,12 @@
-Rolling Cecil AI Master Build
+Rolling Cecil AI Shop Tools Build
 
-Upload these files to your GitHub Pages root:
-- index.html
-- style.css
-- app.js
-- manifest.json
-- service-worker.js
+Added back:
+- Back button
+- Clear part button
+- Save part button
+- Time Clock screen
+- Send clock hours to invoice
+- Smaller phone typography
 
-Then run supabase_master_schema.sql in Supabase SQL Editor.
-
-What changed:
-- Removed TEST UNIVERSAL SEARCH button from the UI.
-- LOOKUP PART now runs Oracle + Universal SQL Search + Repair Kits together.
-- Raw JSON output replaced with cards: database parts, cross refs, labor, torque, fluids, diagnostics, suppliers, repair kits.
-- Service worker now caches app.js and style.css too.
-- Backend SQL is rebuilt around relational manufacturers / parts / part_cross_refs.
-
-Important:
-The Supabase key in app.js is your anon key. That is normal for browser apps, but Row Level Security should be tightened before storing sensitive customer data.
+Upload all files to GitHub Pages root and replace existing files.
+If old version sticks, clear Safari website data or re-add Home Screen app because service worker cache changed.

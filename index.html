@@ -15,6 +15,7 @@
   <!-- TOP HEADER -->
   <header class="topBar">
     <button class="iconBtn" onclick="toggleSideMenu()">☰</button>
+    <button class="iconBtn" onclick="goBack()">←</button>
 
     <div class="brandBlock">
       <div class="brandMain">
@@ -35,6 +36,7 @@
   <aside id="sideMenu" class="sideMenu">
     <button onclick="showScreen('settings')">⚙️ Settings</button>
     <button onclick="showScreen('invoice')">💵 Invoice / Quote</button>
+    <button onclick="showScreen('timeClock')">⏱️ Time Clock</button>
     <button onclick="showScreen('team')">👥 Team / Tech Viewer</button>
     <button onclick="showScreen('voice')">🎙️ Voice Navigator</button>
     <button onclick="toggleSideMenu()">✖ Close</button>
@@ -157,6 +159,13 @@
         <span>→</span>
       </button>
 
+      <button class="toolCard" onclick="showScreen('timeClock')">
+        <div class="toolIcon">⏱️</div>
+        <h2>TIME CLOCK</h2>
+        <p>Clock in/out, billable hours, labor total</p>
+        <span>→</span>
+      </button>
+
       <button class="toolCard" onclick="showScreen('settings')">
         <div class="toolIcon">⚙️</div>
         <h2>SETTINGS</h2>
@@ -204,10 +213,13 @@
 
     <div class="buttonRow">
       <button onclick="askPart()">LOOKUP PART</button>
+      <button onclick="saveCurrentPart()">SAVE PART</button>
+      <button onclick="clearPartFields()">CLEAR</button>
       <button onclick="findNearestDealer()">FIND NEAREST PARTS / DEALER</button>
     </div>
 
     <section id="partOut" class="resultBox">Enter a part, VIN, ESN, CPL, or description.</section>
+    <section id="savedPartsOut" class="resultBox smallBox">Saved parts will appear here.</section>
   </main>
 
   <!-- DIESEL AI SCREEN -->
@@ -279,6 +291,27 @@
     <section class="resultBox">
       <h2>Under Construction</h2>
       <p>This button is ready. Team viewer, master tech support, shared screens, and tech status will plug in here.</p>
+    </section>
+  </main>
+
+
+
+  <!-- TIME CLOCK -->
+  <main id="timeClock" class="screen">
+    <h1 class="screenTitle">TIME CLOCK</h1>
+    <section class="resultBox">
+      <div class="clockGrid">
+        <div><b>START</b><span id="clockStart">--</span></div>
+        <div><b>STOP</b><span id="clockStop">--</span></div>
+        <div><b>BILLABLE HOURS</b><span id="clockHours">0.00</span></div>
+        <div><b>LABOR TOTAL</b><span id="clockLabor">$0.00</span></div>
+      </div>
+      <div class="buttonRow">
+        <button onclick="clockIn()">CLOCK IN</button>
+        <button onclick="clockOut()">CLOCK OUT</button>
+        <button onclick="resetClock()">RESET CLOCK</button>
+        <button onclick="sendClockToInvoice()">SEND TO INVOICE</button>
+      </div>
     </section>
   </main>
 

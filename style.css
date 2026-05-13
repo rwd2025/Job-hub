@@ -623,3 +623,44 @@ label textarea{
 .smartNote{margin-top:12px;color:#ffd6a0;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
 .emptyNote{color:#aeb8bf;font-size:14px;margin:8px 0 0}.actionRow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.actionRow button{padding:12px;border-radius:12px}
 @media(max-width:520px){.smartGrid,.actionRow{grid-template-columns:1fr}}
+
+
+/* Rolling Cecil AI shop-tools update: smaller phone text + utility blocks */
+.brandMain{font-size:28px}
+.brandSub{font-size:12px}
+.heroTitle{font-size:30px;letter-spacing:3px}
+.screenTitle{font-size:28px;letter-spacing:1.5px}
+.toolCard{min-height:205px;padding:18px 12px}
+.toolIcon{font-size:44px}
+.toolCard h2{font-size:18px}
+.toolCard p{font-size:12px}
+.searchPanel textarea{font-size:17px}
+textarea,input{font-size:15px;padding:13px}
+.searchBtn,.buttonRow button,main > button,.resultBox button,.schematicBox button,.fileLabel{font-size:14px;padding:14px 18px}
+.resultBox{font-size:15px;padding:18px}
+.oracleTitle{font-size:19px}.smartCardTitle{font-size:18px}
+.smallBox{font-size:13px;color:#cbd3d8}
+.clockGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.clockGrid div{background:#051018;border:1px solid #164b6b;border-radius:14px;padding:12px}
+.clockGrid b{display:block;color:#ffcf8a;font-size:11px;margin-bottom:6px}
+.clockGrid span{display:block;color:#fff;font-size:18px;font-weight:900;overflow-wrap:anywhere}
+@media(max-width:520px){
+  .appShell{padding:10px}
+  .topBar{gap:8px;padding:6px 0 14px}
+  .brandMain{font-size:18px;letter-spacing:1px}
+  .brandSub{font-size:9px;letter-spacing:1.5px}
+  .iconBtn{width:40px;height:40px;font-size:19px;border-radius:11px}
+  .truckCard{padding:12px;margin-bottom:22px;border-radius:16px}
+  .truckImage{min-height:68px;font-size:44px}
+  .dataCell strong{font-size:14px}.dataCell small{font-size:10px}
+  .heroTitle{font-size:24px;letter-spacing:2px}
+  .screenTitle{font-size:24px;margin:8px 0 14px}
+  .toolCard{min-height:142px;padding:12px 8px;border-radius:14px}
+  .toolIcon{font-size:30px}.toolCard h2{font-size:15px}.toolCard p{font-size:11px}
+  .searchPanel{padding:12px;margin:16px auto 18px;border-radius:14px}
+  textarea{min-height:78px} textarea,input{font-size:14px;padding:12px;border-radius:12px}
+  .buttonRow{gap:9px}.buttonRow button{font-size:13px;padding:13px 10px;border-radius:12px}
+  .resultBox{font-size:14px;padding:15px;border-radius:14px}
+  .oracleTitle{font-size:18px}.smartCardTitle{font-size:16px}
+  .clockGrid{grid-template-columns:1fr}
+}
