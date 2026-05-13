@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Rolling Wrench Diesel | Rolling Cecil AI</title>
+<title>Rolling Wrench Diesel | Rolling Cecil AI Field Pro</title>
 <link rel="stylesheet" href="style.css" />
 <link rel="manifest" href="manifest.json" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -79,9 +79,17 @@
     </div>
   </section>
 
+
+  <section class="fieldStrip">
+    <div><b>FIELD MODE</b><span>Ready for roadside/shop use</span></div>
+    <div><b>LOOKUP FLOW</b><span>Oracle + Database + Repair Kit</span></div>
+    <div><b>SHOP TOOLS</b><span>Clock • Parts • Invoice • Saved Jobs</span></div>
+  </section>
+
   <!-- HOME SCREEN -->
   <main id="home" class="screen active">
     <h1 class="heroTitle">ROLLING CECIL AI</h1>
+    <p class="heroSubtitle">Field-ready diesel lookup, parts, repair kits, clock, and invoices.</p>
 
     <section class="searchPanel">
       <div class="searchBox">
@@ -208,17 +216,34 @@
   <!-- PARTS SCREEN -->
   <main id="parts" class="screen">
     <h1 class="screenTitle">OEM PARTS LOOKUP</h1>
-    <label>PART NUMBER / PART NAME<textarea id="partq" placeholder="Example: 2022 PACCAR MX-13 water pump"></textarea></label>
-    <label>NOTES / VIN / ESN / CPL<textarea id="partNote" placeholder="Add VIN, ESN, CPL or notes"></textarea></label>
 
-    <div class="buttonRow">
+    <label>PART NUMBER / PART NAME<textarea id="partq" placeholder="Example: 2022 PACCAR MX-13 water pump, 5633513, rear main seal"></textarea></label>
+    <label>NOTES / VIN / ESN / CPL<textarea id="partNote" placeholder="Add VIN, ESN, CPL, symptoms, measurements, supplier notes"></textarea></label>
+
+    <div class="formGrid">
+      <label>PART NAME<input id="manualPartName" placeholder="Water pump, rear main seal, air dryer"></label>
+      <label>PART NUMBER<input id="manualPartNumber" placeholder="OEM or aftermarket #"></label>
+      <label>QTY<input id="manualPartQty" type="number" step="1" value="1"></label>
+      <label>UNIT PRICE<input id="manualPartPrice" type="number" step="0.01" placeholder="0.00"></label>
+      <label>SUPPLIER / BRAND<input id="manualPartSupplier" placeholder="FleetPride, Cummins, Bendix, NAPA"></label>
+      <label class="fileLabel fullWidth">ADD PART PICTURE<input id="partPhoto" type="file" accept="image/*"></label>
+    </div>
+
+    <img id="partPhotoPreview" class="previewImg" alt="Part picture preview">
+
+    <div class="buttonRow featureButtons">
       <button onclick="askPart()">LOOKUP PART</button>
+      <button onclick="addManualPartToInvoice()">ADD PART TO INVOICE</button>
+      <button onclick="addLookupToInvoice()">ADD LOOKUP RESULT</button>
       <button onclick="saveCurrentPart()">SAVE PART</button>
-      <button onclick="clearPartFields()">CLEAR</button>
+      <button onclick="startPartVoiceInput()">SAY PART NAME / NUMBER</button>
+      <button onclick="clearPartFields()">CLEAR PARTS</button>
       <button onclick="findNearestDealer()">FIND NEAREST PARTS / DEALER</button>
+      <button onclick="showScreen('invoice')">GO TO INVOICE</button>
     </div>
 
     <section id="partOut" class="resultBox">Enter a part, VIN, ESN, CPL, or description.</section>
+    <section id="invoicePartsOut" class="resultBox smallBox">Invoice parts will appear here.</section>
     <section id="savedPartsOut" class="resultBox smallBox">Saved parts will appear here.</section>
   </main>
 
@@ -319,23 +344,39 @@
   <main id="invoice" class="screen">
     <h1 class="screenTitle">INVOICE / QUOTE</h1>
     <div class="formGrid">
-      <label>CUSTOMER<input id="custName"></label>
-      <label>PHONE<input id="custPhone"></label>
-      <label>TRUCK<input id="invoiceTruck"></label>
-      <label>VIN<input id="invoiceVin"></label>
+      <label>CUSTOMER<input id="custName" placeholder="Customer name"></label>
+      <label>PHONE<input id="custPhone" placeholder="Customer phone"></label>
+      <label>TRUCK<input id="invoiceTruck" placeholder="Year make model / unit"></label>
+      <label>VIN<input id="invoiceVin" placeholder="VIN"></label>
       <label>LABOR HOURS<input id="laborHours" type="number" step="0.1"></label>
       <label>LABOR RATE<input id="laborRate" type="number"></label>
       <label>SERVICE CALL<input id="serviceCall" type="number"></label>
-      <label>PARTS COST<input id="partsCost" type="number"></label>
+      <label>EXTRA PARTS COST<input id="partsCost" type="number" placeholder="Manual extra parts"></label>
       <label>TAX %<input id="taxRate" type="number"></label>
       <label>CARD FEE %<input id="cardFee" type="number"></label>
     </div>
-    <label>WORK / PARTS DESCRIPTION<textarea id="laborDesc"></textarea></label>
-    <div class="buttonRow">
-      <button onclick="buildInvoice()">BUILD INVOICE</button>
-      <button onclick="copyText('quoteOut')">COPY</button>
+    <div class="formGrid">
+      <label>COMPLAINT<textarea id="complaintText" placeholder="Customer complaint / symptom"></textarea></label>
+      <label>CAUSE<textarea id="causeText" placeholder="Root cause / test results"></textarea></label>
+      <label>CORRECTION<textarea id="correctionText" placeholder="Correction / repair performed"></textarea></label>
+      <label>WORK / PARTS DESCRIPTION<textarea id="laborDesc" placeholder="Extra work notes, parts notes, warranty notes"></textarea></label>
     </div>
+
+    <section id="invoicePartsOutInvoice" class="resultBox smallBox">Invoice parts will appear here.</section>
+
+    <div class="buttonRow featureButtons">
+      <button onclick="buildInvoice()">BUILD INVOICE</button>
+      <button onclick="saveInvoice()">SAVE INVOICE</button>
+      <button onclick="copyText('quoteOut')">COPY INVOICE</button>
+      <button onclick="sendClockToInvoice()">ADD CLOCK HOURS</button>
+      <button onclick="clearInvoiceForm()">CLEAR INVOICE</button>
+      <button onclick="loadLastInvoice()">LOAD LAST INVOICE</button>
+      <button onclick="clearInvoiceParts()">CLEAR PARTS LIST</button>
+      <button onclick="showScreen('parts')">ADD MORE PARTS</button>
+    </div>
+
     <section id="quoteOut" class="resultBox">Invoice output will appear here.</section>
+    <section id="savedInvoicesOut" class="resultBox smallBox">Saved invoices will appear here.</section>
   </main>
 
   <!-- SETTINGS -->

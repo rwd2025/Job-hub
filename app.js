@@ -435,3 +435,151 @@ const VoiceNavigator = {active:false,toggle(){this.active=!this.active; const bt
 
 window.addEventListener("error",e=>{ localStorage.setItem("diesel_doctor_last_error",`${e.message} line ${e.lineno}`); });
 window.addEventListener("DOMContentLoaded",()=>{ loadSettings(); loadActiveTruckIntoFields(); updateActiveTruckBar(); wireImagePreview(); renderSavedParts(); renderClock(); setInterval(renderClock,30000); });
+
+
+/* =========================
+   FULL SHOP FEATURE PACK
+   ========================= */
+function getInvoiceParts(){
+  try{return JSON.parse(localStorage.getItem("invoiceParts") || "[]");}catch(e){return []}
+}
+function saveInvoiceParts(list){
+  localStorage.setItem("invoiceParts", JSON.stringify((list||[]).slice(0,100)));
+  renderInvoiceParts();
+}
+function partPhotoData(){
+  return localStorage.getItem("currentPartPhoto") || "";
+}
+function partRowHtml(p,i,withRemove=true){
+  const qty = Number(p.qty || 1), price = Number(p.price || 0), total = qty * price;
+  return `<div class="invoiceLine">
+    <b>${safeText(p.name || "Part")}</b> <span class="totalBadge">${money(total)}</span>
+    <small>Part #: ${safeText(p.number || "N/A")} | Qty: ${qty} | Unit: ${money(price)} | Supplier: ${safeText(p.supplier || "")}</small>
+    ${p.note ? `<small>${safeText(p.note)}</small>` : ""}
+    ${p.photo ? `<img class="partThumb" src="${p.photo}" alt="part photo">` : ""}
+    ${withRemove ? `<button class="secondaryBtn" onclick="removeInvoicePart(${i})">REMOVE</button>` : ""}
+  </div>`;
+}
+function renderInvoiceParts(){
+  const parts = getInvoiceParts();
+  const total = parts.reduce((sum,p)=>sum + Number(p.qty||1)*Number(p.price||0),0);
+  const html = parts.length
+    ? `<div class="smartCardTitle"><span>INVOICE PARTS</span><span class="totalBadge">${money(total)}</span></div><div class="partsList">${parts.map((p,i)=>partRowHtml(p,i,true)).join("")}</div>`
+    : "Invoice parts will appear here.";
+  if($("invoicePartsOut")) $("invoicePartsOut").innerHTML = html;
+  if($("invoicePartsOutInvoice")) $("invoicePartsOutInvoice").innerHTML = html;
+}
+function removeInvoicePart(i){
+  const list=getInvoiceParts(); list.splice(i,1); saveInvoiceParts(list);
+}
+function clearInvoiceParts(){
+  if(!confirm("Clear all invoice parts?")) return;
+  saveInvoiceParts([]);
+}
+function addManualPartToInvoice(){
+  const p={
+    name:$("manualPartName")?.value.trim() || $("partq")?.value.trim() || "Part",
+    number:$("manualPartNumber")?.value.trim() || "",
+    qty:Number($("manualPartQty")?.value || 1),
+    price:Number($("manualPartPrice")?.value || 0),
+    supplier:$("manualPartSupplier")?.value.trim() || "",
+    note:$("partNote")?.value.trim() || "",
+    photo:partPhotoData(),
+    truck:getActiveTruck(),
+    added_at:new Date().toLocaleString()
+  };
+  if(!p.name && !p.number){ alert("Enter a part name or part number."); return; }
+  const list=getInvoiceParts(); list.push(p); saveInvoiceParts(list);
+  alert("Part added to invoice.");
+}
+function addLookupToInvoice(){
+  const q=$("partq")?.value.trim() || "Lookup result";
+  const out=$("partOut")?.innerText.trim() || "";
+  const p={name:q,number:$("manualPartNumber")?.value.trim() || "",qty:Number($("manualPartQty")?.value || 1),price:Number($("manualPartPrice")?.value || 0),supplier:$("manualPartSupplier")?.value.trim() || "Lookup",note:out.slice(0,800),photo:partPhotoData(),truck:getActiveTruck(),added_at:new Date().toLocaleString()};
+  const list=getInvoiceParts(); list.push(p); saveInvoiceParts(list); alert("Lookup result added to invoice.");
+}
+function wirePartPhoto(){
+  const input=$("partPhoto"), preview=$("partPhotoPreview");
+  if(!input || !preview) return;
+  input.addEventListener("change",()=>{
+    const file=input.files?.[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=()=>{ localStorage.setItem("currentPartPhoto", reader.result); preview.src=reader.result; preview.style.display="block"; };
+    reader.readAsDataURL(file);
+  });
+}
+function startPartVoiceInput(){
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRecognition){ alert("Voice input not supported on this browser."); return; }
+  const r=new SpeechRecognition(); r.lang="en-US";
+  r.onresult=e=>{ const text=e.results[0][0].transcript; setValue("partq", text); setValue("manualPartName", text); };
+  r.start();
+}
+const oldClearPartFields = clearPartFields;
+clearPartFields = function(){
+  oldClearPartFields();
+  ["manualPartName","manualPartNumber","manualPartPrice","manualPartSupplier"].forEach(id=>setValue(id,""));
+  setValue("manualPartQty","1");
+  localStorage.removeItem("currentPartPhoto");
+  if($("partPhotoPreview")){ $("partPhotoPreview").src=""; $("partPhotoPreview").style.display="none"; }
+};
+
+function invoicePartsTotal(){return getInvoiceParts().reduce((s,p)=>s+Number(p.qty||1)*Number(p.price||0),0);}
+function invoicePartsText(){
+  const parts=getInvoiceParts();
+  if(!parts.length) return "No line-item parts added.";
+  return parts.map((p,i)=>`${i+1}. ${p.name || "Part"} | #${p.number || "N/A"} | Qty ${p.qty || 1} | ${money(p.price || 0)} each | ${money(Number(p.qty||1)*Number(p.price||0))} | ${p.supplier || ""}`).join("\n");
+}
+buildInvoice = function(){
+  const shop=getShop();
+  const h=Number($("laborHours")?.value||0), r=Number($("laborRate")?.value||0), service=Number($("serviceCall")?.value||0);
+  const manualParts=Number($("partsCost")?.value||0), lineParts=invoicePartsTotal();
+  const taxPct=Number($("taxRate")?.value||0), cardPct=Number($("cardFee")?.value||0);
+  const labor=h*r, parts=manualParts+lineParts, subtotal=labor+service+parts, tax=subtotal*(taxPct/100), card=(subtotal+tax)*(cardPct/100), total=subtotal+tax+card;
+  const txt=`${shop.name}\n${shop.phone}\n${shop.website}\n\nCUSTOMER:\n${$("custName")?.value || ""}\n${$("custPhone")?.value || ""}\n\nVEHICLE:\n${$("invoiceTruck")?.value || ""}\nVIN: ${$("invoiceVin")?.value || ""}\n\nWORK:\n${$("laborDesc")?.value || ""}\n\nPARTS:\n${invoicePartsText()}\n\nLabor: ${money(labor)}\nService Call: ${money(service)}\nParts: ${money(parts)}\nTax: ${money(tax)}\nCard Fee: ${money(card)}\n\nTOTAL DUE:\n${money(total)}\n\nTERMS:\n${shop.terms}`.trim();
+  if($("quoteOut")) $("quoteOut").textContent=txt;
+  return {shop,h,r,service,parts,labor,tax,card,total,text:txt,invoiceParts:getInvoiceParts()};
+};
+function getSavedInvoices(){try{return JSON.parse(localStorage.getItem("savedInvoices")||"[]");}catch(e){return []}}
+function saveInvoice(){
+  const built=buildInvoice();
+  const inv={id:Date.now(),customer:$("custName")?.value||"",phone:$("custPhone")?.value||"",truck:$("invoiceTruck")?.value||"",vin:$("invoiceVin")?.value||"",laborHours:$("laborHours")?.value||"",laborRate:$("laborRate")?.value||"",serviceCall:$("serviceCall")?.value||"",partsCost:$("partsCost")?.value||"",taxRate:$("taxRate")?.value||"",cardFee:$("cardFee")?.value||"",laborDesc:$("laborDesc")?.value||"",parts:getInvoiceParts(),output:built.text,total:built.total,saved_at:new Date().toLocaleString()};
+  const list=getSavedInvoices(); list.unshift(inv); localStorage.setItem("savedInvoices", JSON.stringify(list.slice(0,50))); renderSavedInvoices(); alert("Invoice saved.");
+}
+function loadInvoice(i){
+  const inv=getSavedInvoices()[i]; if(!inv){alert("Invoice not found."); return;}
+  setValue("custName",inv.customer); setValue("custPhone",inv.phone); setValue("invoiceTruck",inv.truck); setValue("invoiceVin",inv.vin); setValue("laborHours",inv.laborHours); setValue("laborRate",inv.laborRate); setValue("serviceCall",inv.serviceCall); setValue("partsCost",inv.partsCost); setValue("taxRate",inv.taxRate); setValue("cardFee",inv.cardFee); setValue("laborDesc",inv.laborDesc);
+  saveInvoiceParts(inv.parts||[]); if($("quoteOut")) $("quoteOut").textContent=inv.output||""; showScreen("invoice");
+}
+function loadLastInvoice(){loadInvoice(0)}
+function renderSavedInvoices(){
+  const box=$("savedInvoicesOut"); if(!box) return; const list=getSavedInvoices();
+  if(!list.length){ box.textContent="Saved invoices will appear here."; return; }
+  box.innerHTML=`<div class="smartCardTitle"><span>SAVED INVOICES</span><span class="badge good">${list.length}</span></div>` + list.slice(0,8).map((inv,i)=>`<div class="invoiceLine"><b>${safeText(inv.customer || "Invoice")}</b> <span class="totalBadge">${money(inv.total||0)}</span><small>${safeText(inv.saved_at)} | ${safeText(inv.truck)} | VIN ${safeText(inv.vin)}</small><button class="secondaryBtn" onclick="loadInvoice(${i})">LOAD</button></div>`).join("");
+}
+function clearInvoiceForm(){
+  if(!confirm("Clear invoice fields?")) return;
+  ["custName","custPhone","invoiceTruck","invoiceVin","laborHours","partsCost","laborDesc"].forEach(id=>setValue(id,""));
+  loadSettings(); if($("quoteOut")) $("quoteOut").textContent="Invoice output will appear here.";
+}
+
+const oldSaveCurrentPart = saveCurrentPart;
+saveCurrentPart = function(){
+  const q=$("partq")?.value.trim() || $("manualPartName")?.value.trim() || $("manualPartNumber")?.value.trim() || "Saved part";
+  const note=$("partNote")?.value.trim() || "";
+  const out=$("partOut")?.innerText.trim() || "";
+  const list=getSavedParts();
+  list.unshift({query:q,number:$("manualPartNumber")?.value.trim()||"",supplier:$("manualPartSupplier")?.value.trim()||"",price:$("manualPartPrice")?.value||"",note,result:out.slice(0,900),photo:partPhotoData(),truck:getActiveTruck(),saved_at:new Date().toLocaleString()});
+  localStorage.setItem("savedParts", JSON.stringify(list.slice(0,50))); renderSavedParts(); alert("Part saved.");
+};
+renderSavedParts = function(){
+  const box=$("savedPartsOut"); if(!box) return; const list=getSavedParts();
+  if(!list.length){ box.textContent="Saved parts will appear here."; return; }
+  box.innerHTML=`<div class="smartCardTitle"><span>SAVED PARTS</span><span class="badge good">${list.length}</span></div><div class="partsList">` + list.slice(0,8).map((p,i)=>`<div class="partLine"><b>${safeText(p.query)}</b><small>${safeText(p.saved_at)} | #${safeText(p.number||"")} | ${safeText(p.supplier||"")} | ${safeText(p.price?money(p.price):"")}</small>${p.photo?`<img class="partThumb" src="${p.photo}" alt="saved part">`:""}<button class="secondaryBtn" onclick="addSavedPartToInvoice(${i})">ADD TO INVOICE</button></div>`).join("") + `</div>`;
+};
+function addSavedPartToInvoice(i){
+  const p=getSavedParts()[i]; if(!p) return;
+  const list=getInvoiceParts(); list.push({name:p.query,number:p.number,qty:1,price:Number(p.price||0),supplier:p.supplier,note:p.note||p.result||"",photo:p.photo||"",truck:p.truck,added_at:new Date().toLocaleString()}); saveInvoiceParts(list); alert("Saved part added to invoice.");
+}
+
+window.addEventListener("DOMContentLoaded",()=>{ wirePartPhoto(); renderInvoiceParts(); renderSavedInvoices(); renderSavedParts(); renderClock(); });

@@ -1,12 +1,33 @@
-Rolling Cecil AI Shop Tools Build
+Rolling Cecil AI FIELD PRO BUILD
 
-Added back:
-- Back button
-- Clear part button
-- Save part button
-- Time Clock screen
-- Send clock hours to invoice
-- Smaller phone typography
+Professional field-ready full feature version.
 
-Upload all files to GitHub Pages root and replace existing files.
-If old version sticks, clear Safari website data or re-add Home Screen app because service worker cache changed.
+Upload/replace ALL files in GitHub Pages root:
+- index.html
+- app.js
+- style.css
+- manifest.json
+- service-worker.js
+- supabase_master_schema.sql
+- README.txt
+
+Includes:
+- Rolling Cecil AI branding
+- compact professional field UI
+- back/clear buttons
+- parts lookup with Oracle + Universal DB + repair kits
+- add part manually
+- add lookup result to invoice
+- part photo attachment
+- voice part input
+- save parts
+- saved parts list
+- invoice builder
+- complaint/cause/correction fields
+- invoice parts list
+- save/load invoice history
+- time clock
+- send clock hours to invoice
+- service worker cache update
+
+After uploading, hard refresh or delete/re-add the Home Screen app because old service worker cache can hold the previous version.

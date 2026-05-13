@@ -664,3 +664,73 @@ textarea,input{font-size:15px;padding:13px}
   .oracleTitle{font-size:18px}.smartCardTitle{font-size:16px}
   .clockGrid{grid-template-columns:1fr}
 }
+
+
+/* FULL SHOP FEATURE ADDITIONS */
+.fullWidth{grid-column:1/-1}
+.featureButtons{grid-template-columns:repeat(4,1fr)}
+.smallBox{font-size:14px;padding:15px}
+.partsList{display:grid;gap:10px}
+.partLine,.invoiceLine{background:#051018;border:1px solid #164b6b;border-radius:14px;padding:10px;color:#fff}
+.partLine b,.invoiceLine b{color:#ffcf8a}
+.partLine small,.invoiceLine small{display:block;color:#aeb8bf;margin-top:4px}
+.partThumb{max-width:120px;max-height:90px;border-radius:10px;border:1px solid #39464e;margin-top:8px;display:block}
+.totalBadge{display:inline-block;background:#0b2b17;color:#39ff14;border:1px solid #39ff14;border-radius:999px;padding:4px 9px;font-weight:900;margin-left:6px}
+.warnBadge{display:inline-block;background:#332100;color:#ffd27f;border:1px solid #8f6b18;border-radius:999px;padding:4px 9px;font-weight:900;margin-left:6px}
+.screenTitle{font-size:28px}.heroTitle{font-size:30px}.brandMain{font-size:28px}.toolCard h2{font-size:18px}.toolCard{min-height:190px}.toolIcon{font-size:42px}.resultBox{font-size:15px}.searchPanel textarea{font-size:17px}textarea,input{font-size:15px}.topBar{gap:12px}
+@media(max-width:900px){.featureButtons{grid-template-columns:1fr 1fr}.screenTitle{font-size:24px}.heroTitle{font-size:26px}.brandMain{font-size:22px}.toolCard h2{font-size:16px}.toolIcon{font-size:34px}}
+@media(max-width:520px){.featureButtons{grid-template-columns:1fr}.screenTitle{font-size:22px}.heroTitle{font-size:24px}.brandMain{font-size:19px}.brandSub{font-size:10px}.truckData{font-size:12px}.dataCell strong{font-size:13px}.toolCard{min-height:150px}.toolCard h2{font-size:15px}.toolCard p{font-size:11px}.resultBox{font-size:14px;padding:16px}}
+
+
+/* FIELD READY PRO OVERRIDES */
+:root{
+  --bg:#04070a;
+  --panel:#071018;
+  --panel2:#0b141b;
+  --card:#0e171f;
+  --line:#263640;
+  --lineBright:#3b5360;
+  --neon:#35d46a;
+  --orange:#ff7a18;
+  --orange2:#c94f00;
+  --text:#f7fbff;
+  --muted:#9faeb8;
+  --soft:#dce7ee;
+}
+html,body{background:linear-gradient(180deg,#071018 0%,#03070a 45%,#010203 100%);}
+.appShell{max-width:1120px;padding:12px 14px 104px;}
+.topBar{position:sticky;top:0;z-index:25;background:rgba(3,8,12,.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,122,24,.25);padding:8px 0 10px;margin-bottom:10px;}
+.iconBtn{width:42px;height:42px;font-size:19px;border-radius:11px;background:#0a1218;border:1px solid var(--lineBright);}
+.brandMain{font-size:22px !important;letter-spacing:1.3px;}
+.brandSub{font-size:10px !important;letter-spacing:2px;color:#cbd7df;}
+.topStatus{font-size:12px;padding-right:12px;}
+.truckCard{margin:8px 0 12px;padding:12px;border-radius:16px;background:linear-gradient(180deg,#0e1921,#071018);border:1px solid var(--lineBright);box-shadow:0 8px 28px rgba(0,0,0,.35);}
+.truckImage{width:104px;min-height:86px;font-size:48px;border-radius:12px;}
+.truckData{grid-template-columns:repeat(7,1fr);gap:8px;}
+.dataCell{padding:8px;border-left:0;background:#050d13;border:1px solid #1e3340;border-radius:10px;}
+.dataCell small{font-size:9px;letter-spacing:.8px;color:#95a5af;margin-bottom:4px;}
+.dataCell strong{font-size:12px;line-height:1.15;}
+.changeTruckBtn{font-size:11px;min-height:38px;border-radius:10px;}
+.fieldStrip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 18px;}
+.fieldStrip div{background:linear-gradient(180deg,#0b151d,#050c12);border:1px solid #223846;border-radius:14px;padding:11px 12px;}
+.fieldStrip b{display:block;color:var(--orange);font-size:11px;letter-spacing:.9px;margin-bottom:4px;}
+.fieldStrip span{display:block;color:#d9e5ec;font-size:12px;}
+.heroTitle{font-size:25px !important;letter-spacing:2px;margin:14px 0 4px;text-align:left;}
+.heroSubtitle{color:var(--muted);font-size:13px;margin:0 0 12px;}
+.searchPanel{margin:10px 0 16px;padding:12px;border-radius:15px;border:1px solid rgba(53,212,106,.85);box-shadow:0 0 18px rgba(53,212,106,.15);}
+.searchBox span{font-size:24px;padding-top:6px;}.searchPanel textarea{min-height:58px !important;font-size:15px !important;}
+.searchBtn,.buttonRow button,main > button,.resultBox button,.schematicBox button,.fileLabel{font-size:12px !important;padding:12px 13px !important;border-radius:11px;letter-spacing:.4px;text-transform:uppercase;box-shadow:0 3px 0 rgba(0,0,0,.35);}
+.secondaryBtn{background:#111b22 !important;color:#dce7ee !important;border:1px solid #344955 !important;}
+.buttonRow{gap:9px;margin:10px 0;}.featureButtons{grid-template-columns:repeat(4,minmax(0,1fr));}
+.toolGrid{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;}
+.toolCard{min-height:138px !important;border-radius:15px;padding:13px 10px !important;text-align:left;background:linear-gradient(180deg,#111b22,#070c10);}
+.toolIcon{font-size:28px !important;}.toolCard h2{font-size:13px !important;line-height:1.1;margin:4px 0;text-transform:uppercase;}.toolCard p{font-size:10.5px !important;line-height:1.25;color:#b8c4cb;}.toolCard span{font-size:20px;align-self:flex-end;}.toolCard em{font-size:9px;}
+.statusGrid{grid-template-columns:repeat(4,1fr);gap:9px;margin:16px 0;padding:12px;border-radius:15px;}.statusGrid div{padding:9px;border-left:0;background:#050d13;border:1px solid #1e3340;border-radius:10px;}.statusGrid b{font-size:10px;margin-bottom:4px}.statusGrid span{font-size:13px}.statusGrid small{font-size:10px}
+.screenTitle{font-size:22px !important;margin:8px 0 12px;color:var(--orange);}.formGrid{gap:9px;}label{font-size:11px;letter-spacing:.7px;margin-bottom:10px;color:#dce7ee;}label input,label textarea{margin-top:6px;}
+textarea,input{font-size:14px !important;padding:11px 12px !important;border-radius:11px;background:#04090d;border-color:#2e414d;}textarea{min-height:82px;}
+.resultBox{font-size:13px !important;padding:13px !important;border-radius:14px;margin:12px 0;background:#06131b;border-color:#17618d;line-height:1.4;}
+.oracleCard,.smartCard{border-radius:15px;padding:12px;background:#07131b;border-color:#17618d;}.oracleTitle,.smartCardTitle{font-size:15px !important;margin-bottom:10px;}.vinGrid,.smartGrid{gap:8px;}.vinGrid div,.smartCell{padding:8px;border-radius:10px;}.vinGrid b,.smartCell b{font-size:9px;}.vinGrid span,.smartCell span{font-size:12px;}.oracleNote,.smartNote{font-size:12px;}
+.partLine,.invoiceLine{border-radius:12px;padding:10px;background:#061018;border-color:#223846;}.partLine b,.invoiceLine b{font-size:13px;}.partLine small,.invoiceLine small{font-size:11px;line-height:1.3}.totalBadge,.warnBadge,.badge{font-size:10px;padding:3px 7px;}.partThumb{max-width:92px;max-height:72px;}
+.clockGrid{grid-template-columns:repeat(3,1fr);gap:9px}.clockGrid div{padding:10px;border-radius:12px}.clockGrid b{font-size:9px}.clockGrid span{font-size:15px}.bottomNav{bottom:8px;border-radius:15px;width:min(1080px,calc(100vw - 14px));}.bottomNav button{font-size:18px;padding:10px 3px}.bottomNav button span{font-size:9px;letter-spacing:.4px}
+@media(max-width:900px){.truckData{grid-template-columns:1fr 1fr 1fr}.truckImage{display:none}.fieldStrip{grid-template-columns:1fr}.toolGrid{grid-template-columns:1fr 1fr}.statusGrid{grid-template-columns:1fr 1fr}.featureButtons{grid-template-columns:1fr 1fr}.clockGrid{grid-template-columns:1fr 1fr}.topStatus{display:none}}
+@media(max-width:520px){body{padding-bottom:88px}.appShell{padding:8px 9px 92px}.topBar{gap:6px}.iconBtn{width:36px;height:36px;font-size:16px}.brandMain{font-size:16px !important}.brandSub{font-size:8px !important;letter-spacing:1.2px}.truckCard{padding:9px}.truckData{grid-template-columns:1fr 1fr}.dataCell{padding:7px}.dataCell strong{font-size:11px}.fieldStrip div{padding:9px}.heroTitle{font-size:21px !important}.heroSubtitle{font-size:12px}.searchPanel{padding:9px}.toolGrid{grid-template-columns:1fr 1fr;gap:8px}.toolCard{min-height:126px !important;padding:10px 8px !important}.toolIcon{font-size:24px !important}.toolCard h2{font-size:12px !important}.toolCard p{font-size:10px !important}.formGrid,.buttonRow,.featureButtons,.statusGrid,.vinGrid,.smartGrid,.clockGrid{grid-template-columns:1fr}.buttonRow button{font-size:12px !important}.screenTitle{font-size:20px !important}.bottomNav button{font-size:16px;padding:9px 2px}.bottomNav button span{font-size:8px}}
