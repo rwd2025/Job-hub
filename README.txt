@@ -1,6 +1,6 @@
-Rolling Cecil AI - Phase 5 OCR + Vision Pro Build
+Rolling Cecil AI Phase 6 Production UI Pro
 
-Upload/replace all files in GitHub Pages root:
+Upload these files to the GitHub Pages root:
 - index.html
 - app.js
 - style.css
@@ -8,18 +8,16 @@ Upload/replace all files in GitHub Pages root:
 - service-worker.js
 - supabase_master_schema.sql
 
-New Phase 5 features:
-- OCR / Vision Pro screen
-- camera photo upload with capture=environment
-- scan part label / VIN plate / receipt / work order photo
-- AI OCR hook through Oracle Edge Function
-- text cleanup and part-number candidate extraction
-- send scanned part to Parts Lookup
-- lookup scanned part directly
-- add scanned part to invoice
-- save photo note locally and to Supabase photo_notes table
-- scan history with reload
+Phase 6 focus:
+- dealer-grade field UI polish
+- smaller mobile typography
+- compact active-truck card
+- professional tool cards
+- polished quick dock
+- better result/status/error card styling
+- updated PWA cache version
 
-Also keeps Phase 1-4 features: Shop OS, Parts Pro, Diesel Intelligence, Field Tools Pro.
-
-After upload, hard refresh or remove/re-add Home Screen app because service worker cache changed.
+After upload:
+1. Commit changes.
+2. Wait for GitHub Pages deploy.
+3. Hard refresh Safari or remove/re-add the Home Screen icon.

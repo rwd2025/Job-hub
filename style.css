@@ -940,3 +940,144 @@ textarea,input{font-size:14px !important;padding:11px 12px !important;border-rad
 .visionGrid b{display:block;color:var(--orange);font-size:12px;margin-bottom:5px;}
 .visionGrid span{display:block;color:#dbe6ea;font-size:12px;line-height:1.25;}
 @media(max-width:700px){.visionGrid{grid-template-columns:1fr 1fr}}
+
+
+/* === PHASE 6: PRODUCTION UI PRO OVERRIDES === */
+:root{
+  --bg:#020507;
+  --panel:#071018;
+  --panel2:#0b1218;
+  --card:#0d151c;
+  --line:#26343d;
+  --lineStrong:#40515c;
+  --neon:#39ff14;
+  --orange:#ff7b00;
+  --orange2:#d85c00;
+  --text:#f7fbff;
+  --muted:#9aa8b2;
+  --warn:#ffd27f;
+  --red:#ff4b3e;
+  --blue:#1a9ce8;
+  --shadow:0 12px 32px rgba(0,0,0,.48);
+}
+
+html,body{
+  background:
+    radial-gradient(circle at 18% 0%,rgba(255,123,0,.12),transparent 26%),
+    radial-gradient(circle at 80% 0%,rgba(57,255,20,.10),transparent 24%),
+    linear-gradient(180deg,#061018 0%,#020507 55%,#000 100%);
+  font-size:15px;
+}
+
+.appShell{max-width:1120px;padding:12px 12px 124px;}
+.topBar{gap:10px;padding:6px 0 12px;position:sticky;top:0;z-index:35;background:linear-gradient(180deg,rgba(2,5,7,.98),rgba(2,5,7,.88));backdrop-filter:blur(10px);}
+.iconBtn{width:42px;height:42px;border-radius:12px;font-size:18px;background:#071018;box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);}
+.brandMain{font-size:22px;letter-spacing:1.4px;}
+.brandSub{font-size:10px;letter-spacing:2.5px;color:#c6d0d7;}
+.topStatus{font-size:12px;padding-right:10px;}
+.onlineDot{width:9px;height:9px;}
+
+.truckCard{gap:10px;padding:10px 12px;border-radius:16px;margin-bottom:14px;box-shadow:var(--shadow);background:linear-gradient(180deg,#0d171f,#050b10);}
+.truckImage{width:78px;min-height:66px;font-size:38px;border-radius:12px;}
+.truckData{grid-template-columns:repeat(4,1fr);gap:7px;}
+.dataCell{padding:8px 8px 8px 10px;border-left:2px solid rgba(255,123,0,.42);background:#071119;border-radius:10px;}
+.dataCell small{font-size:9px;margin-bottom:3px;color:#98a8b2;letter-spacing:.8px;}
+.dataCell strong{font-size:12px;line-height:1.15;}
+.changeTruckBtn{font-size:11px;min-height:40px;}
+
+.fieldStrip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 16px;}
+.fieldStrip div{background:linear-gradient(180deg,#0d151c,#071018);border:1px solid var(--line);border-radius:13px;padding:10px 12px;box-shadow:var(--shadow);}
+.fieldStrip b{display:block;color:var(--orange);font-size:10px;letter-spacing:1px;margin-bottom:3px;}
+.fieldStrip span{display:block;color:#dbe6ec;font-size:12px;line-height:1.25;}
+
+.heroTitle{font-size:27px;letter-spacing:2px;margin:12px 0 4px;text-shadow:0 0 18px rgba(57,255,20,.25);}
+.heroSubtitle{text-align:center;color:var(--muted);font-size:13px;line-height:1.35;margin:0 auto 12px;max-width:760px;}
+.screenTitle{font-size:24px;letter-spacing:1.4px;margin:8px 0 14px;}
+
+.searchPanel{padding:12px;border:1px solid rgba(57,255,20,.72);border-radius:16px;box-shadow:0 0 18px rgba(57,255,20,.17);margin:14px auto 14px;background:linear-gradient(180deg,#0b151d,#061018);}
+.searchBox{gap:9px;}
+.searchBox span{font-size:22px;padding-top:7px;}
+.searchPanel textarea{min-height:54px;font-size:15px;padding:8px 0;}
+textarea,input,select{font-size:14px;padding:12px;border-radius:12px;border-color:#2c3c45;}
+textarea{min-height:82px;}
+label{font-size:11px;letter-spacing:.9px;margin-bottom:10px;color:#d8e1e6;}
+
+button,.searchBtn,.buttonRow button,main > button,.resultBox button,.schematicBox button,.fileLabel{border-radius:12px;padding:12px 14px;font-size:12px;letter-spacing:.7px;box-shadow:0 8px 18px rgba(0,0,0,.22);}
+button:active{transform:translateY(1px);}
+.buttonRow{gap:9px;margin:9px 0;}
+.secondaryBtn{background:#101820;color:#eaf3f8;border:1px solid var(--lineStrong);}
+
+.toolGrid{grid-template-columns:repeat(5,1fr);gap:10px;}
+.toolCard{min-height:156px;padding:14px 10px;border-radius:15px;background:linear-gradient(180deg,#101a22,#060b10);border-color:#2f414d;box-shadow:var(--shadow);}
+.toolCard h2{font-size:14px;letter-spacing:.5px;line-height:1.15;margin:5px 0;}
+.toolCard p{font-size:11px;color:#b8c4cb;line-height:1.25;}
+.toolIcon{font-size:30px;}
+.toolCard span{font-size:18px;color:var(--neon);}
+.toolCard em{font-size:9px;}
+
+.statusGrid{grid-template-columns:repeat(4,1fr);gap:8px;padding:12px;border-radius:15px;margin:16px 0;}
+.statusGrid div{padding:10px;border-left:2px solid rgba(57,255,20,.42);background:#08121a;border-radius:11px;}
+.statusGrid b{font-size:10px;margin-bottom:5px;}
+.statusGrid span{font-size:14px;}
+.statusGrid small{font-size:11px;line-height:1.25;}
+
+.resultBox{font-size:13px;line-height:1.38;padding:14px;border-radius:15px;margin:12px 0;background:linear-gradient(180deg,#061720,#041018);border-color:#145d8a;box-shadow:var(--shadow);}
+.oracleCard{border-radius:16px;padding:13px;background:linear-gradient(180deg,#081620,#051018);border-color:#126293;box-shadow:var(--shadow);}
+.oracleTitle{font-size:16px;margin-bottom:10px;letter-spacing:.7px;}
+.vinGrid{gap:7px;}
+.vinGrid div{padding:8px;border-radius:10px;background:#041018;}
+.vinGrid b{font-size:9px;margin-bottom:4px;letter-spacing:.7px;}
+.vinGrid span{font-size:12px;}
+.oracleNote{font-size:12px;line-height:1.4;}
+
+.quickDock{position:fixed;left:50%;bottom:74px;transform:translateX(-50%);width:min(1100px,calc(100vw - 18px));display:grid;grid-template-columns:repeat(7,1fr);gap:6px;z-index:31;background:rgba(5,10,14,.92);border:1px solid #26343d;border-radius:16px;padding:7px;box-shadow:0 0 26px rgba(0,0,0,.70);backdrop-filter:blur(10px);}
+.quickDock button{padding:10px 6px;font-size:10px;border-radius:10px;background:linear-gradient(#1c2a34,#0b151d);border:1px solid #31434f;color:#fff;box-shadow:none;}
+.quickDock button:nth-child(3){background:linear-gradient(#ff9500,#e26000);}
+.quickDock button:nth-child(7){background:linear-gradient(#40b95b,#167336);}
+
+.bottomNav{bottom:8px;border-radius:15px;width:min(1100px,calc(100vw - 18px));}
+.bottomNav button{font-size:18px;padding:10px 4px;}
+.bottomNav button span{font-size:9px;letter-spacing:.7px;}
+
+.fieldProPanel,.visionPanel,.schematicBox{background:linear-gradient(180deg,#0d171f,#060c11);border:1px solid #31434f;border-radius:16px;padding:13px;box-shadow:var(--shadow);}
+.fieldToolGrid,.visionGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:10px;}
+.smallBox{font-size:12px;}
+.previewImg{max-height:280px;object-fit:contain;background:#03080c;border:1px solid var(--line);}
+
+.badge,.confidenceBadge,.statusBadge{display:inline-flex;align-items:center;gap:5px;border:1px solid #2f414d;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:900;letter-spacing:.6px;background:#071018;color:#dfeaf0;}
+.errorCard{border-color:#7a1f18;background:linear-gradient(180deg,#24100d,#100705);color:#ffd0c8;}
+.warnCard{border-color:#7a5a18;background:linear-gradient(180deg,#241c0d,#100d05);color:#ffe0a3;}
+.loadingCard{border-color:#1d6d9f;background:linear-gradient(180deg,#071a26,#051018);color:#cfeeff;}
+
+@media(max-width:900px){
+  .toolGrid{grid-template-columns:repeat(3,1fr);}
+  .fieldStrip,.statusGrid{grid-template-columns:1fr 1fr;}
+  .fieldToolGrid,.visionGrid{grid-template-columns:1fr 1fr;}
+}
+
+@media(max-width:520px){
+  .appShell{padding:10px 9px 126px;}
+  .topBar{gap:7px;}
+  .iconBtn{width:38px;height:38px;font-size:16px;}
+  .brandMain{font-size:18px;letter-spacing:1px;}
+  .brandSub{font-size:9px;letter-spacing:1.6px;}
+  .truckCard{padding:9px;}
+  .truckImage{display:none;}
+  .truckData{grid-template-columns:repeat(2,1fr);}
+  .fieldStrip{grid-template-columns:1fr;}
+  .heroTitle{font-size:22px;letter-spacing:1.4px;}
+  .heroSubtitle{font-size:12px;}
+  .screenTitle{font-size:20px;}
+  .toolGrid{grid-template-columns:1fr 1fr;gap:8px;}
+  .toolCard{min-height:132px;padding:11px 8px;}
+  .toolIcon{font-size:26px;}
+  .toolCard h2{font-size:12px;}
+  .toolCard p{font-size:10px;}
+  .searchPanel{padding:10px;}
+  .searchPanel textarea{font-size:14px;}
+  .formGrid,.buttonRow,.statusGrid,.fieldToolGrid,.visionGrid{grid-template-columns:1fr;}
+  .quickDock{grid-template-columns:repeat(4,1fr);bottom:67px;gap:5px;padding:6px;}
+  .quickDock button{font-size:9px;padding:9px 4px;}
+  .bottomNav button{font-size:17px;padding:9px 2px;}
+  .bottomNav button span{font-size:8px;}
+}

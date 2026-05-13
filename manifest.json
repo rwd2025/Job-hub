@@ -1,10 +1,1 @@
-{
-  "name": "Rolling Cecil AI Phase 5 Vision Pro",
-  "short_name": "Cecil AI",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#050505",
-  "theme_color": "#ff7a18",
-  "icons": [],
-  "description": "Rolling Wrench Diesel field-ready shop OS with parts, diagnostics, invoices, clock, and Diesel Brain memory."
-}
+{"name":"Rolling Cecil AI Field Pro","short_name":"Cecil AI","start_url":"./index.html","display":"standalone","background_color":"#020507","theme_color":"#ff7b00","icons":[]}
