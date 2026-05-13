@@ -609,3 +609,17 @@ label textarea{
   .bottomNav button{font-size:19px;padding:12px 3px}
   .bottomNav button span{font-size:10px}
 }
+
+
+/* MASTER BUILD RESULT CARDS */
+.resultGroup{display:grid;gap:14px;margin-top:14px}
+.smartCard{background:#07141d;border:1px solid #0d5f8f;border-radius:22px;padding:16px;color:#fff;margin-top:14px}
+.smartCardTitle{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--orange);font-size:20px;font-weight:900;margin-bottom:12px}
+.badge{display:inline-block;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;letter-spacing:.4px;border:1px solid #36525e;color:#fff;background:#0b1b25}
+.badge.good{border-color:#29d35c;color:#29d35c}.badge.warn{border-color:#ffd27f;color:#ffd27f}.badge.hot{border-color:#ff7b00;color:#ffb36b}
+.smartGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.smartCell{background:#051018;border:1px solid #164b6b;border-radius:14px;padding:10px;min-width:0}
+.smartCell b{display:block;color:#ffcf8a;font-size:11px;margin-bottom:5px}.smartCell span{display:block;color:#fff;font-size:14px;overflow-wrap:anywhere}
+.smartNote{margin-top:12px;color:#ffd6a0;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
+.emptyNote{color:#aeb8bf;font-size:14px;margin:8px 0 0}.actionRow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.actionRow button{padding:12px;border-radius:12px}
+@media(max-width:520px){.smartGrid,.actionRow{grid-template-columns:1fr}}
