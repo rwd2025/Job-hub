@@ -1,38 +1,20 @@
-Rolling Cecil AI — Phase 10 Final Release Pro
+Rolling Cecil AI Master Build
 
-Upload/replace all files in the GitHub Pages root:
+Upload these files to your GitHub Pages root:
 - index.html
-- app.js
 - style.css
+- app.js
 - manifest.json
 - service-worker.js
-- supabase_master_schema.sql
-- README.txt
 
-After upload:
-1. Commit changes.
-2. Wait 30-90 seconds for GitHub Pages.
-3. Open the app in Safari.
-4. Hard refresh.
-5. If old version still appears, remove the Home Screen icon and re-add it.
-6. Open Final Release screen and run Production Check.
-7. Open Debug screen and run Full QA Check.
+Then run supabase_master_schema.sql in Supabase SQL Editor.
 
-Included through Phase 10:
-- Rolling Cecil AI branding
-- Field-ready dashboard
-- Active truck/VIN memory
-- Oracle lookup
-- Universal SQL search
-- Repair kits
-- Parts/invoice workflow
-- Labor clock
-- Saved jobs/parts/repair notes
-- Field tools GPS/DOT
-- Vision/OCR workflow shell
-- Backend expansion tools
-- QA/debug screen
-- Final Release setup/checklist/backup tools
+What changed:
+- Removed TEST UNIVERSAL SEARCH button from the UI.
+- LOOKUP PART now runs Oracle + Universal SQL Search + Repair Kits together.
+- Raw JSON output replaced with cards: database parts, cross refs, labor, torque, fluids, diagnostics, suppliers, repair kits.
+- Service worker now caches app.js and style.css too.
+- Backend SQL is rebuilt around relational manufacturers / parts / part_cross_refs.
 
-Safety note:
-Verify all torque specs, OEM procedures, fitment, VIN/ESN/CPL, and safety-critical repairs with trusted OEM/service information before use in the field.
+Important:
+The Supabase key in app.js is your anon key. That is normal for browser apps, but Row Level Security should be tightened before storing sensitive customer data.

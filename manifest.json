@@ -1,10 +1,9 @@
 {
-  "name": "Rolling Cecil AI Final Release Pro",
-  "short_name": "Cecil AI",
+  "name": "Rolling Wrench Rolling Cecil AI",
+  "short_name": "Diesel Doctor",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#050505",
-  "theme_color": "#050505",
-  "icons": [],
-  "description": "Rolling Wrench Diesel field-ready shop OS with parts, diagnostics, invoices, clock, vision, backend tools, and QA."
+  "background_color": "#03080c",
+  "theme_color": "#ff7b00",
+  "description": "Rolling Wrench Diesel mobile repair, parts, VIN, quote, and diagnostic assistant."
 }
