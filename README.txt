@@ -1,20 +1,47 @@
-Rolling Cecil AI Master Build
+Rolling Cecil AI Phase 12 — Live Semantic Retrieval
 
-Upload these files to your GitHub Pages root:
+Upload all files to your GitHub Pages root:
 - index.html
-- style.css
 - app.js
+- style.css
 - manifest.json
 - service-worker.js
+- supabase_master_schema.sql
 
-Then run supabase_master_schema.sql in Supabase SQL Editor.
+Supabase:
+1. Open SQL Editor.
+2. Run supabase_master_schema.sql.
+3. Confirm these RPC functions pass in the app Debug screen:
+   - universal_diesel_search
+   - diesel_brain_search
+   - recursive_interchange_chain
+   - expanded_backend_search
+   - rolling_cecil_live_retrieval
 
-What changed:
-- Removed TEST UNIVERSAL SEARCH button from the UI.
-- LOOKUP PART now runs Oracle + Universal SQL Search + Repair Kits together.
-- Raw JSON output replaced with cards: database parts, cross refs, labor, torque, fluids, diagnostics, suppliers, repair kits.
-- Service worker now caches app.js and style.css too.
-- Backend SQL is rebuilt around relational manufacturers / parts / part_cross_refs.
+Phase 12 adds:
+- source-backed retrieval cards
+- repair memory ranking
+- live retrieval router
+- semantic_search_events logging
+- manual_ingestion_queue table
+- seed field notes for X15 idle stutter and DD15 NOx/SCR issues
+
+After upload:
+- Reset cache from Debug if old UI appears.
+- Test Doctor search: X15 stutter idle
+- Test AI Brain search: NOx efficiency
+
+
+PHASE 13 — REAL EMBEDDINGS + RAG
+Added:
+- Phase 13 AI Brain ingestion queue UI
+- Hybrid RAG search button
+- manual/TSB/catalog text queueing
+- embedding_ingestion_jobs table
+- embedding_router_events table
+- queue_embedding_ingestion RPC
+- rolling_cecil_hybrid_rag_search RPC
+- Edge Function starter package under supabase/functions/embedding-router
 
 Important:
-The Supabase key in app.js is your anon key. That is normal for browser apps, but Row Level Security should be tightened before storing sensitive customer data.
+Run supabase_master_schema.sql after upload. Real semantic vector similarity requires an Edge Function/API key to generate embeddings and populate knowledge_base_embeddings.embedding.
