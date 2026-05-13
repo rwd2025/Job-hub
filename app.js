@@ -375,15 +375,59 @@ ${data.repair_notes}
 `;
 }
 
-window.testRepairKit = async function(){
-  alert("Button works");
 
-  const result = await getRepairKit("Water Pump");
 
-  alert(result);
+async function universalSearch(search){
+
+  const { data, error } = await supabaseClient
+    .rpc("universal_diesel_search", {
+      search_text: search
+    });
+
+  if(error){
+    throw error;
+  }
+
+  return data;
+
+}
+window.testUniversalSearch = async function(){
+
+  const q =
+    $("partq")?.value.trim() ||
+    "water";
+
+  try{
+
+    const data = await universalSearch(q);
+
+    console.log(data);
+
+    $("partOut").innerHTML = `
+      <div class="oracleCard">
+
+        <div class="oracleTitle">
+          UNIVERSAL SEARCH
+        </div>
+
+        <div class="oracleNote"
+             style="white-space:pre-wrap;font-family:monospace;">
+
+${JSON.stringify(data,null,2)}
+
+        </div>
+
+      </div>
+    `;
+
+  }catch(e){
+
+    $("partOut").textContent =
+      "Universal Search Error: " + e.message;
+
+  }
+
 };
-
-
   async function runDoctorSearch(){
   const q = $("doctorAsk")?.value.trim() || "";
   if(!q){
