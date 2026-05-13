@@ -412,3 +412,146 @@ begin
   return result;
 end;
 $$;
+
+
+-- PHASE 3 DIESEL INTELLIGENCE ENGINE
+create table if not exists known_engine_patterns (
+  id bigint generated always as identity primary key,
+  engine_family text,
+  platform text,
+  fault_code text,
+  symptom text,
+  pattern text,
+  common_fix text,
+  warning text,
+  confidence_score numeric default 0.80,
+  created_at timestamptz default now()
+);
+
+create table if not exists diagnostic_memory (
+  id bigint generated always as identity primary key,
+  vin text,
+  engine_family text,
+  fault_code text,
+  symptom text,
+  confirmed_cause text,
+  confirmed_fix text,
+  parts_used text,
+  test_results text,
+  confidence_score numeric default 1.0,
+  created_at timestamptz default now()
+);
+
+alter table common_failures add column if not exists confidence_score numeric default 0.80;
+alter table common_failures add column if not exists warning text;
+alter table diagnostic_tests add column if not exists confidence_score numeric default 0.80;
+alter table repair_notes add column if not exists engine_family text;
+alter table repair_notes add column if not exists fault_code text;
+
+create index if not exists idx_known_engine_patterns_engine on known_engine_patterns(engine_family);
+create index if not exists idx_known_engine_patterns_fault on known_engine_patterns(fault_code);
+create index if not exists idx_diagnostic_memory_vin on diagnostic_memory(vin);
+create index if not exists idx_diagnostic_memory_fault on diagnostic_memory(fault_code);
+
+create or replace function diesel_brain_search(search_text text, vin_text text default null)
+returns jsonb
+language plpgsql
+as $$
+declare
+  result jsonb;
+begin
+  result := jsonb_build_object(
+    'common_failures', (
+      select coalesce(jsonb_agg(to_jsonb(c)), '[]'::jsonb)
+      from common_failures c
+      where c.fault_code ilike '%' || search_text || '%'
+         or c.symptom ilike '%' || search_text || '%'
+         or c.engine_family ilike '%' || search_text || '%'
+         or c.likely_causes ilike '%' || search_text || '%'
+         or c.common_fix ilike '%' || search_text || '%'
+      limit 12
+    ),
+    'diagnostic_tests', (
+      select coalesce(jsonb_agg(to_jsonb(d)), '[]'::jsonb)
+      from diagnostic_tests d
+      where d.fault_code ilike '%' || search_text || '%'
+         or d.symptom ilike '%' || search_text || '%'
+         or d.engine_family ilike '%' || search_text || '%'
+         or d.test_name ilike '%' || search_text || '%'
+      limit 12
+    ),
+    'known_patterns', (
+      select coalesce(jsonb_agg(to_jsonb(k)), '[]'::jsonb)
+      from known_engine_patterns k
+      where k.fault_code ilike '%' || search_text || '%'
+         or k.symptom ilike '%' || search_text || '%'
+         or k.engine_family ilike '%' || search_text || '%'
+         or k.pattern ilike '%' || search_text || '%'
+         or k.common_fix ilike '%' || search_text || '%'
+      limit 12
+    ),
+    'repair_memory', (
+      select coalesce(jsonb_agg(to_jsonb(r)), '[]'::jsonb)
+      from repair_notes r
+      where (vin_text is not null and r.vin = vin_text)
+         or r.symptom ilike '%' || search_text || '%'
+         or r.repair_action ilike '%' || search_text || '%'
+      limit 12
+    ),
+    'diagnostic_memory', (
+      select coalesce(jsonb_agg(to_jsonb(m)), '[]'::jsonb)
+      from diagnostic_memory m
+      where (vin_text is not null and m.vin = vin_text)
+         or m.fault_code ilike '%' || search_text || '%'
+         or m.symptom ilike '%' || search_text || '%'
+         or m.confirmed_cause ilike '%' || search_text || '%'
+         or m.confirmed_fix ilike '%' || search_text || '%'
+      limit 12
+    )
+  );
+  return result;
+end;
+$$;
+
+-- Starter seed examples. Verify all service data by VIN/ESN/CPL before customer use.
+insert into known_engine_patterns (engine_family, platform, fault_code, symptom, pattern, common_fix, warning, confidence_score)
+values
+('Cummins X15', 'Heavy Duty', 'SPN 5246 FMI 15', 'SCR derate / inducement', 'Often follows upstream NOx/DEF/SCR faults, failed regens, poor DEF quality, or ignored active codes.', 'Resolve root emissions fault, perform proper regen/SCR test, verify NOx conversion before clearing derate.', 'Do not only clear codes. Find the original emissions fault first.', 0.82),
+('Detroit DD15', 'Heavy Duty', 'EGR DELTA PRESSURE', 'EGR flow fault / delta pressure reading off', 'Delta pressure tubes/sensor plugging, leaks, wiring faults, or EGR restriction can skew readings.', 'Inspect tubes/hoses, verify sensor power/ground/signal, run EGR low flow/slow learn procedure when applicable.', 'Do not condemn EGR valve until sensor/tubes and wiring are verified.', 0.84),
+('PACCAR MX13', 'Heavy Duty', 'NOX EFFICIENCY', 'Outlet NOx efficiency high / SCR efficiency issue', 'Commonly caused by DEF quality, dosing issue, exhaust leak, biased NOx sensor, or poor regen history.', 'Check DEF concentration, dosing, exhaust leaks, NOx sensor plausibility, then run OEM SCR test.', 'Do not replace outlet NOx sensor without checking dosing and leaks.', 0.80)
+on conflict do nothing;
+
+
+-- PHASE 4 FIELD TOOLS PRO TABLES
+create table if not exists field_jobs (
+  id bigint generated always as identity primary key,
+  vin text,
+  truck text,
+  customer_name text,
+  customer_phone text,
+  location_name text,
+  gps_coordinates text,
+  roadside_status text,
+  eta_update text,
+  checklist text,
+  field_note text,
+  created_at timestamptz default now()
+);
+
+create table if not exists field_photos (
+  id bigint generated always as identity primary key,
+  vin text,
+  job_id bigint,
+  photo_note text,
+  photo_url text,
+  created_at timestamptz default now()
+);
+
+create table if not exists offline_sync_log (
+  id bigint generated always as identity primary key,
+  vin text,
+  item_type text,
+  payload jsonb,
+  synced boolean default false,
+  created_at timestamptz default now()
+);

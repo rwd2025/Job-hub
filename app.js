@@ -399,11 +399,166 @@ async function runDiag(){
   const q = $("diagq")?.value.trim() || "";
   const note = $("diagNote")?.value.trim() || "";
   if(!q){ $("diagOut").textContent = "Enter fault code or symptom first."; return; }
-  $("diagOut").textContent = "Fault Doctor running...";
+  $("diagOut").textContent = "Fault Doctor running Oracle + Diesel Brain...";
+  if($("intelOut")) $("intelOut").textContent = "Searching Diesel Brain memory...";
   try{
     const data = await callOracle({part_query:q,question:q,note,mode:"fault_doctor"});
-    $("diagOut").textContent = formatOracleData(data);
-  }catch(e){ $("diagOut").textContent = "DIAGNOSTIC ERROR: " + e.message; }
+    renderDiagnosticOracle("diagOut", data, q);
+    await renderDieselIntelligence(q, note);
+  }catch(e){
+    $("diagOut").textContent = "DIAGNOSTIC ERROR: " + e.message;
+    try{ await renderDieselIntelligence(q, note); }catch(_){}
+  }
+}
+
+
+function renderDiagnosticOracle(targetId, data, query){
+  const d = data?.data || data || {};
+  const answer = data?.answer || data?.message || d.answer || "";
+  const html = `
+    <div class="oracleCard diagCard">
+      <div class="oracleTitle">FAULT DOCTOR ORACLE</div>
+      <div class="smartGrid">
+        ${gridCell("QUERY", query || "—")}
+        ${gridCell("ENGINE", d.engine || getActiveTruck().engine || "UNKNOWN")}
+        ${gridCell("VIN", d.vin || getActiveTruck().vin || "NO VIN")}
+        ${gridCell("SOURCE", data?.source || "oracle")}
+      </div>
+      <div class="oracleNote" style="white-space:pre-wrap;">${safeText(answer || formatOracleData(data))}</div>
+    </div>`;
+  if($(targetId)) $(targetId).innerHTML = html;
+}
+
+function extractFaultTerms(q){
+  const text = String(q || "").toUpperCase();
+  const out = [];
+  const spn = text.match(/SPN\s*([0-9]+)/i);
+  const fmi = text.match(/FMI\s*([0-9]+)/i);
+  if(spn) out.push("SPN " + spn[1]);
+  if(fmi) out.push("FMI " + fmi[1]);
+  if(spn && fmi) out.push("SPN " + spn[1] + " FMI " + fmi[1]);
+  text.split(/[^A-Z0-9]+/).filter(w=>w.length>3).slice(0,8).forEach(w=>out.push(w));
+  return [...new Set(out)];
+}
+
+async function dieselBrainSearch(search, note=""){
+  if(!supabaseClient) throw new Error("Supabase client not loaded.");
+  const term = String(search || "").trim();
+  if(!term) return { common_failures:[], diagnostic_tests:[], known_patterns:[], repair_memory:[] };
+
+  let rpcData = null;
+  try{
+    const { data, error } = await supabaseClient.rpc("diesel_brain_search", { search_text: term, vin_text: activeVin() || null });
+    if(error) throw error;
+    rpcData = data;
+  }catch(e){
+    console.warn("diesel_brain_search RPC fallback", e.message);
+  }
+
+  if(rpcData) return rpcData;
+
+  const [failures, tests, notes] = await Promise.all([
+    supabaseClient.from("common_failures").select("*").or(`fault_code.ilike.%${term}%,symptom.ilike.%${term}%,engine_family.ilike.%${term}%,likely_causes.ilike.%${term}%,common_fix.ilike.%${term}%`).limit(8),
+    supabaseClient.from("diagnostic_tests").select("*").or(`fault_code.ilike.%${term}%,symptom.ilike.%${term}%,engine_family.ilike.%${term}%,test_name.ilike.%${term}%`).limit(8),
+    supabaseClient.from("repair_notes").select("*").or(`symptom.ilike.%${term}%,repair_action.ilike.%${term}%`).limit(8)
+  ]);
+
+  return {
+    common_failures: failures.data || [],
+    diagnostic_tests: tests.data || [],
+    known_patterns: [],
+    repair_memory: notes.data || []
+  };
+}
+
+function renderIntelligenceCards(data, q){
+  const failures = asArray(data.common_failures);
+  const tests = asArray(data.diagnostic_tests);
+  const patterns = asArray(data.known_patterns);
+  const memory = asArray(data.repair_memory || data.repair_notes);
+  const pieces = [];
+
+  if(failures.length){
+    pieces.push(card("LIKELY ROOT CAUSES", {text:`${failures.length} HIT${failures.length>1?"S":""}`, cls:"hot"},
+      `<div class="smartGrid">${failures.slice(0,6).map((f,i)=>gridCell(`#${i+1} ${f.fault_code || f.symptom || "CAUSE"}`, `${f.likely_causes || ""} → ${f.common_fix || ""}`)).join("")}</div>`,
+      "Ranked from Diesel Brain database. Verify readings before replacing parts."));
+  }
+
+  if(tests.length){
+    pieces.push(card("DEALER-STYLE TEST STEPS", {text:"GUIDED", cls:"good"},
+      `<div class="smartGrid">${tests.slice(0,5).map(t=>gridCell(t.test_name || t.fault_code || "TEST", `${t.test_steps || ""} ${t.pass_fail_specs ? " | SPEC: "+t.pass_fail_specs : ""}`)).join("")}</div>`));
+  }
+
+  if(patterns.length){
+    pieces.push(card("KNOWN BAD ENGINE PATTERNS", {text:"WATCH", cls:"warn"},
+      `<div class="smartGrid">${patterns.slice(0,5).map(p=>gridCell(p.engine_family || p.platform || "PATTERN", `${p.pattern || p.symptom || ""} ${p.warning || p.common_fix || ""}`)).join("")}</div>`));
+  }
+
+  if(memory.length){
+    pieces.push(card("SHOP REPAIR MEMORY", {text:`${memory.length} NOTE${memory.length>1?"S":""}`, cls:"good"},
+      `<div class="smartGrid">${memory.slice(0,6).map(m=>gridCell(m.verified_fix ? "VERIFIED FIX" : "REPAIR NOTE", `${m.symptom || ""} → ${m.repair_action || m.notes || ""}`)).join("")}</div>`));
+  }
+
+  if(!pieces.length){
+    pieces.push(card("DIESEL BRAIN", {text:"NO LOCAL MATCH", cls:"warn"},
+      `<div class="smartGrid">${gridCell("SEARCH", q)}${gridCell("NEXT STEP", "Save confirmed fixes to build shop memory.")}</div>`,
+      "No local diagnostic match yet. Oracle result above may still help."));
+  }
+
+  return pieces.join("");
+}
+
+async function renderDieselIntelligence(q, note=""){
+  const box = $("intelOut") || $("diagOut");
+  if(box) box.textContent = "Searching Diesel Brain...";
+  const terms = extractFaultTerms(q);
+  let all = { common_failures:[], diagnostic_tests:[], known_patterns:[], repair_memory:[] };
+  const searches = [q, ...terms].filter(Boolean).slice(0,5);
+  for(const s of searches){
+    try{
+      const data = await dieselBrainSearch(s, note);
+      all.common_failures.push(...asArray(data.common_failures));
+      all.diagnostic_tests.push(...asArray(data.diagnostic_tests));
+      all.known_patterns.push(...asArray(data.known_patterns));
+      all.repair_memory.push(...asArray(data.repair_memory || data.repair_notes));
+    }catch(e){
+      console.warn("Diesel brain term failed", s, e.message);
+    }
+  }
+  // simple de-dupe by JSON id / content
+  for(const k of Object.keys(all)){
+    const seen = new Set();
+    all[k] = all[k].filter(x=>{ const key = x.id || JSON.stringify(x).slice(0,160); if(seen.has(key)) return false; seen.add(key); return true; });
+  }
+  if(box) box.innerHTML = renderIntelligenceCards(all, q);
+  return all;
+}
+
+async function runIntelligenceOnly(){
+  const q = $("diagq")?.value.trim() || $("doctorAsk")?.value.trim() || "";
+  const note = $("diagNote")?.value.trim() || "";
+  if(!q){ alert("Enter a fault code or symptom first."); return; }
+  try{ await renderDieselIntelligence(q, note); }catch(e){ if($("intelOut")) $("intelOut").textContent = "Diesel Brain error: " + e.message; }
+}
+
+async function saveVerifiedFix(){
+  const symptom = $("diagq")?.value || $("doctorAsk")?.value || "";
+  const action = $("diagOut")?.innerText || $("intelOut")?.innerText || $("laborDesc")?.value || "";
+  if(!symptom || !action){ alert("Run a diagnostic and add a symptom first."); return; }
+  try{
+    await cloudInsert("repair_notes", { vin: activeVin(), symptom, repair_action: action.slice(0,1800), verified_fix: true });
+    await saveTruckHistoryCloud("verified_fix", `${symptom}\n${action.slice(0,600)}`);
+    alert("Verified fix saved to Diesel Brain memory.");
+  }catch(e){
+    alert("Verified fix save failed: " + e.message);
+  }
+}
+
+function clearDiagFields(){
+  setValue("diagq", "");
+  setValue("diagNote", "");
+  if($("diagOut")) $("diagOut").textContent = "Enter fault code or symptom.";
+  if($("intelOut")) $("intelOut").textContent = "Diesel Brain results will appear here.";
 }
 
 function imageToBase64(file){ return new Promise((resolve,reject)=>{ const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); }); }
@@ -770,4 +925,117 @@ async function saveRepairNoteCloud(){
 
 window.addEventListener("DOMContentLoaded",()=>{
   if($("cloudHistoryOut")) $("cloudHistoryOut").textContent = "Cloud job history ready.";
+});
+
+
+/* PHASE 4 FIELD TOOLS PRO */
+function getOfflineQueue(){
+  try{return JSON.parse(localStorage.getItem("offlineQueue") || "[]");}catch(e){return []}
+}
+function saveOfflineQueue(list){
+  localStorage.setItem("offlineQueue", JSON.stringify((list || []).slice(0,100)));
+  renderOfflineQueue();
+}
+function activeTruckSummary(){
+  const t=getActiveTruck();
+  return `${t.year || ""} ${t.make || ""} ${t.model || ""} ${t.engine || ""}`.trim();
+}
+function dropGpsPin(){
+  const out=$("fieldOut");
+  if(!navigator.geolocation){ alert("GPS not supported on this device/browser."); return; }
+  if(out) out.textContent="Getting GPS location...";
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const gps=`${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
+    setValue("fieldGps", gps);
+    const map=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(gps)}`;
+    localStorage.setItem("lastGpsMap", map);
+    if(out) out.innerHTML=`<div class="smartCardTitle"><span>GPS PIN DROPPED</span><span class="badge good">READY</span></div><b>${safeText(gps)}</b><br><button class="secondaryBtn" onclick="openCurrentGpsMap()">OPEN MAP</button>`;
+  },err=>{
+    if(out) out.textContent="GPS error: " + err.message;
+  },{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
+}
+function openCurrentGpsMap(){
+  const gps=$("fieldGps")?.value.trim() || "";
+  const map=gps ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(gps)}` : localStorage.getItem("lastGpsMap");
+  if(!map){ alert("Drop GPS pin first."); return; }
+  window.open(map,"_blank");
+}
+function getChecklistItems(){
+  return Array.from(document.querySelectorAll(".dotCheck:checked")).map(x=>x.value);
+}
+function buildDotChecklistNote(){
+  const items=getChecklistItems();
+  const note=`DOT / FIELD CHECKLIST\nVIN: ${activeVin() || "NONE"}\nUnit: ${activeTruckSummary() || "UNKNOWN"}\nLocation: ${$("fieldLocationName")?.value || ""}\nGPS: ${$("fieldGps")?.value || ""}\nStatus: ${$("roadsideStatus")?.value || ""}\n\nChecked:\n${items.length ? items.map(x=>"- "+x).join("\n") : "- No checklist items selected"}\n\nField Notes:\n${$("fieldNote")?.value || ""}`;
+  if($("fieldOut")) $("fieldOut").textContent=note;
+  return note;
+}
+function addChecklistToInvoice(){
+  const note=buildDotChecklistNote();
+  const current=$("laborDesc")?.value || "";
+  setValue("laborDesc", (current ? current + "\n\n" : "") + note);
+  alert("Checklist added to invoice/work notes.");
+}
+function fieldPhotoData(){
+  const img=$("fieldPhotoPreview");
+  return img && img.src && img.style.display !== "none" ? img.src : "";
+}
+function saveFieldJobLocal(){
+  const job={
+    id:Date.now(),
+    vin:activeVin(),
+    truck:activeTruckSummary(),
+    customer:$("custName")?.value || "",
+    phone:$("custPhone")?.value || "",
+    location:$("fieldLocationName")?.value || "",
+    gps:$("fieldGps")?.value || "",
+    status:$("roadsideStatus")?.value || "",
+    eta:$("customerEta")?.value || "",
+    checklist:getChecklistItems(),
+    note:$("fieldNote")?.value || "",
+    photo:fieldPhotoData(),
+    saved_at:new Date().toLocaleString()
+  };
+  const list=getOfflineQueue();
+  list.unshift({type:"field_job", payload:job});
+  saveOfflineQueue(list);
+  saveTruckHistoryCloud("field_job_saved", `${job.status} ${job.location} ${job.gps} ${job.note}`.slice(0,900)).catch(()=>{});
+  if($("fieldOut")) $("fieldOut").innerHTML=`<span class="cloudOk">Field job saved locally and queued.</span>`;
+}
+function queueOfflineSync(){
+  const built={
+    type:"job_sync",
+    payload:{
+      vin:activeVin(), truck:activeTruckSummary(), customer:$("custName")?.value || "",
+      invoice:$("quoteOut")?.innerText || "", field_note:$("fieldNote")?.value || "",
+      gps:$("fieldGps")?.value || "", created_at:new Date().toISOString()
+    }
+  };
+  const q=getOfflineQueue(); q.unshift(built); saveOfflineQueue(q);
+  alert("Added to offline sync queue.");
+}
+function renderOfflineQueue(){
+  const box=$("offlineQueueOut"); if(!box) return;
+  const q=getOfflineQueue();
+  if(!q.length){ box.textContent="Offline queue empty."; return; }
+  box.innerHTML=`<div class="smartCardTitle"><span>OFFLINE QUEUE</span><span class="badge warn">${q.length}</span></div>` + q.slice(0,8).map((item,i)=>`<div class="invoiceLine"><b>${safeText(item.type)}</b><small>${safeText(item.payload?.saved_at || item.payload?.created_at || "Queued")}</small><small>VIN ${safeText(item.payload?.vin || "")}</small><button class="secondaryBtn" onclick="removeOfflineQueueItem(${i})">REMOVE</button></div>`).join("");
+}
+function removeOfflineQueueItem(i){ const q=getOfflineQueue(); q.splice(i,1); saveOfflineQueue(q); }
+function copyCustomerUpdate(){
+  const text=`Rolling Wrench Diesel Update\nStatus: ${$("roadsideStatus")?.value || "On job"}\nUnit: ${activeTruckSummary() || "your unit"}\nVIN: ${activeVin() || ""}\nETA/Update: ${$("customerEta")?.value || "Working on it now"}\nLocation: ${$("fieldLocationName")?.value || ""}\nNotes: ${$("fieldNote")?.value || ""}`.trim();
+  navigator.clipboard?.writeText(text);
+  if($("fieldOut")) $("fieldOut").textContent=text;
+  alert("Customer update copied.");
+}
+function wireFieldPhotoPreview(){
+  const input=$("fieldPhoto"); const preview=$("fieldPhotoPreview");
+  if(!input || !preview) return;
+  input.addEventListener("change",()=>{
+    const file=input.files?.[0]; if(!file) return;
+    preview.src=URL.createObjectURL(file); preview.style.display="block";
+  });
+}
+const __phase4OldDOMContentLoaded = window.__phase4DomReady || null;
+window.addEventListener("DOMContentLoaded",()=>{
+  wireFieldPhotoPreview();
+  renderOfflineQueue();
 });

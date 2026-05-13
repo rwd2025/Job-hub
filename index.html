@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Rolling Wrench Diesel | Rolling Cecil AI Parts Pro</title>
+<title>Rolling Wrench Diesel | Rolling Cecil AI Diesel Intelligence</title>
 <link rel="stylesheet" href="style.css" />
 <link rel="manifest" href="manifest.json" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -37,6 +37,7 @@
     <button onclick="showScreen('settings')">⚙️ Settings</button>
     <button onclick="showScreen('invoice')">💵 Invoice / Quote</button>
     <button onclick="showScreen('timeClock')">⏱️ Time Clock</button>
+    <button onclick="showScreen('fieldTools')">📍 Field Tools</button>
     <button onclick="showScreen('team')">👥 Team / Tech Viewer</button>
     <button onclick="showScreen('voice')">🎙️ Voice Navigator</button>
     <button onclick="toggleSideMenu()">✖ Close</button>
@@ -89,7 +90,7 @@
   <!-- HOME SCREEN -->
   <main id="home" class="screen active">
     <h1 class="heroTitle">ROLLING CECIL AI</h1>
-    <p class="heroSubtitle">Field-ready diesel lookup, parts, repair kits, clock, and invoices.</p>
+    <p class="heroSubtitle">Field-ready diesel lookup, parts, diagnostics, repair memory, clock, and invoices.</p>
 
     <section class="searchPanel">
       <div class="searchBox">
@@ -174,6 +175,13 @@
         <span>→</span>
       </button>
 
+      <button class="toolCard" onclick="showScreen('fieldTools')">
+        <div class="toolIcon">📍</div>
+        <h2>FIELD TOOLS PRO</h2>
+        <p>GPS pin, DOT checklist, photo notes, offline queue</p>
+        <span>→</span>
+      </button>
+
       <button class="toolCard" onclick="showScreen('settings')">
         <div class="toolIcon">⚙️</div>
         <h2>SETTINGS</h2>
@@ -185,7 +193,7 @@
     <section class="statusGrid">
       <div><b>☁️ CONNECTION</b><span>Online</span><small>All systems operational</small></div>
       <div><b>🛡️ OEM GATEWAY</b><span>Connected</span><small>PACCAR, Cummins, Detroit ready</small></div>
-      <div><b>🗄️ PARTS DATABASE</b><span>Phase 2</span><small>Oracle + cross refs + suppliers</small></div>
+      <div><b>🗄️ DIESEL BRAIN</b><span>Phase 3</span><small>Diagnostics + parts + repair memory</small></div>
       <div><b>🧠 REPAIR INSIGHTS</b><span>Ready</span><small>Buddy system prepared</small></div>
     </section>
   </main>
@@ -279,13 +287,30 @@
   <!-- FAULT DOCTOR -->
   <main id="faultDoctor" class="screen">
     <h1 class="screenTitle">FAULT DOCTOR</h1>
-    <label>FAULT CODE / SYMPTOM<textarea id="diagq" placeholder="SPN 5246 FMI 15, derate, regen issue, NOx efficiency..."></textarea></label>
-    <label>NOTES<textarea id="diagNote" placeholder="Engine, symptoms, readings, tests already done"></textarea></label>
-    <div class="buttonRow">
+    <section class="intelPanel">
+      <div class="panelHead">
+        <b>PHASE 3 DIESEL INTELLIGENCE</b>
+        <span>SPN/FMI • likely causes • common fixes • verified repair memory • Buddy warnings</span>
+      </div>
+      <div class="intelGrid">
+        <div><b>ROOT CAUSE</b><span>Ranks likely failures</span></div>
+        <div><b>COMMON FIX</b><span>Shows shop-proven repairs</span></div>
+        <div><b>VIN MEMORY</b><span>Pulls previous notes</span></div>
+        <div><b>WARNINGS</b><span>Flags common misdiagnosis</span></div>
+      </div>
+    </section>
+    <label>FAULT CODE / SYMPTOM<textarea id="diagq" placeholder="SPN 5246 FMI 15, derate, regen issue, NOx efficiency, EGR delta pressure..."></textarea></label>
+    <label>NOTES<textarea id="diagNote" placeholder="Engine, symptoms, readings, tests already done, VIN/ESN/CPL, temps, pressures"></textarea></label>
+    <div class="buttonRow featureButtons">
       <button onclick="runDiag()">RUN FAULT DOCTOR</button>
+      <button onclick="runIntelligenceOnly()">DIESEL BRAIN ONLY</button>
+      <button onclick="saveVerifiedFix()">SAVE VERIFIED FIX</button>
       <button onclick="saveRepairNoteCloud()">SAVE REPAIR NOTE</button>
+      <button onclick="clearDiagFields()">CLEAR DIAG</button>
+      <button onclick="showScreen('invoice')">GO TO INVOICE</button>
     </div>
     <section id="diagOut" class="resultBox">Enter fault code or symptom.</section>
+    <section id="intelOut" class="resultBox smallBox">Diesel Brain results will appear here.</section>
   </main>
 
   <!-- REPAIR HUD -->
@@ -359,6 +384,60 @@
     </section>
   </main>
 
+
+  <!-- FIELD TOOLS PRO -->
+  <main id="fieldTools" class="screen">
+    <h1 class="screenTitle">FIELD TOOLS PRO</h1>
+
+    <section class="fieldProPanel">
+      <div class="panelHead">
+        <b>PHASE 4 FIELD OPERATIONS</b>
+        <span>GPS • roadside mode • DOT checklist • photo notes • offline queue • customer updates</span>
+      </div>
+      <div class="fieldToolGrid">
+        <button onclick="dropGpsPin()">📍 DROP GPS PIN</button>
+        <button onclick="openCurrentGpsMap()">🗺️ OPEN MAP</button>
+        <button onclick="saveFieldJobLocal()">💾 SAVE FIELD JOB</button>
+        <button onclick="queueOfflineSync()">☁️ QUEUE OFFLINE SYNC</button>
+        <button onclick="copyCustomerUpdate()">📲 COPY CUSTOMER UPDATE</button>
+        <button onclick="copyText('quoteOut')">📋 COPY INVOICE</button>
+      </div>
+    </section>
+
+    <div class="formGrid">
+      <label>JOB SITE / LOCATION<input id="fieldLocationName" placeholder="Customer yard, roadside mile marker, shop bay"></label>
+      <label>GPS COORDINATES<input id="fieldGps" placeholder="Tap DROP GPS PIN"></label>
+      <label>ROADSIDE STATUS<select id="roadsideStatus"><option>Not Started</option><option>En Route</option><option>On Site</option><option>Diagnosing</option><option>Waiting on Parts</option><option>Repairing</option><option>Complete</option></select></label>
+      <label>ETA / UPDATE<input id="customerEta" placeholder="Example: On site now, parts run, 45 minutes"></label>
+    </div>
+
+    <div class="formGrid">
+      <label>FIELD NOTE<textarea id="fieldNote" placeholder="Roadside notes, safety issues, location details, customer update"></textarea></label>
+      <label>PHOTO NOTE<input id="fieldPhoto" type="file" accept="image/*"><img id="fieldPhotoPreview" class="previewImg" alt="Field photo preview"></label>
+    </div>
+
+    <section class="checklistPanel">
+      <div class="smartCardTitle"><span>DOT / FIELD CHECKLIST</span><span class="badge good">Tap items done</span></div>
+      <div class="checkGrid">
+        <label><input type="checkbox" class="dotCheck" value="Lights checked"> Lights</label>
+        <label><input type="checkbox" class="dotCheck" value="Brakes inspected"> Brakes</label>
+        <label><input type="checkbox" class="dotCheck" value="Air leaks checked"> Air Leaks</label>
+        <label><input type="checkbox" class="dotCheck" value="Tires inspected"> Tires</label>
+        <label><input type="checkbox" class="dotCheck" value="Fluids checked"> Fluids</label>
+        <label><input type="checkbox" class="dotCheck" value="Leaks inspected"> Leaks</label>
+        <label><input type="checkbox" class="dotCheck" value="Battery/charging checked"> Battery</label>
+        <label><input type="checkbox" class="dotCheck" value="Road test completed"> Road Test</label>
+      </div>
+      <div class="buttonRow">
+        <button onclick="buildDotChecklistNote()">BUILD CHECKLIST NOTE</button>
+        <button onclick="addChecklistToInvoice()">ADD TO INVOICE NOTES</button>
+      </div>
+    </section>
+
+    <section id="fieldOut" class="resultBox">Field tools ready. Drop GPS pin or build a checklist.</section>
+    <section id="offlineQueueOut" class="resultBox smallBox">Offline queue ready.</section>
+  </main>
+
   <!-- INVOICE -->
   <main id="invoice" class="screen">
     <h1 class="screenTitle">INVOICE / QUOTE</h1>
@@ -426,6 +505,7 @@
     <button onclick="clockIn()">START CLOCK</button>
     <button onclick="showScreen('vin')">VIN</button>
     <button onclick="showScreen('dieselAI')">CAMERA</button>
+    <button onclick="showScreen('fieldTools')">GPS/DOT</button>
     <button onclick="saveJobCloud()">SAVE JOB</button>
   </div>
 

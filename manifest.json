@@ -1,9 +1,10 @@
 {
-  "name": "Rolling Cecil AI Parts Pro",
-  "short_name": "Cecil Parts",
+  "name": "Rolling Cecil AI Diesel Intelligence",
+  "short_name": "Rolling Cecil",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#050505",
   "theme_color": "#ff7a18",
-  "icons": []
+  "icons": [],
+  "description": "Rolling Wrench Diesel field-ready shop OS with parts, diagnostics, invoices, clock, and Diesel Brain memory."
 }
