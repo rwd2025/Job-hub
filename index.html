@@ -265,7 +265,10 @@
     <h1 class="screenTitle">FAULT DOCTOR</h1>
     <label>FAULT CODE / SYMPTOM<textarea id="diagq" placeholder="SPN 5246 FMI 15, derate, regen issue, NOx efficiency..."></textarea></label>
     <label>NOTES<textarea id="diagNote" placeholder="Engine, symptoms, readings, tests already done"></textarea></label>
-    <button onclick="runDiag()">RUN FAULT DOCTOR</button>
+    <div class="buttonRow">
+      <button onclick="runDiag()">RUN FAULT DOCTOR</button>
+      <button onclick="saveRepairNoteCloud()">SAVE REPAIR NOTE</button>
+    </div>
     <section id="diagOut" class="resultBox">Enter fault code or symptom.</section>
   </main>
 
@@ -367,16 +370,19 @@
     <div class="buttonRow featureButtons">
       <button onclick="buildInvoice()">BUILD INVOICE</button>
       <button onclick="saveInvoice()">SAVE INVOICE</button>
+      <button onclick="saveJobCloud()">SAVE JOB CLOUD</button>
       <button onclick="copyText('quoteOut')">COPY INVOICE</button>
       <button onclick="sendClockToInvoice()">ADD CLOCK HOURS</button>
       <button onclick="clearInvoiceForm()">CLEAR INVOICE</button>
       <button onclick="loadLastInvoice()">LOAD LAST INVOICE</button>
+      <button onclick="loadJobHistoryCloud()">LOAD CLOUD HISTORY</button>
       <button onclick="clearInvoiceParts()">CLEAR PARTS LIST</button>
       <button onclick="showScreen('parts')">ADD MORE PARTS</button>
     </div>
 
     <section id="quoteOut" class="resultBox">Invoice output will appear here.</section>
     <section id="savedInvoicesOut" class="resultBox smallBox">Saved invoices will appear here.</section>
+    <section id="cloudHistoryOut" class="resultBox smallBox">Cloud job history will appear here.</section>
   </main>
 
   <!-- SETTINGS -->
@@ -395,6 +401,17 @@
     <button onclick="saveSettings()">SAVE SETTINGS</button>
     <section id="settingsOut" class="resultBox">Settings ready.</section>
   </main>
+
+
+  <!-- PHASE 1 FIELD QUICK ACTIONS -->
+  <div class="quickDock" id="quickDock">
+    <button onclick="showScreen('parts')">＋ PART</button>
+    <button onclick="showScreen('invoice')">＋ LABOR</button>
+    <button onclick="clockIn()">START CLOCK</button>
+    <button onclick="showScreen('vin')">VIN</button>
+    <button onclick="showScreen('dieselAI')">CAMERA</button>
+    <button onclick="saveJobCloud()">SAVE JOB</button>
+  </div>
 
   <!-- BOTTOM NAV -->
   <nav class="bottomNav">

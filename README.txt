@@ -1,33 +1,23 @@
-Rolling Cecil AI FIELD PRO BUILD
+Rolling Cecil AI - Phase 1 Shop OS Build
 
-Professional field-ready full feature version.
-
-Upload/replace ALL files in GitHub Pages root:
+Upload all files to your GitHub Pages root:
 - index.html
 - app.js
 - style.css
 - manifest.json
 - service-worker.js
 - supabase_master_schema.sql
-- README.txt
 
-Includes:
-- Rolling Cecil AI branding
-- compact professional field UI
-- back/clear buttons
-- parts lookup with Oracle + Universal DB + repair kits
-- add part manually
-- add lookup result to invoice
-- part photo attachment
-- voice part input
-- save parts
-- saved parts list
-- invoice builder
-- complaint/cause/correction fields
-- invoice parts list
-- save/load invoice history
-- time clock
-- send clock hours to invoice
-- service worker cache update
+What's added:
+- Field quick action dock
+- Save Job Cloud button
+- Load Cloud History button
+- Save Repair Note button
+- Saved jobs wired to Supabase saved_jobs table
+- Saved parts wired to Supabase saved_parts table
+- Labor clock wired to Supabase labor_clock table
+- Truck history events wired to truck_history table
+- Repair notes wired to repair_notes table
+- Service worker cache updated for app.js and style.css
 
-After uploading, hard refresh or delete/re-add the Home Screen app because old service worker cache can hold the previous version.
+If app still shows old version, clear Safari website data or remove/re-add the Home Screen app.

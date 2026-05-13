@@ -734,3 +734,40 @@ textarea,input{font-size:14px !important;padding:11px 12px !important;border-rad
 .clockGrid{grid-template-columns:repeat(3,1fr);gap:9px}.clockGrid div{padding:10px;border-radius:12px}.clockGrid b{font-size:9px}.clockGrid span{font-size:15px}.bottomNav{bottom:8px;border-radius:15px;width:min(1080px,calc(100vw - 14px));}.bottomNav button{font-size:18px;padding:10px 3px}.bottomNav button span{font-size:9px;letter-spacing:.4px}
 @media(max-width:900px){.truckData{grid-template-columns:1fr 1fr 1fr}.truckImage{display:none}.fieldStrip{grid-template-columns:1fr}.toolGrid{grid-template-columns:1fr 1fr}.statusGrid{grid-template-columns:1fr 1fr}.featureButtons{grid-template-columns:1fr 1fr}.clockGrid{grid-template-columns:1fr 1fr}.topStatus{display:none}}
 @media(max-width:520px){body{padding-bottom:88px}.appShell{padding:8px 9px 92px}.topBar{gap:6px}.iconBtn{width:36px;height:36px;font-size:16px}.brandMain{font-size:16px !important}.brandSub{font-size:8px !important;letter-spacing:1.2px}.truckCard{padding:9px}.truckData{grid-template-columns:1fr 1fr}.dataCell{padding:7px}.dataCell strong{font-size:11px}.fieldStrip div{padding:9px}.heroTitle{font-size:21px !important}.heroSubtitle{font-size:12px}.searchPanel{padding:9px}.toolGrid{grid-template-columns:1fr 1fr;gap:8px}.toolCard{min-height:126px !important;padding:10px 8px !important}.toolIcon{font-size:24px !important}.toolCard h2{font-size:12px !important}.toolCard p{font-size:10px !important}.formGrid,.buttonRow,.featureButtons,.statusGrid,.vinGrid,.smartGrid,.clockGrid{grid-template-columns:1fr}.buttonRow button{font-size:12px !important}.screenTitle{font-size:20px !important}.bottomNav button{font-size:16px;padding:9px 2px}.bottomNav button span{font-size:8px}}
+
+
+/* PHASE 1 SHOP OS QUICK ACTIONS */
+.quickDock{
+  position:fixed;
+  left:50%;
+  bottom:68px;
+  transform:translateX(-50%);
+  width:min(1080px,calc(100vw - 14px));
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:7px;
+  background:rgba(4,9,13,.94);
+  border:1px solid rgba(255,122,24,.45);
+  border-radius:14px;
+  padding:7px;
+  z-index:31;
+  box-shadow:0 0 28px rgba(0,0,0,.65);
+  backdrop-filter:blur(10px);
+}
+.quickDock button{
+  background:#101a22;
+  color:#f7fbff;
+  border:1px solid #2d4350;
+  border-radius:10px;
+  padding:9px 4px;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.35px;
+}
+.quickDock button:nth-child(3){border-color:#35d46a;color:#35d46a;}
+.cloudOk{color:#35d46a;font-weight:900}
+.cloudWarn{color:#ffd27f;font-weight:900}
+@media(max-width:700px){
+  .quickDock{grid-template-columns:repeat(3,1fr);bottom:63px;}
+  .quickDock button{font-size:9px;padding:8px 3px;}
+}

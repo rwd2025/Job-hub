@@ -583,3 +583,191 @@ function addSavedPartToInvoice(i){
 }
 
 window.addEventListener("DOMContentLoaded",()=>{ wirePartPhoto(); renderInvoiceParts(); renderSavedInvoices(); renderSavedParts(); renderClock(); });
+
+
+/* ===============================
+   PHASE 1 SHOP OS CLOUD WIRING
+   saved_jobs • saved_parts • labor_clock • truck_history • repair_notes
+   =============================== */
+function cloudReady(){
+  return !!supabaseClient;
+}
+function activeVin(){
+  return ($("invoiceVin")?.value || $("vinGlobal")?.value || getActiveTruck().vin || "").trim().toUpperCase();
+}
+function activeTruckText(){
+  const t = getActiveTruck();
+  return ($("invoiceTruck")?.value || `${t.year || ""} ${t.make || ""} ${t.model || ""}`.trim() || "").trim();
+}
+async function cloudInsert(table, payload){
+  if(!cloudReady()) throw new Error("Supabase client not loaded.");
+  const { data, error } = await supabaseClient.from(table).insert(payload).select().limit(1);
+  if(error) throw error;
+  return data?.[0] || null;
+}
+async function cloudSelect(table, vin, limit=20){
+  if(!cloudReady()) throw new Error("Supabase client not loaded.");
+  let q = supabaseClient.from(table).select("*").order("created_at", { ascending:false }).limit(limit);
+  if(vin) q = q.eq("vin", vin);
+  const { data, error } = await q;
+  if(error) throw error;
+  return data || [];
+}
+async function saveTruckHistoryCloud(eventType, notes){
+  try{
+    await cloudInsert("truck_history", {
+      vin: activeVin(),
+      event_type: eventType || "job_event",
+      notes: notes || ""
+    });
+  }catch(e){
+    console.warn("Truck history cloud save failed", e.message);
+  }
+}
+async function saveJobCloud(){
+  const built = buildInvoice ? buildInvoice() : {text:$("quoteOut")?.textContent || "", total:0, labor:0, parts:0};
+  const t = getActiveTruck();
+  const payload = {
+    vin: activeVin(),
+    year: $("yearGlobal")?.value || t.year || "",
+    make: $("makeGlobal")?.value || t.make || "",
+    model: $("modelGlobal")?.value || t.model || "",
+    engine: $("engine")?.value || t.engine || "",
+    customer_name: $("custName")?.value || "",
+    customer_phone: $("custPhone")?.value || "",
+    complaint: $("complaintText")?.value || "",
+    cause: $("causeText")?.value || "",
+    correction: $("correctionText")?.value || $("laborDesc")?.value || "",
+    labor_hours: Number($("laborHours")?.value || 0),
+    labor_total: Number(built.labor || 0),
+    parts_total: Number(built.parts || 0),
+    grand_total: Number(built.total || 0),
+    invoice_text: built.text || $("quoteOut")?.textContent || ""
+  };
+  try{
+    await cloudInsert("saved_jobs", payload);
+    await saveTruckHistoryCloud("saved_job", `Saved job: ${payload.customer_name || "customer"} / ${payload.complaint || "no complaint entered"}`);
+    if($("cloudHistoryOut")) $("cloudHistoryOut").innerHTML = `<span class="cloudOk">Cloud job saved.</span>`;
+    alert("Job saved to Supabase.");
+  }catch(e){
+    const msg = "Cloud save failed: " + e.message;
+    if($("cloudHistoryOut")) $("cloudHistoryOut").innerHTML = `<span class="cloudWarn">${safeText(msg)}</span>`;
+    alert(msg);
+  }
+}
+async function loadJobHistoryCloud(){
+  const box = $("cloudHistoryOut");
+  const vin = activeVin();
+  if(box) box.textContent = "Loading cloud history...";
+  try{
+    const rows = await cloudSelect("saved_jobs", vin, 15);
+    if(!box) return;
+    if(!rows.length){ box.textContent = vin ? "No cloud jobs saved for this VIN yet." : "No cloud jobs found."; return; }
+    box.innerHTML = `<div class="smartCardTitle"><span>CLOUD JOB HISTORY</span><span class="badge good">${rows.length}</span></div>` + rows.map((r,i)=>`
+      <div class="invoiceLine">
+        <b>${safeText(r.customer_name || "Saved Job")}</b> <span class="totalBadge">${money(r.grand_total || 0)}</span>
+        <small>${safeText(new Date(r.created_at).toLocaleString())} | VIN ${safeText(r.vin || "")}</small>
+        <small>Complaint: ${safeText(r.complaint || "")}</small>
+        <small>Correction: ${safeText(r.correction || "")}</small>
+        <button class="secondaryBtn" onclick="loadCloudJobToInvoice(${i})">LOAD TO INVOICE</button>
+      </div>`).join("");
+    window.__cloudJobs = rows;
+  }catch(e){
+    if(box) box.innerHTML = `<span class="cloudWarn">Cloud history error: ${safeText(e.message)}</span>`;
+  }
+}
+function loadCloudJobToInvoice(i){
+  const r = (window.__cloudJobs || [])[i];
+  if(!r) return alert("Cloud job not found.");
+  setValue("custName", r.customer_name || "");
+  setValue("custPhone", r.customer_phone || "");
+  setValue("invoiceTruck", `${r.year || ""} ${r.make || ""} ${r.model || ""}`.trim());
+  setValue("invoiceVin", r.vin || "");
+  setValue("laborHours", r.labor_hours || "");
+  setValue("complaintText", r.complaint || "");
+  setValue("causeText", r.cause || "");
+  setValue("correctionText", r.correction || "");
+  setValue("laborDesc", r.correction || "");
+  if($("quoteOut")) $("quoteOut").textContent = r.invoice_text || "";
+  showScreen("invoice");
+}
+
+const __phase1_oldSaveActiveTruck = saveActiveTruck;
+saveActiveTruck = function(){
+  __phase1_oldSaveActiveTruck();
+  saveTruckHistoryCloud("active_truck_saved", ctx()).catch(()=>{});
+};
+
+const __phase1_oldClockIn = clockIn;
+clockIn = function(){
+  __phase1_oldClockIn();
+  const c = getClock();
+  cloudInsert("labor_clock", {
+    vin: activeVin(),
+    technician: "Rolling Wrench Diesel",
+    start_time: c.start,
+    stop_time: null,
+    labor_hours: 0,
+    notes: "Clock started from Rolling Cecil AI"
+  }).then(row=>{
+    if(row?.id){ c.cloud_id = row.id; saveClock(c); }
+  }).catch(e=>console.warn("Clock cloud start failed", e.message));
+};
+
+const __phase1_oldClockOut = clockOut;
+clockOut = function(){
+  __phase1_oldClockOut();
+  const c = getClock();
+  const h = clockHours(c);
+  if(!c.cloud_id){
+    cloudInsert("labor_clock", {
+      vin: activeVin(),
+      technician: "Rolling Wrench Diesel",
+      start_time: c.start,
+      stop_time: c.stop,
+      labor_hours: h,
+      notes: "Clock completed from Rolling Cecil AI"
+    }).catch(e=>console.warn("Clock cloud save failed", e.message));
+    return;
+  }
+  supabaseClient.from("labor_clock").update({stop_time:c.stop,labor_hours:h,notes:"Clock completed from Rolling Cecil AI"}).eq("id", c.cloud_id)
+    .then(({error})=>{ if(error) console.warn("Clock cloud update failed", error.message); });
+};
+
+const __phase1_oldSaveCurrentPart = saveCurrentPart;
+saveCurrentPart = function(){
+  __phase1_oldSaveCurrentPart();
+  const payload = {
+    vin: activeVin(),
+    oem_part: $("manualPartNumber")?.value || $("partq")?.value || "",
+    aftermarket_part: "",
+    component_name: $("manualPartName")?.value || $("partq")?.value || "",
+    manufacturer: $("manualPartSupplier")?.value || "",
+    qty: Number($("manualPartQty")?.value || 1),
+    price: Number($("manualPartPrice")?.value || 0),
+    notes: $("partNote")?.value || $("partOut")?.innerText?.slice(0,900) || ""
+  };
+  cloudInsert("saved_parts", payload).catch(e=>console.warn("Saved part cloud failed", e.message));
+};
+
+async function saveRepairNoteCloud(){
+  const symptom = $("diagq")?.value || $("doctorAsk")?.value || "";
+  const action = $("diagOut")?.innerText || $("doctorOut")?.innerText || $("laborDesc")?.value || "";
+  if(!symptom && !action){ alert("Enter a symptom or diagnostic result first."); return; }
+  try{
+    await cloudInsert("repair_notes", {
+      vin: activeVin(),
+      symptom,
+      repair_action: action.slice(0,1800),
+      verified_fix: false
+    });
+    await saveTruckHistoryCloud("repair_note", `${symptom}\n${action.slice(0,400)}`);
+    alert("Repair note saved to cloud.");
+  }catch(e){
+    alert("Repair note cloud save failed: " + e.message);
+  }
+}
+
+window.addEventListener("DOMContentLoaded",()=>{
+  if($("cloudHistoryOut")) $("cloudHistoryOut").textContent = "Cloud job history ready.";
+});

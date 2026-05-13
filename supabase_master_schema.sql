@@ -278,3 +278,72 @@ from parts p1, parts p2
 where (p1.part_number='4353204' and p2.part_number='AF27844')
    or (p1.part_number='2501022C92' and p2.part_number='800405')
 on conflict do nothing;
+
+
+-- PHASE 1 SHOP OS TABLES
+create table if not exists saved_jobs (
+  id bigint generated always as identity primary key,
+  vin text,
+  year text,
+  make text,
+  model text,
+  engine text,
+  customer_name text,
+  customer_phone text,
+  complaint text,
+  cause text,
+  correction text,
+  labor_hours numeric default 0,
+  labor_total numeric default 0,
+  parts_total numeric default 0,
+  grand_total numeric default 0,
+  invoice_text text,
+  created_at timestamptz default now()
+);
+
+create table if not exists saved_parts (
+  id bigint generated always as identity primary key,
+  vin text,
+  oem_part text,
+  aftermarket_part text,
+  component_name text,
+  manufacturer text,
+  qty numeric default 1,
+  price numeric default 0,
+  notes text,
+  created_at timestamptz default now()
+);
+
+create table if not exists labor_clock (
+  id bigint generated always as identity primary key,
+  vin text,
+  technician text,
+  start_time timestamptz,
+  stop_time timestamptz,
+  labor_hours numeric default 0,
+  notes text,
+  created_at timestamptz default now()
+);
+
+create table if not exists truck_history (
+  id bigint generated always as identity primary key,
+  vin text,
+  event_type text,
+  notes text,
+  created_at timestamptz default now()
+);
+
+create table if not exists repair_notes (
+  id bigint generated always as identity primary key,
+  vin text,
+  symptom text,
+  repair_action text,
+  verified_fix boolean default false,
+  created_at timestamptz default now()
+);
+
+create index if not exists saved_jobs_vin_idx on saved_jobs(vin);
+create index if not exists saved_parts_vin_idx on saved_parts(vin);
+create index if not exists labor_clock_vin_idx on labor_clock(vin);
+create index if not exists truck_history_vin_idx on truck_history(vin);
+create index if not exists repair_notes_vin_idx on repair_notes(vin);
