@@ -304,6 +304,23 @@ async function askPart(){
     });
 
     renderOracleCard("partOut","ORACLE VERIFIED PART LOOKUP",data);
+    const repair = await getRepairKit(q);
+
+if(repair && repair !== "No repair kit found."){
+
+  $("partOut").innerHTML += `
+    <div class="oracleCard" style="margin-top:16px;">
+      <div class="oracleTitle">SMART REPAIR KIT</div>
+
+      <div class="oracleNote"
+           style="white-space:pre-wrap;font-family:monospace;">
+
+${repair}
+
+      </div>
+    </div>
+  `;
+}
   }catch(e){
     $("partOut").textContent = "ORACLE SEARCH ERROR: " + e.message;
   }
