@@ -40,6 +40,7 @@
     <button onclick="showScreen('fieldTools')">📍 Field Tools</button>
     <button onclick="showScreen('visionPro')">📷 OCR / Vision Pro</button>
     <button onclick="showScreen('backendPro')">🗄️ Backend Pro</button>
+    <button onclick="showScreen('debugPro')">🧪 Debug / QA</button>
     <button onclick="showScreen('team')">👥 Team / Tech Viewer</button>
     <button onclick="showScreen('voice')">🎙️ Voice Navigator</button>
     <button onclick="toggleSideMenu()">✖ Close</button>
@@ -592,6 +593,44 @@
   </main>
 
 
+
+
+  <!-- PHASE 9 QA / DEBUG / STABILITY PRO -->
+  <main id="debugPro" class="screen">
+    <h1 class="screenTitle">QA / DEBUG / STABILITY PRO</h1>
+
+    <section class="debugHero">
+      <div>
+        <b>APP VERSION</b>
+        <span id="debugVersion">Phase 9</span>
+      </div>
+      <div>
+        <b>SUPABASE</b>
+        <span id="debugSupabaseStatus">Not tested</span>
+      </div>
+      <div>
+        <b>CACHE</b>
+        <span id="debugCacheStatus">Ready</span>
+      </div>
+    </section>
+
+    <div class="buttonRow featureButtons">
+      <button onclick="runFullQACheck()">RUN FULL QA CHECK</button>
+      <button onclick="testAllCoreButtons()">TEST CORE BUTTONS</button>
+      <button onclick="testSupabaseConnection()">TEST SUPABASE</button>
+      <button onclick="testRequiredTables()">CHECK TABLES</button>
+      <button onclick="testRequiredRPCs()">CHECK RPC FUNCTIONS</button>
+      <button onclick="showErrorLog()">SHOW ERROR LOG</button>
+      <button onclick="exportDebugReport()">EXPORT DEBUG REPORT</button>
+      <button onclick="resetAppCache()">RESET CACHE</button>
+      <button onclick="clearLocalAppData()">CLEAR LOCAL STORAGE</button>
+      <button onclick="enableFallbackMode()">FALLBACK MODE</button>
+    </div>
+
+    <section id="debugOut" class="resultBox">Debug tools ready. Run full QA after each upload.</section>
+    <section id="debugLogOut" class="resultBox smallBox">Error log will appear here.</section>
+  </main>
+
   <!-- PHASE 1 FIELD QUICK ACTIONS -->
   <div class="quickDock" id="quickDock">
     <button onclick="phase8MasterSearch()">MASTER</button>
@@ -602,6 +641,7 @@
     <button onclick="showScreen('visionPro')">CAMERA</button>
     <button onclick="showScreen('fieldTools')">GPS/DOT</button>
     <button onclick="showScreen('backendPro')">BACKEND</button>
+    <button onclick="showScreen('debugPro')">DEBUG</button>
     <button onclick="saveJobCloud()">SAVE JOB</button>
   </div>
 

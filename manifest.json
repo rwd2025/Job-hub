@@ -1,6 +1,6 @@
 {
-  "name": "Rolling Cecil AI Phase 8 Final Integration Pro",
-  "short_name": "Rolling Cecil AI",
+  "name": "Rolling Cecil AI Phase 9 QA Debug",
+  "short_name": "Cecil AI P9",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#050505",

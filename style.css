@@ -1137,3 +1137,22 @@ button:active{transform:translateY(1px);}
   .sessionActions button{flex:1;min-width:31%}
   .phase8ActionRow{grid-template-columns:1fr 1fr}
 }
+
+
+/* PHASE 9 QA / DEBUG / STABILITY PRO */
+.debugHero{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin:12px 0 16px;
+}
+.debugHero div{
+  background:linear-gradient(180deg,#0f1a22,#061018);
+  border:1px solid #28404f;
+  border-radius:14px;
+  padding:13px;
+}
+.debugHero b{display:block;color:#ffcf8a;font-size:10px;letter-spacing:.8px;margin-bottom:6px;}
+.debugHero span{display:block;color:#fff;font-weight:900;font-size:13px;overflow-wrap:anywhere;}
+#debugOut,#debugLogOut{font-size:12px;line-height:1.45;}
+@media(max-width:700px){.debugHero{grid-template-columns:1fr}.quickDock{grid-template-columns:repeat(4,1fr)!important}}

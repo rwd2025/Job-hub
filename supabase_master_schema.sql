@@ -890,3 +890,16 @@ create table if not exists unified_job_sessions (
 
 create index if not exists idx_unified_job_sessions_vin on unified_job_sessions(vin);
 create index if not exists idx_unified_job_sessions_created_at on unified_job_sessions(created_at desc);
+
+
+-- PHASE 9 QA / DEBUG / STABILITY PRO
+create table if not exists debug_reports (
+  id bigint generated always as identity primary key,
+  report_type text,
+  app_version text,
+  device_info text,
+  error_message text,
+  report_json jsonb,
+  created_at timestamptz default now()
+);
+create index if not exists idx_debug_reports_created_at on debug_reports(created_at desc);

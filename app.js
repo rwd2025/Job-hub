@@ -1,6 +1,7 @@
 const SUPABASE_URL = "https://uxpkqwcmvtqvubibbrek.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4cGtxd2NtdnRxdnViaWJicmVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzk4NjQsImV4cCI6MjA5MjgxNTg2NH0.afiaSFqkRFEXW5nPQVRXKZcpKkS6iF3T_hTQC2P15HQ";
 const API_URL = "https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/oracle-parts-search";
+const APP_VERSION = "Rolling Cecil AI Phase 9 QA / Debug / Stability Pro";
 
 const $ = id => document.getElementById(id);
 const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
@@ -26,7 +27,7 @@ function showScreen(id){
 
   document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
 
-  const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1,timeClock:5,fieldTools:5,visionPro:3,backendPro:5};
+  const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1,timeClock:5,fieldTools:5,visionPro:3,backendPro:5,debugPro:5};
   const index = map[id] || 1;
   const btn = document.querySelector(`.bottomNav button:nth-child(${index})`);
   if(btn) btn.classList.add("active");
@@ -43,7 +44,7 @@ function goBack(){
     document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
     if($(last)) $(last).classList.add("active");
     document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
-    const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1,timeClock:5,fieldTools:5,visionPro:3,backendPro:5};
+    const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1,timeClock:5,fieldTools:5,visionPro:3,backendPro:5,debugPro:5};
     const btn = document.querySelector(`.bottomNav button:nth-child(${map[last] || 1})`);
     if(btn) btn.classList.add("active");
     window.scrollTo({top:0,behavior:"smooth"});
@@ -1463,4 +1464,165 @@ async function saveUnifiedJob(){
 window.addEventListener("DOMContentLoaded",()=>{
   updatePhase8SessionBar();
   setInterval(updatePhase8SessionBar, 30000);
+});
+
+
+/* =========================
+   PHASE 9 QA / DEBUG / STABILITY PRO
+   ========================= */
+function debugWrite(msg){
+  const out = $("debugOut");
+  if(out) out.textContent = msg;
+}
+function appendDebug(msg){
+  const out = $("debugOut");
+  if(out) out.textContent = (out.textContent ? out.textContent + "\n" : "") + msg;
+}
+function getDebugErrors(){
+  try{return JSON.parse(localStorage.getItem("rolling_cecil_error_log") || "[]");}catch(e){return []}
+}
+function saveDebugError(entry){
+  const list = getDebugErrors();
+  list.unshift({...entry, at:new Date().toISOString(), version:APP_VERSION});
+  localStorage.setItem("rolling_cecil_error_log", JSON.stringify(list.slice(0,60)));
+}
+window.addEventListener("error", e=>{
+  saveDebugError({type:"window_error", message:e.message, file:e.filename, line:e.lineno, col:e.colno});
+});
+window.addEventListener("unhandledrejection", e=>{
+  saveDebugError({type:"promise_rejection", message:String(e.reason?.message || e.reason || "unknown")});
+});
+function showErrorLog(){
+  const list = getDebugErrors();
+  const last = localStorage.getItem("diesel_doctor_last_error") || "none";
+  const text = list.length ? list.map((e,i)=>`${i+1}. ${e.at}\n${e.type}: ${e.message}\n${e.file || ""} ${e.line || ""}`).join("\n\n") : "No stored errors.";
+  if($("debugLogOut")) $("debugLogOut").textContent = `LAST LEGACY ERROR:\n${last}\n\nERROR LOG:\n${text}`;
+}
+async function testSupabaseConnection(){
+  if(!supabaseClient){
+    if($("debugSupabaseStatus")) $("debugSupabaseStatus").textContent = "Client missing";
+    throw new Error("Supabase client is missing. Check CDN script and keys.");
+  }
+  const { error } = await supabaseClient.from("saved_jobs").select("id", { count:"exact", head:true });
+  if(error) throw error;
+  if($("debugSupabaseStatus")) $("debugSupabaseStatus").textContent = "Connected";
+  return "Supabase connected";
+}
+async function testRequiredTables(){
+  const tables = [
+    "saved_jobs","saved_parts","labor_clock","truck_history","repair_notes",
+    "photo_notes","supplier_pricing","repair_procedures","known_failures","vin_history_expanded",
+    "staging_catalog_imports","parts","manufacturers","part_cross_refs","repair_kits"
+  ];
+  const rows = [];
+  for(const table of tables){
+    try{
+      const { error } = await supabaseClient.from(table).select("*", { count:"exact", head:true });
+      rows.push(`${error ? "❌" : "✅"} ${table}${error ? " — " + error.message : ""}`);
+    }catch(e){
+      rows.push(`❌ ${table} — ${e.message}`);
+    }
+  }
+  const msg = "TABLE CHECK:\n" + rows.join("\n");
+  debugWrite(msg);
+  return msg;
+}
+async function testRequiredRPCs(){
+  const tests = [
+    {name:"universal_diesel_search", args:{search_text:"water"}},
+    {name:"diesel_brain_search", args:{search_text:"SPN"}},
+    {name:"recursive_interchange_chain", args:{search_part:"5633513"}},
+    {name:"expanded_backend_search", args:{search_text:"water"}}
+  ];
+  const rows=[];
+  for(const t of tests){
+    try{
+      const { error } = await supabaseClient.rpc(t.name, t.args);
+      rows.push(`${error ? "❌" : "✅"} ${t.name}${error ? " — " + error.message : ""}`);
+    }catch(e){ rows.push(`❌ ${t.name} — ${e.message}`); }
+  }
+  const msg = "RPC CHECK:\n" + rows.join("\n");
+  debugWrite(msg);
+  return msg;
+}
+function testAllCoreButtons(){
+  const buttons = Array.from(document.querySelectorAll("button[onclick]")).map(btn=>({
+    label:(btn.textContent || "").trim().replace(/\s+/g," ").slice(0,50),
+    onclick:btn.getAttribute("onclick")
+  }));
+  const missing=[];
+  for(const b of buttons){
+    const fn=(b.onclick || "").split("(")[0].trim();
+    if(fn && typeof window[fn] !== "function" && typeof eval(`typeof ${fn}`) === "undefined") missing.push(`${b.label} → ${b.onclick}`);
+  }
+  const msg = `BUTTON CHECK:\nButtons found: ${buttons.length}\nMissing handlers: ${missing.length}\n\n${missing.length ? missing.join("\n") : "All checked button handlers exist."}`;
+  debugWrite(msg);
+  return msg;
+}
+async function runFullQACheck(){
+  debugWrite("Running QA checks...");
+  const chunks=[];
+  chunks.push(`VERSION: ${APP_VERSION}`);
+  try{chunks.push(await testSupabaseConnection());}catch(e){chunks.push("❌ Supabase — " + e.message); saveDebugError({type:"qa_supabase",message:e.message});}
+  try{chunks.push(testAllCoreButtons());}catch(e){chunks.push("❌ Button check — " + e.message); saveDebugError({type:"qa_buttons",message:e.message});}
+  try{chunks.push(await testRequiredTables());}catch(e){chunks.push("❌ Table check — " + e.message); saveDebugError({type:"qa_tables",message:e.message});}
+  try{chunks.push(await testRequiredRPCs());}catch(e){chunks.push("❌ RPC check — " + e.message); saveDebugError({type:"qa_rpcs",message:e.message});}
+  debugWrite(chunks.join("\n\n---\n\n"));
+  showErrorLog();
+}
+async function resetAppCache(){
+  try{
+    if("serviceWorker" in navigator){
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r=>r.unregister()));
+    }
+    if("caches" in window){
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k=>caches.delete(k)));
+    }
+    if($("debugCacheStatus")) $("debugCacheStatus").textContent = "Reset complete";
+    alert("Cache reset. Close and reopen the app.");
+  }catch(e){
+    saveDebugError({type:"cache_reset",message:e.message});
+    alert("Cache reset error: " + e.message);
+  }
+}
+function clearLocalAppData(){
+  if(!confirm("Clear local app data on this phone? Cloud records stay in Supabase.")) return;
+  const keep = ["rolling_cecil_error_log"];
+  Object.keys(localStorage).forEach(k=>{ if(!keep.includes(k)) localStorage.removeItem(k); });
+  alert("Local app data cleared. Reloading.");
+  location.reload();
+}
+function enableFallbackMode(){
+  localStorage.setItem("rolling_cecil_fallback_mode","true");
+  alert("Fallback mode enabled. The app will keep local tools usable if backend calls fail.");
+}
+function exportDebugReport(){
+  const report = {
+    version:APP_VERSION,
+    at:new Date().toISOString(),
+    activeTruck:getActiveTruck(),
+    currentScreen,
+    fallbackMode:localStorage.getItem("rolling_cecil_fallback_mode") === "true",
+    lastError:localStorage.getItem("diesel_doctor_last_error") || "",
+    errors:getDebugErrors(),
+    localKeys:Object.keys(localStorage).sort(),
+    userAgent:navigator.userAgent
+  };
+  const text = JSON.stringify(report,null,2);
+  if(navigator.clipboard) navigator.clipboard.writeText(text).catch(()=>{});
+  const blob = new Blob([text], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `rolling-cecil-debug-${Date.now()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  debugWrite("Debug report exported and copied when clipboard is available.");
+}
+window.addEventListener("DOMContentLoaded",()=>{
+  if($("debugVersion")) $("debugVersion").textContent = APP_VERSION;
 });
