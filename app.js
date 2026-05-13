@@ -303,7 +303,33 @@ async function askPart(){
       mode:"parts_lookup"
     });
 
-    renderOracleCard("partOut","ORACLE VERIFIED PART LOOKUP",data);
+    const universal = await universalSearch(
+  data?.data?.oem_part ||
+  data?.data?.part ||
+  q
+);
+
+renderOracleCard(
+  "partOut",
+  "ORACLE VERIFIED PART LOOKUP",
+  data
+);
+
+if(universal){
+
+  $("partOut").innerHTML += `
+  <div class="oracleCard" style="margin-top:16px;">
+    <div class="oracleTitle">
+      UNIVERSAL DATABASE RESULTS
+    </div>
+
+    <div class="oracleNote"
+    style="white-space:pre-wrap;font-family:monospace;">
+${JSON.stringify(universal,null,2)}
+    </div>
+  </div>
+  `;
+}
     const repair = await getRepairKit(
   data?.data?.oem_part ||
   data?.data?.part ||
