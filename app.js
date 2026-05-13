@@ -305,11 +305,12 @@ async function askPart(){
 
     renderOracleCard("partOut","ORACLE VERIFIED PART LOOKUP",data);
   }catch(e){
-    $("partOut").textContent = "ORACLE SEARCH ERROR: " + }
- }
+    $("partOut").textContent = "ORACLE SEARCH ERROR: " + e.message;
   }
+}
+
 async function getRepairKit(component){
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("repair_kits")
     .select("*")
     .ilike("component_name", `%${component}%`)
