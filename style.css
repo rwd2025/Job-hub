@@ -1106,3 +1106,34 @@ button:active{transform:translateY(1px);}
 .backendGrid b{display:block;color:var(--orange);font-size:12px;margin-bottom:6px;}
 .backendGrid span{display:block;color:#d6e2e8;font-size:12px;line-height:1.25;}
 @media(max-width:700px){.backendGrid{grid-template-columns:1fr 1fr}.backendGrid b{font-size:11px}.backendGrid span{font-size:11px}}
+
+
+/* PHASE 8 FINAL INTEGRATION PRO */
+.sessionBar{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  background:linear-gradient(180deg,#0b161f,#050b10);
+  border:1px solid rgba(57,255,20,.42);
+  border-radius:18px;
+  padding:12px 14px;
+  margin:0 0 20px;
+  box-shadow:0 0 18px rgba(57,255,20,.08);
+}
+.sessionBar small{display:block;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:1.5px;margin-bottom:4px}
+.sessionBar strong{display:block;color:#fff;font-size:15px;line-height:1.2}
+.sessionBar span{display:block;color:#cbd3d8;font-size:12px;margin-top:4px}
+.sessionActions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.sessionActions button,.phase8ActionRow button{padding:10px 12px;border-radius:11px;background:#111b23;border:1px solid #35505f;color:#fff;font-size:11px;font-weight:900;letter-spacing:.5px}
+.phase8ActionRow{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:12px 0}
+.phase8Card{border-color:rgba(57,255,20,.55)!important;box-shadow:0 0 20px rgba(57,255,20,.12)}
+.loadingCard{background:#07141d;border:1px solid var(--neon);border-radius:16px;padding:18px;color:#fff;font-weight:900}
+.phase8Results .smartCard{margin-bottom:10px}
+.quickDock button:first-child{background:linear-gradient(#39ff14,#1d8f10);color:#041007}
+@media(max-width:720px){
+  .sessionBar{display:block}
+  .sessionActions{justify-content:stretch;margin-top:10px}
+  .sessionActions button{flex:1;min-width:31%}
+  .phase8ActionRow{grid-template-columns:1fr 1fr}
+}

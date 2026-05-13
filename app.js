@@ -1281,3 +1281,186 @@ function clearBackendPro(){
   if($("backendOut")) $("backendOut").textContent="Backend expansion ready. Search a part, engine, system, fault, torque spec, labor job, or staged import.";
 }
 window.addEventListener("DOMContentLoaded",()=>{ loadImportQueue(); });
+
+
+/* ===============================
+   PHASE 8 FINAL INTEGRATION PRO
+   One master flow: Search → Diagnose → Parts → Repair Kit → Clock → Invoice → Save
+   =============================== */
+function phase8Session(){
+  try{return JSON.parse(localStorage.getItem("phase8JobSession") || "{}");}catch(e){return {};}
+}
+function savePhase8Session(session){
+  localStorage.setItem("phase8JobSession", JSON.stringify(session || {}));
+  updatePhase8SessionBar();
+}
+function buildPhase8SessionTitle(){
+  const t = getActiveTruck();
+  const vin = activeVin ? activeVin() : (t.vin || "");
+  const customer = $("custName")?.value || phase8Session().customer || "";
+  const unit = activeTruckText ? activeTruckText() : `${t.year||""} ${t.make||""} ${t.model||""}`.trim();
+  return [customer, unit, vin].filter(Boolean).join(" • ") || "Active field job";
+}
+function startUnifiedSession(){
+  const s = phase8Session();
+  s.started_at = s.started_at || new Date().toISOString();
+  s.vin = activeVin ? activeVin() : getActiveTruck().vin || "";
+  s.truck = activeTruckText ? activeTruckText() : "";
+  s.customer = $("custName")?.value || s.customer || "";
+  s.status = "ACTIVE";
+  savePhase8Session(s);
+  alert("Active job session started.");
+}
+function clearUnifiedSession(){
+  if(!confirm("Clear active job session? This will not delete saved invoices or cloud history.")) return;
+  localStorage.removeItem("phase8JobSession");
+  updatePhase8SessionBar();
+}
+function updatePhase8SessionBar(){
+  const s = phase8Session();
+  const title = $("sessionTitle");
+  const meta = $("sessionMeta");
+  if(!title || !meta) return;
+  if(!s.started_at){
+    title.textContent = "No active job";
+    meta.textContent = "Start from VIN, master search, invoice, or clock.";
+    return;
+  }
+  title.textContent = buildPhase8SessionTitle();
+  const clock = getClock ? clockHours(getClock()).toFixed(2) : "0.00";
+  const parts = typeof invoicePartsTotal === "function" ? money(invoicePartsTotal()) : "$0.00";
+  meta.textContent = `${s.status || "ACTIVE"} • Started ${new Date(s.started_at).toLocaleString()} • Clock ${clock} hrs • Parts ${parts}`;
+}
+function phase8SearchInput(){
+  return ($("doctorAsk")?.value || $("partq")?.value || $("diagq")?.value || $("homeAiAsk")?.value || "").trim();
+}
+function phase8SetSearchEverywhere(q){
+  if(!q) return;
+  setValue("doctorAsk", q);
+  setValue("partq", q);
+  setValue("diagq", q);
+}
+function phase8ActionsHtml(q){
+  const safe = safeText(q || "");
+  return `<div class="phase8ActionRow">
+    <button onclick="showScreen('parts')">PARTS</button>
+    <button onclick="showScreen('faultDoctor')">DIAG</button>
+    <button onclick="showScreen('invoice')">INVOICE</button>
+    <button onclick="sendClockToInvoice()">CLOCK → INVOICE</button>
+    <button onclick="addLookupToInvoice()">ADD LOOKUP</button>
+    <button onclick="saveUnifiedJob()">SAVE JOB</button>
+  </div>
+  <div class="smartNote">Unified query: ${safe}</div>`;
+}
+async function phase8MasterSearch(){
+  const q = phase8SearchInput();
+  if(!q){
+    alert("Enter a part, fault code, VIN, symptom, or repair question first.");
+    return;
+  }
+  startUnifiedSession();
+  phase8SetSearchEverywhere(q);
+  const out = $("doctorOut") || $("partOut") || $("diagOut");
+  if(out) out.innerHTML = `<div class="loadingCard">Rolling Cecil AI is running the full workflow...</div>`;
+
+  const session = phase8Session();
+  session.last_query = q;
+  session.last_search_at = new Date().toISOString();
+  savePhase8Session(session);
+
+  let oracleData = null, universal = {}, brain = {}, kits = [];
+  let oracleErr = "", universalErr = "", brainErr = "";
+
+  try{ oracleData = await callOracle({ part_query:q, question:q, note:ctx(), mode:"master_workflow" }); }
+  catch(e){ oracleErr = e.message; }
+
+  const term = oracleData ? smartSearchTerm(q, oracleData) : q;
+  try{ universal = await universalSearch(term); }
+  catch(e){ universalErr = e.message; }
+
+  try{ brain = await dieselBrainSearch(q, ctx()); }
+  catch(e){ brainErr = e.message; }
+
+  try{ kits = await getRepairKit(term); }
+  catch(e){ kits = []; }
+
+  let html = `<div class="resultGroup phase8Results">`;
+  html += card("MASTER WORKFLOW", {text:"PHASE 8", cls:"good"}, `<div class="smartGrid">
+    ${gridCell("QUERY", q)}
+    ${gridCell("SEARCH TERM", term)}
+    ${gridCell("ACTIVE VIN", activeVin ? activeVin() : getActiveTruck().vin || "NO VIN")}
+    ${gridCell("ACTIVE ENGINE", getActiveTruck().engine || $("engine")?.value || "UNKNOWN")}
+  </div>`, "One flow: Oracle + SQL database + Diesel Brain + repair kits + invoice/job tools.");
+
+  if(oracleData){
+    const d = oracleData.data || oracleData || {};
+    html += card("ORACLE RESULT", {text:"AI", cls:"hot"}, `<div class="smartGrid">
+      ${gridCell("PART", d.oem_part || d.part || d.part_number || "UNKNOWN")}
+      ${gridCell("ENGINE", d.engine || getActiveTruck().engine || "UNKNOWN")}
+      ${gridCell("FITMENT", d.verified_fitment ? "VIN/ESN/CPL CONTEXT" : "VERIFY BY VIN/ESN/CPL")}
+      ${gridCell("SOURCE", oracleData.source || "oracle")}
+    </div>`, oracleData.answer || oracleData.message || (Array.isArray(d.notes) ? d.notes.join("\n") : ""));
+  }else{
+    html += card("ORACLE RESULT", {text:"ERROR", cls:"warn"}, `<div class="smartGrid">${gridCell("ERROR", oracleErr || "No Oracle response")}</div>`);
+  }
+
+  const localCount = Object.values(universal || {}).reduce((sum,v)=>sum + (Array.isArray(v) ? v.length : 0), 0);
+  html += card("LOCAL DATABASE", {text:`${localCount} HIT${localCount===1?"":"S"}`, cls:localCount?"good":"warn"}, `<div class="smartGrid">
+    ${gridCell("PARTS", asArray(universal.parts).length)}
+    ${gridCell("CROSS REFS", asArray(universal.cross_refs || universal.part_cross_refs).length)}
+    ${gridCell("LABOR", asArray(universal.labor_times).length)}
+    ${gridCell("TORQUE", asArray(universal.torque_specs).length)}
+    ${gridCell("FAILURES", asArray(universal.common_failures).length)}
+    ${gridCell("SUPPLIERS", asArray(universal.supplier_links).length)}
+  </div>`, universalErr || "Database results are grouped below on the Parts screen when you run LOOKUP PART.");
+
+  const brainCount = asArray(brain.common_failures).length + asArray(brain.diagnostic_tests).length + asArray(brain.known_patterns).length + asArray(brain.repair_memory || brain.repair_notes).length;
+  html += card("DIESEL BRAIN", {text:`${brainCount} HIT${brainCount===1?"":"S"}`, cls:brainCount?"hot":"warn"}, renderIntelligenceCards(brain || {}, q), brainErr || "Diagnostic memory and verified fixes are tied into the same workflow.");
+
+  if(Array.isArray(kits) && kits.length){
+    html += `<div class="resultGroup">`;
+    for(const k of kits.slice(0,3)){
+      html += card("SMART REPAIR KIT", {text:"KIT", cls:"good"}, `<div class="smartGrid">
+        ${gridCell("COMPONENT", k.component_name)}${gridCell("ENGINE", k.engine_family)}${gridCell("OEM", k.oem_part_number)}${gridCell("LABOR", k.labor_hours ? k.labor_hours+" hrs" : "—")}${gridCell("GASKETS", k.gasket_set)}${gridCell("SEALS", k.seals)}
+      </div>`, `${k.torque_specs || ""}\n${k.repair_notes || ""}`.trim());
+    }
+    html += `</div>`;
+  }else{
+    html += card("SMART REPAIR KIT", {text:"NO KIT", cls:"warn"}, `<div class="smartGrid">${gridCell("NEXT", "Add repair_kits rows for this search term")}</div>`);
+  }
+  html += phase8ActionsHtml(q);
+  html += `</div>`;
+
+  if($("doctorOut")) $("doctorOut").innerHTML = html;
+  if($("partOut")) $("partOut").innerHTML = html;
+  updatePhase8SessionBar();
+  showScreen("home");
+}
+
+// Phase 8 override: the home search runs the full workflow now.
+runDoctorSearch = phase8MasterSearch;
+
+async function saveUnifiedJob(){
+  startUnifiedSession();
+  if(typeof buildInvoice === "function") buildInvoice();
+  const s = phase8Session();
+  s.customer = $("custName")?.value || s.customer || "";
+  s.vin = activeVin ? activeVin() : getActiveTruck().vin || "";
+  s.truck = activeTruckText ? activeTruckText() : s.truck || "";
+  s.invoice_text = $("quoteOut")?.textContent || "";
+  s.last_saved_at = new Date().toISOString();
+  savePhase8Session(s);
+  try{
+    if(typeof saveJobCloud === "function") await saveJobCloud();
+  }catch(e){
+    console.warn("Cloud save from unified job failed", e.message);
+    alert("Local session saved. Cloud save failed: " + e.message);
+    return;
+  }
+  alert("Unified job saved/synced.");
+}
+
+window.addEventListener("DOMContentLoaded",()=>{
+  updatePhase8SessionBar();
+  setInterval(updatePhase8SessionBar, 30000);
+});

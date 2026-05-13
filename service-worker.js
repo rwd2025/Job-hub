@@ -1,4 +1,4 @@
-const CACHE="mmp-phase7-backend-pro-v1";
+const CACHE="rolling-cecil-ai-phase8-final";
 const ASSETS=["./","./index.html","./app.js","./style.css","./manifest.json","./service-worker.js","./supabase_master_schema.sql"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))))});

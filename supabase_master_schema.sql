@@ -871,3 +871,22 @@ begin
   return processed_count;
 end;
 $$;
+
+
+-- PHASE 8 FINAL INTEGRATION PRO
+-- Unified job session tracking across VIN, parts, diagnostics, invoice, and field tools.
+create table if not exists unified_job_sessions (
+  id bigint generated always as identity primary key,
+  vin text,
+  customer_name text,
+  truck text,
+  status text default 'ACTIVE',
+  last_query text,
+  invoice_text text,
+  notes text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists idx_unified_job_sessions_vin on unified_job_sessions(vin);
+create index if not exists idx_unified_job_sessions_created_at on unified_job_sessions(created_at desc);

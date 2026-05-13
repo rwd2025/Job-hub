@@ -89,6 +89,19 @@
     <div><b>SHOP TOOLS</b><span>Clock • Parts • Invoice • Saved Jobs</span></div>
   </section>
 
+  <section class="sessionBar phase8Session">
+    <div>
+      <small>ACTIVE JOB SESSION</small>
+      <strong id="sessionTitle">No active job</strong>
+      <span id="sessionMeta">Start from VIN, master search, invoice, or clock.</span>
+    </div>
+    <div class="sessionActions">
+      <button onclick="startUnifiedSession()">START SESSION</button>
+      <button onclick="saveUnifiedJob()">SAVE / SYNC</button>
+      <button onclick="clearUnifiedSession()">CLEAR SESSION</button>
+    </div>
+  </section>
+
   <!-- HOME SCREEN -->
   <main id="home" class="screen active">
     <h1 class="heroTitle">ROLLING CECIL AI</h1>
@@ -97,13 +110,13 @@
     <section class="searchPanel">
       <div class="searchBox">
         <span>🔎</span>
-        <textarea id="doctorAsk" placeholder="Ask Diesel Doctor... VIN, part number, fault code, symptom, repair question..."></textarea>
+        <textarea id="doctorAsk" placeholder="Master search: VIN, part number, fault code, symptom, repair, quote note..."></textarea>
       </div>
-      <button class="searchBtn" onclick="runDoctorSearch()">SEARCH</button>
+      <button class="searchBtn" onclick="phase8MasterSearch()">MASTER SEARCH</button>
     </section>
 
     <section id="doctorOut" class="resultBox miniResult">
-      Ready. Enter a VIN, part, fault code, symptom, or repair question.
+      Ready. Master Search runs Oracle + parts database + Diesel Brain + repair kits + job session memory.
     </section>
 
     <section class="toolGrid">
@@ -198,6 +211,14 @@
         <div class="toolIcon">🗄️</div>
         <h2>BACKEND PRO</h2>
         <p>Search indexes, imports, torque, labor, failures</p>
+        <span>→</span>
+      </button>
+
+
+      <button class="toolCard phase8Card" onclick="phase8MasterSearch()">
+        <div class="toolIcon">⚡</div>
+        <h2>MASTER WORKFLOW</h2>
+        <p>Search, diagnose, add parts, clock, save job</p>
         <span>→</span>
       </button>
 
@@ -573,6 +594,7 @@
 
   <!-- PHASE 1 FIELD QUICK ACTIONS -->
   <div class="quickDock" id="quickDock">
+    <button onclick="phase8MasterSearch()">MASTER</button>
     <button onclick="showScreen('parts')">＋ PART</button>
     <button onclick="showScreen('invoice')">＋ LABOR</button>
     <button onclick="clockIn()">START CLOCK</button>

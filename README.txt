@@ -1,19 +1,25 @@
-Rolling Cecil AI - Phase 7 Backend Expansion Pro
+Rolling Cecil AI - Phase 8 Final Integration Pro
 
-Upload all files to your GitHub Pages root.
+Upload all files to the GitHub Pages root.
 
-Then in Supabase SQL Editor, run supabase_master_schema.sql.
+Phase 8 ties the app into one field workflow:
+1. Master Search
+2. Oracle lookup
+3. Universal SQL database
+4. Diesel Brain diagnostics
+5. Smart repair kits
+6. Clock/labor
+7. Parts/invoice
+8. Save/sync job
 
-Phase 7 adds:
-- Backend Expansion Pro screen
-- recursive_interchange_chain RPC
-- backend_expansion_search RPC
-- staging_catalog_imports
-- supplier_pricing
-- repair_procedures
-- known_failures
-- vin_history_expanded
-- indexes for faster field search
-- optional process_staging_catalog_imports() importer
+Files:
+- index.html
+- app.js
+- style.css
+- manifest.json
+- service-worker.js
+- supabase_master_schema.sql
 
-After upload, hard refresh the app or re-add it to Home Screen because the service worker cache changed.
+After uploading, hard-refresh Safari or remove/re-add the Home Screen app because the service worker caches files.
+
+Run supabase_master_schema.sql if you have not already added the Phase 8 table.
