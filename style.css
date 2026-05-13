@@ -1156,3 +1156,15 @@ button:active{transform:translateY(1px);}
 .debugHero span{display:block;color:#fff;font-weight:900;font-size:13px;overflow-wrap:anywhere;}
 #debugOut,#debugLogOut{font-size:12px;line-height:1.45;}
 @media(max-width:700px){.debugHero{grid-template-columns:1fr}.quickDock{grid-template-columns:repeat(4,1fr)!important}}
+
+
+/* PHASE 10 FINAL RELEASE PRO */
+.releaseHero{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 16px}
+.releaseHero div,.releasePanel{background:linear-gradient(180deg,#0d1921,#071018);border:1px solid #284958;border-radius:16px;padding:14px}
+.releaseHero small{display:block;color:var(--muted);font-weight:900;font-size:11px;letter-spacing:1px;margin-bottom:6px}
+.releaseHero b{display:block;color:#fff;font-size:18px;margin-bottom:5px}
+.releaseHero span{display:block;color:#ffd6a0;font-size:13px}.goodText{color:var(--neon)!important}.releasePanel{margin:12px 0}
+.releasePanel h2{margin:0 0 10px;color:var(--orange);font-size:17px;letter-spacing:1px}
+.checkGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.checkGrid label{background:#061018;border:1px solid #17394a;border-radius:12px;padding:10px;margin:0;font-size:12px;letter-spacing:0;text-transform:none}.checkGrid input{width:auto;margin-right:8px}
+.releaseList{display:grid;grid-template-columns:1fr 1fr;gap:8px}.releaseList span{background:#061018;border:1px solid #17394a;border-radius:12px;padding:10px;color:#dbe9ef;font-size:12px}.warnPanel{border-color:#7a5300;background:linear-gradient(180deg,#1a1307,#0b0a08)}.warnPanel p{margin:0;color:#ffd6a0;font-size:13px;line-height:1.4}
+@media(max-width:700px){.releaseHero,.checkGrid,.releaseList{grid-template-columns:1fr}}

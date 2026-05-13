@@ -903,3 +903,21 @@ create table if not exists debug_reports (
   created_at timestamptz default now()
 );
 create index if not exists idx_debug_reports_created_at on debug_reports(created_at desc);
+
+
+-- PHASE 10 FINAL RELEASE PRO
+create table if not exists app_release_events (
+  id bigint generated always as identity primary key,
+  app_version text,
+  event_type text,
+  notes text,
+  created_at timestamptz default now()
+);
+
+create table if not exists local_backup_index (
+  id bigint generated always as identity primary key,
+  vin text,
+  backup_type text,
+  backup_notes text,
+  created_at timestamptz default now()
+);

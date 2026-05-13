@@ -27,7 +27,9 @@ function showScreen(id){
 
   document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
 
-  const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1,timeClock:5,fieldTools:5,visionPro:3,backendPro:5,debugPro:5};
+  const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,
+    releasePro:5,team:5,voice:5,
+    releasePro:5,vin:1,timeClock:5,fieldTools:5,visionPro:3,backendPro:5,debugPro:5};
   const index = map[id] || 1;
   const btn = document.querySelector(`.bottomNav button:nth-child(${index})`);
   if(btn) btn.classList.add("active");
@@ -44,7 +46,9 @@ function goBack(){
     document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
     if($(last)) $(last).classList.add("active");
     document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
-    const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1,timeClock:5,fieldTools:5,visionPro:3,backendPro:5,debugPro:5};
+    const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,
+    releasePro:5,team:5,voice:5,
+    releasePro:5,vin:1,timeClock:5,fieldTools:5,visionPro:3,backendPro:5,debugPro:5};
     const btn = document.querySelector(`.bottomNav button:nth-child(${map[last] || 1})`);
     if(btn) btn.classList.add("active");
     window.scrollTo({top:0,behavior:"smooth"});
@@ -1625,4 +1629,73 @@ function exportDebugReport(){
 }
 window.addEventListener("DOMContentLoaded",()=>{
   if($("debugVersion")) $("debugVersion").textContent = APP_VERSION;
+});
+
+
+/* =============================
+   PHASE 10 FINAL RELEASE PRO
+============================= */
+function showReleaseNotes(){
+  const out = $("releaseOut");
+  if(!out) return;
+  out.innerHTML = `
+<div class="oracleCard">
+  <div class="oracleTitle">${APP_RELEASE_NAME} — v${APP_VERSION}</div>
+  <div class="releaseList">
+    <span>✓ Phase 1 Shop OS: saved jobs, parts, labor clock, truck history</span>
+    <span>✓ Phase 2 Parts Pro: interchange cards, supplier shortcuts, confidence badges</span>
+    <span>✓ Phase 3 Diesel Intelligence: SPN/FMI hooks, verified fix memory, known patterns</span>
+    <span>✓ Phase 4 Field Tools: GPS, DOT checklist, customer updates, offline queue</span>
+    <span>✓ Phase 5 Vision Pro: photo/OCR workflow, scan-to-parts, photo notes</span>
+    <span>✓ Phase 6 Production UI: tighter field-ready layout and cards</span>
+    <span>✓ Phase 7 Backend Expansion: staging imports, indexes, recursive search support</span>
+    <span>✓ Phase 8 Final Integration: master workflow and active job session</span>
+    <span>✓ Phase 9 QA Debug: connection tests, cache reset, debug report</span>
+    <span>✓ Phase 10 Final Release: setup guide, backup, checklist, release notes</span>
+  </div>
+</div>`;
+}
+
+function runProductionChecklist(){
+  const checks = [];
+  checks.push(["Supabase library", !!window.supabase]);
+  checks.push(["Supabase client", !!supabaseClient]);
+  checks.push(["App shell", !!document.querySelector(".appShell")]);
+  checks.push(["Home screen", !!$("home")]);
+  checks.push(["Parts screen", !!$("parts")]);
+  checks.push(["Invoice screen", !!$("invoice")]);
+  checks.push(["Debug screen", !!$("debugPro")]);
+  checks.push(["Release screen", !!$("releasePro")]);
+  checks.push(["Service worker supported", "serviceWorker" in navigator]);
+  const txt = checks.map(([name, ok]) => `${ok ? "✅" : "❌"} ${name}`).join("\n");
+  if($("releaseOut")) $("releaseOut").textContent = `PRODUCTION CHECK — v${APP_VERSION}\n\n${txt}\n\nNext: run DEBUG → FULL QA CHECK after upload.`;
+}
+
+function exportLocalBackup(){
+  const backup = {
+    app: APP_RELEASE_NAME,
+    version: APP_VERSION,
+    exported_at: new Date().toISOString(),
+    activeTruck: getActiveTruck(),
+    shopSettings: getShop(),
+    invoiceParts: window.invoiceParts || [],
+    savedInvoices: JSON.parse(localStorage.getItem("savedInvoices") || "[]"),
+    savedParts: JSON.parse(localStorage.getItem("savedParts") || "[]"),
+    lastInvoice: localStorage.getItem("lastInvoice") || "",
+    lastError: localStorage.getItem("diesel_doctor_last_error") || ""
+  };
+  const text = JSON.stringify(backup,null,2);
+  if(navigator.clipboard) navigator.clipboard.writeText(text);
+  if($("releaseOut")) $("releaseOut").textContent = "LOCAL BACKUP COPIED TO CLIPBOARD:\n\n" + text;
+}
+
+function copyUploadInstructions(){
+  const text = `ROLLING CECIL AI FINAL RELEASE UPLOAD STEPS\n\n1. Upload/replace all files in GitHub Pages root:\n- index.html\n- app.js\n- style.css\n- manifest.json\n- service-worker.js\n- supabase_master_schema.sql\n- README.txt\n\n2. Commit changes.\n3. Wait 30-90 seconds for GitHub Pages.\n4. Open app in Safari.\n5. Hard refresh.\n6. If old app appears, remove Home Screen icon and re-add it.\n7. Open DEBUG and run FULL QA CHECK.\n8. Test: save truck, lookup part, add part, start/stop clock, build invoice, save job.`;
+  if(navigator.clipboard) navigator.clipboard.writeText(text);
+  if($("releaseOut")) $("releaseOut").textContent = text + "\n\nCopied.";
+}
+
+window.addEventListener("DOMContentLoaded",()=>{
+  if($("debugVersion")) $("debugVersion").textContent = "Phase 10 / v" + APP_VERSION;
+  if($("releaseVersion")) $("releaseVersion").textContent = "v" + APP_VERSION;
 });
