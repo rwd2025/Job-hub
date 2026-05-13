@@ -771,3 +771,68 @@ textarea,input{font-size:14px !important;padding:11px 12px !important;border-rad
   .quickDock{grid-template-columns:repeat(3,1fr);bottom:63px;}
   .quickDock button{font-size:9px;padding:8px 3px;}
 }
+
+
+/* PHASE 2 PARTS INTELLIGENCE */
+.partsProPanel{
+  background:linear-gradient(180deg,#0b151d,#050b10);
+  border:1px solid #315466;
+  border-left:5px solid var(--orange);
+  border-radius:16px;
+  padding:14px;
+  margin:12px 0 16px;
+}
+.panelHead{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-end;
+  margin-bottom:12px;
+}
+.panelHead b{color:#fff;font-size:13px;letter-spacing:1px}
+.panelHead span{color:var(--muted);font-size:12px;text-align:right}
+.supplierButtons{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+}
+.supplierButtons button{
+  padding:11px 8px;
+  font-size:12px;
+  border-radius:10px;
+  background:#08141c;
+  border:1px solid #25546b;
+  color:#f7f7f7;
+}
+.phase2Result{
+  display:grid;
+  gap:10px;
+}
+.partProCard{
+  background:#06131b;
+  border:1px solid #1b6b92;
+  border-radius:16px;
+  padding:12px;
+}
+.partProTop{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  margin-bottom:8px;
+}
+.partProTop b{font-size:15px;color:#fff;overflow-wrap:anywhere}
+.confidenceBadge{
+  background:#11331c;
+  border:1px solid var(--neon);
+  color:var(--neon);
+  border-radius:999px;
+  padding:4px 8px;
+  font-size:11px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.crossArrow{color:var(--orange);font-weight:900;margin:0 6px}
+.supplierMiniRow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.supplierMiniRow button{padding:8px 10px;font-size:11px;border-radius:8px;background:#111;border:1px solid #384a55;color:#fff}
+@media(max-width:700px){.supplierButtons{grid-template-columns:1fr 1fr}.panelHead{display:block}.panelHead span{text-align:left;display:block;margin-top:5px}}

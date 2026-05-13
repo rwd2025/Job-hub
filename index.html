@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Rolling Wrench Diesel | Rolling Cecil AI Field Pro</title>
+<title>Rolling Wrench Diesel | Rolling Cecil AI Parts Pro</title>
 <link rel="stylesheet" href="style.css" />
 <link rel="manifest" href="manifest.json" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -185,7 +185,7 @@
     <section class="statusGrid">
       <div><b>☁️ CONNECTION</b><span>Online</span><small>All systems operational</small></div>
       <div><b>🛡️ OEM GATEWAY</b><span>Connected</span><small>PACCAR, Cummins, Detroit ready</small></div>
-      <div><b>🗄️ PARTS DATABASE</b><span>Ready</span><small>Oracle lookup connected</small></div>
+      <div><b>🗄️ PARTS DATABASE</b><span>Phase 2</span><small>Oracle + cross refs + suppliers</small></div>
       <div><b>🧠 REPAIR INSIGHTS</b><span>Ready</span><small>Buddy system prepared</small></div>
     </section>
   </main>
@@ -231,10 +231,26 @@
 
     <img id="partPhotoPreview" class="previewImg" alt="Part picture preview">
 
+    <section class="partsProPanel">
+      <div class="panelHead">
+        <b>PHASE 2 PARTS INTELLIGENCE</b>
+        <span>OEM • aftermarket • interchange • supplier shortcuts • confidence ranking</span>
+      </div>
+      <div class="supplierButtons">
+        <button onclick="openSupplierSearch('fleetpride')">FleetPride</button>
+        <button onclick="openSupplierSearch('napa')">NAPA</button>
+        <button onclick="openSupplierSearch('oreilly')">O’Reilly</button>
+        <button onclick="openSupplierSearch('google')">Google</button>
+        <button onclick="openSupplierSearch('dealer')">Dealer Search</button>
+      </div>
+    </section>
+
     <div class="buttonRow featureButtons">
       <button onclick="askPart()">LOOKUP PART</button>
+      <button onclick="runInterchangeOnly()">INTERCHANGE CHAIN</button>
       <button onclick="addManualPartToInvoice()">ADD PART TO INVOICE</button>
       <button onclick="addLookupToInvoice()">ADD LOOKUP RESULT</button>
+      <button onclick="addBestInterchangeToInvoice()">ADD BEST INTERCHANGE</button>
       <button onclick="saveCurrentPart()">SAVE PART</button>
       <button onclick="startPartVoiceInput()">SAY PART NAME / NUMBER</button>
       <button onclick="clearPartFields()">CLEAR PARTS</button>

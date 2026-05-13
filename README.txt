@@ -1,23 +1,14 @@
-Rolling Cecil AI - Phase 1 Shop OS Build
+Rolling Cecil AI Phase 2 Parts Pro Build
 
-Upload all files to your GitHub Pages root:
-- index.html
-- app.js
-- style.css
-- manifest.json
-- service-worker.js
-- supabase_master_schema.sql
+Upload all files to GitHub Pages root.
 
-What's added:
-- Field quick action dock
-- Save Job Cloud button
-- Load Cloud History button
-- Save Repair Note button
-- Saved jobs wired to Supabase saved_jobs table
-- Saved parts wired to Supabase saved_parts table
-- Labor clock wired to Supabase labor_clock table
-- Truck history events wired to truck_history table
-- Repair notes wired to repair_notes table
-- Service worker cache updated for app.js and style.css
+Includes Phase 1 Shop OS plus Phase 2 parts intelligence:
+- OEM / aftermarket result cards
+- Interchange chain button
+- Supplier shortcut buttons
+- Add best interchange to invoice
+- Cleaner confidence badges
+- Recursive interchange SQL support
+- Updated cache version
 
-If app still shows old version, clear Safari website data or remove/re-add the Home Screen app.
+Run supabase_master_schema.sql in Supabase if the Phase 2 tables/functions are not already present.

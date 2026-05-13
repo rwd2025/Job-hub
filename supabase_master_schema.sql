@@ -347,3 +347,68 @@ create index if not exists saved_parts_vin_idx on saved_parts(vin);
 create index if not exists labor_clock_vin_idx on labor_clock(vin);
 create index if not exists truck_history_vin_idx on truck_history(vin);
 create index if not exists repair_notes_vin_idx on repair_notes(vin);
+
+
+-- PHASE 2 PARTS INTELLIGENCE SUPPORT
+-- Safe relational parts/cross-reference backbone for OEM -> aftermarket chains.
+create table if not exists manufacturers (
+  id uuid primary key default gen_random_uuid(),
+  name text unique not null,
+  created_at timestamptz default now()
+);
+
+create table if not exists parts (
+  id uuid primary key default gen_random_uuid(),
+  part_number text not null,
+  manufacturer_id uuid references manufacturers(id),
+  description text,
+  category text,
+  created_at timestamptz default now(),
+  unique(part_number, manufacturer_id)
+);
+
+create table if not exists part_cross_refs (
+  id uuid primary key default gen_random_uuid(),
+  part_id uuid references parts(id),
+  cross_ref_id uuid references parts(id),
+  confidence_score numeric default 1.0,
+  ref_type text default 'Interchange',
+  source_name text default 'Manual',
+  notes text,
+  created_at timestamptz default now(),
+  unique(part_id, cross_ref_id)
+);
+
+create index if not exists idx_parts_part_number on parts(part_number);
+create index if not exists idx_part_cross_refs_part_id on part_cross_refs(part_id);
+create index if not exists idx_part_cross_refs_cross_ref_id on part_cross_refs(cross_ref_id);
+
+create or replace function recursive_interchange_search(search_text text)
+returns jsonb
+language plpgsql
+as $$
+declare
+  result jsonb;
+begin
+  with recursive start_parts as (
+    select p.id, p.part_number, p.description, m.name as manufacturer
+    from parts p
+    left join manufacturers m on m.id = p.manufacturer_id
+    where p.part_number ilike '%' || search_text || '%'
+    limit 10
+  ), chain as (
+    select sp.id as root_id, sp.id as part_id, sp.part_number, sp.description, sp.manufacturer, 0 as depth, 1.0::numeric as confidence_score
+    from start_parts sp
+    union
+    select c.root_id, p2.id, p2.part_number, p2.description, m2.name as manufacturer, c.depth + 1, pcr.confidence_score
+    from chain c
+    join part_cross_refs pcr on pcr.part_id = c.part_id
+    join parts p2 on p2.id = pcr.cross_ref_id
+    left join manufacturers m2 on m2.id = p2.manufacturer_id
+    where c.depth < 3
+  )
+  select coalesce(jsonb_agg(to_jsonb(chain)), '[]'::jsonb) into result
+  from chain;
+  return result;
+end;
+$$;
