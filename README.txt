@@ -1,23 +1,25 @@
-Rolling Cecil AI Phase 3 Diesel Intelligence Build
+Rolling Cecil AI - Phase 5 OCR + Vision Pro Build
 
-Upload/replace all files in your GitHub Pages root.
+Upload/replace all files in GitHub Pages root:
+- index.html
+- app.js
+- style.css
+- manifest.json
+- service-worker.js
+- supabase_master_schema.sql
 
-Added:
-- Phase 3 Fault Doctor intelligence screen
-- Diesel Brain cards for likely causes, tests, known patterns, and repair memory
-- Save Verified Fix workflow
-- Clear diagnostic button
-- diesel_brain_search RPC SQL
-- known_engine_patterns and diagnostic_memory tables
-- updated cache/service worker
+New Phase 5 features:
+- OCR / Vision Pro screen
+- camera photo upload with capture=environment
+- scan part label / VIN plate / receipt / work order photo
+- AI OCR hook through Oracle Edge Function
+- text cleanup and part-number candidate extraction
+- send scanned part to Parts Lookup
+- lookup scanned part directly
+- add scanned part to invoice
+- save photo note locally and to Supabase photo_notes table
+- scan history with reload
 
-After upload:
-1. Run supabase_master_schema.sql in Supabase SQL Editor.
-2. Upload all app files to GitHub.
-3. Commit changes.
-4. Hard refresh Safari or remove/re-add Home Screen app.
+Also keeps Phase 1-4 features: Shop OS, Parts Pro, Diesel Intelligence, Field Tools Pro.
 
-Reminder: verify exact OEM procedures, parts, and torque specs by VIN/ESN/CPL before customer work.
-
-
-Phase 4 Field Tools Pro added: GPS pin, field tools screen, DOT checklist, customer update copy, field photo notes, offline queue, updated cache, and SQL support tables.
+After upload, hard refresh or remove/re-add Home Screen app because service worker cache changed.

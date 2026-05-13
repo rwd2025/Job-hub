@@ -38,6 +38,7 @@
     <button onclick="showScreen('invoice')">💵 Invoice / Quote</button>
     <button onclick="showScreen('timeClock')">⏱️ Time Clock</button>
     <button onclick="showScreen('fieldTools')">📍 Field Tools</button>
+    <button onclick="showScreen('visionPro')">📷 OCR / Vision Pro</button>
     <button onclick="showScreen('team')">👥 Team / Tech Viewer</button>
     <button onclick="showScreen('voice')">🎙️ Voice Navigator</button>
     <button onclick="toggleSideMenu()">✖ Close</button>
@@ -161,6 +162,14 @@
         <em>UNDER CONSTRUCTION</em>
       </button>
 
+
+      <button class="toolCard" onclick="showScreen('visionPro')">
+        <div class="toolIcon">📷</div>
+        <h2>OCR / VISION PRO</h2>
+        <p>Scan labels, VIN plates, receipts, and part numbers</p>
+        <span>→</span>
+      </button>
+
       <button class="toolCard" onclick="showScreen('invoice')">
         <div class="toolIcon">💵</div>
         <h2>INVOICE / QUOTE</h2>
@@ -261,6 +270,7 @@
       <button onclick="addBestInterchangeToInvoice()">ADD BEST INTERCHANGE</button>
       <button onclick="saveCurrentPart()">SAVE PART</button>
       <button onclick="startPartVoiceInput()">SAY PART NAME / NUMBER</button>
+      <button onclick="showScreen('visionPro')">SCAN PART PHOTO</button>
       <button onclick="clearPartFields()">CLEAR PARTS</button>
       <button onclick="findNearestDealer()">FIND NEAREST PARTS / DEALER</button>
       <button onclick="showScreen('invoice')">GO TO INVOICE</button>
@@ -438,6 +448,59 @@
     <section id="offlineQueueOut" class="resultBox smallBox">Offline queue ready.</section>
   </main>
 
+
+  <!-- OCR / VISION PRO -->
+  <main id="visionPro" class="screen">
+    <h1 class="screenTitle">OCR / VISION PRO</h1>
+
+    <section class="visionPanel">
+      <div class="panelHead">
+        <b>PHASE 5 CAMERA TOOLS</b>
+        <span>Part labels • VIN plates • receipts • work-order photos • scan → lookup → invoice</span>
+      </div>
+      <div class="visionGrid">
+        <div><b>PART LABEL</b><span>Read part numbers and brand names</span></div>
+        <div><b>VIN PLATE</b><span>Clean VIN text and send to truck lookup</span></div>
+        <div><b>RECEIPT</b><span>Pull part cost notes into invoice</span></div>
+        <div><b>JOB PHOTO</b><span>Attach image note to work order</span></div>
+      </div>
+    </section>
+
+    <label class="fileLabel fullWidth">SCAN PHOTO / CAMERA
+      <input id="visionImage" type="file" accept="image/*" capture="environment">
+    </label>
+    <img id="visionPreview" class="previewImg" alt="Vision preview">
+
+    <div class="formGrid">
+      <label>SCAN TYPE
+        <select id="visionType">
+          <option>Part Label</option>
+          <option>VIN Plate</option>
+          <option>Receipt</option>
+          <option>Work Order Photo</option>
+          <option>Sensor / Component</option>
+        </select>
+      </label>
+      <label>OCR / AI RAW TEXT<textarea id="visionRaw" placeholder="Scanned text or AI output appears here. You can paste or correct it too."></textarea></label>
+      <label>CLEANED PART / VIN / NOTE<textarea id="visionClean" placeholder="Cleaned scan result appears here. Correct before sending."></textarea></label>
+      <label>PHOTO NOTE<textarea id="visionNote" placeholder="Where picture was taken, unit, part location, symptoms, receipt notes"></textarea></label>
+    </div>
+
+    <div class="buttonRow featureButtons">
+      <button onclick="scanVisionPhoto()">SCAN PHOTO</button>
+      <button onclick="cleanVisionText()">CLEAN TEXT</button>
+      <button onclick="sendVisionToParts()">SEND TO PART LOOKUP</button>
+      <button onclick="lookupVisionPart()">LOOKUP SCANNED PART</button>
+      <button onclick="addVisionPartToInvoice()">ADD SCAN TO INVOICE</button>
+      <button onclick="sendVisionToVin()">SEND VIN TO TRUCK</button>
+      <button onclick="saveVisionPhotoNote()">SAVE PHOTO NOTE</button>
+      <button onclick="clearVisionScan()">CLEAR SCAN</button>
+    </div>
+
+    <section id="visionOut" class="resultBox">Camera OCR ready. Add a photo, then tap SCAN PHOTO.</section>
+    <section id="visionHistoryOut" class="resultBox smallBox">Vision scan history will appear here.</section>
+  </main>
+
   <!-- INVOICE -->
   <main id="invoice" class="screen">
     <h1 class="screenTitle">INVOICE / QUOTE</h1>
@@ -504,7 +567,7 @@
     <button onclick="showScreen('invoice')">＋ LABOR</button>
     <button onclick="clockIn()">START CLOCK</button>
     <button onclick="showScreen('vin')">VIN</button>
-    <button onclick="showScreen('dieselAI')">CAMERA</button>
+    <button onclick="showScreen('visionPro')">CAMERA</button>
     <button onclick="showScreen('fieldTools')">GPS/DOT</button>
     <button onclick="saveJobCloud()">SAVE JOB</button>
   </div>

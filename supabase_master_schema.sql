@@ -555,3 +555,15 @@ create table if not exists offline_sync_log (
   synced boolean default false,
   created_at timestamptz default now()
 );
+
+
+-- PHASE 5 OCR / VISION PRO
+create table if not exists photo_notes (
+  id bigint generated always as identity primary key,
+  vin text,
+  note_type text,
+  cleaned_text text,
+  raw_text text,
+  notes text,
+  created_at timestamptz default now()
+);

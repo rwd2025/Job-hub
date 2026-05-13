@@ -26,7 +26,7 @@ function showScreen(id){
 
   document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
 
-  const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1,timeClock:5};
+  const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1,timeClock:5,fieldTools:5,visionPro:3};
   const index = map[id] || 1;
   const btn = document.querySelector(`.bottomNav button:nth-child(${index})`);
   if(btn) btn.classList.add("active");
@@ -43,7 +43,7 @@ function goBack(){
     document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
     if($(last)) $(last).classList.add("active");
     document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
-    const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1,timeClock:5};
+    const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1,timeClock:5,fieldTools:5,visionPro:3};
     const btn = document.querySelector(`.bottomNav button:nth-child(${map[last] || 1})`);
     if(btn) btn.classList.add("active");
     window.scrollTo({top:0,behavior:"smooth"});
@@ -1039,3 +1039,150 @@ window.addEventListener("DOMContentLoaded",()=>{
   wireFieldPhotoPreview();
   renderOfflineQueue();
 });
+
+
+/* ===============================
+   PHASE 5 OCR + VISION PRO
+   Camera scan -> clean text -> lookup -> invoice -> work order note
+   =============================== */
+function getVisionScans(){
+  try{return JSON.parse(localStorage.getItem("visionScans") || "[]");}catch(e){return []}
+}
+function saveVisionScans(list){
+  localStorage.setItem("visionScans", JSON.stringify((list || []).slice(0,50)));
+  renderVisionHistory();
+}
+function visionImageData(){
+  return localStorage.getItem("currentVisionImage") || "";
+}
+function wireVisionPreview(){
+  const input=$("visionImage"), preview=$("visionPreview");
+  if(!input || !preview) return;
+  input.addEventListener("change",()=>{
+    const file=input.files?.[0];
+    if(!file) return;
+    const reader=new FileReader();
+    reader.onload=()=>{
+      localStorage.setItem("currentVisionImage", reader.result);
+      preview.src=reader.result;
+      preview.style.display="block";
+      if($("visionOut")) $("visionOut").textContent="Photo loaded. Tap SCAN PHOTO or type/paste text into RAW TEXT.";
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function normalizeScanText(text){
+  return String(text || "")
+    .toUpperCase()
+    .replace(/[|]/g,"1")
+    .replace(/[O]/g,"0")
+    .replace(/[^A-Z0-9\-\s\.\/]/g," ")
+    .replace(/\s+/g," ")
+    .trim();
+}
+function extractPartCandidates(text){
+  const t=normalizeScanText(text);
+  const matches=t.match(/\b[A-Z0-9][A-Z0-9\-\.\/]{3,24}\b/g) || [];
+  const bad=new Set(["PART","NUMBER","MODEL","SERIAL","FILTER","ENGINE","DIESEL","WARNING","CAUTION","MADE","DATE","CODE","TYPE","QTY"]);
+  return [...new Set(matches.filter(x=>!bad.has(x) && /\d/.test(x)))].slice(0,12);
+}
+function bestVisionCandidate(text){
+  const list=extractPartCandidates(text);
+  return list[0] || normalizeScanText(text).slice(0,80);
+}
+async function scanVisionPhoto(){
+  const img=visionImageData();
+  const rawManual=$("visionRaw")?.value.trim() || "";
+  const type=$("visionType")?.value || "Part Label";
+  if(!img && !rawManual){ alert("Add a photo or paste scan text first."); return; }
+  if($("visionOut")) $("visionOut").textContent="Scanning photo with Rolling Cecil AI...";
+  try{
+    let raw=rawManual;
+    if(img){
+      const data=await callOracle({
+        mode:"vision_ocr_scan",
+        part_query:`OCR scan ${type}`,
+        question:`Read this ${type}. Extract part numbers, VIN, brand, label text, prices if receipt, and any repair-useful notes. Return concise plain text.`,
+        note:{image:img.split(",")[1], scan_type:type, vehicleContext:ctx()}
+      });
+      raw = data?.answer || data?.message || data?.data?.text || data?.data?.notes?.join("\n") || JSON.stringify(data,null,2);
+    }
+    setValue("visionRaw", raw);
+    const cleaned=bestVisionCandidate(raw);
+    setValue("visionClean", cleaned);
+    const scans=getVisionScans();
+    scans.unshift({type, raw:String(raw).slice(0,1200), cleaned, note:$("visionNote")?.value || "", vin:activeVin(), truck:activeTruckSummary(), image:img, saved_at:new Date().toLocaleString()});
+    saveVisionScans(scans);
+    if($("visionOut")) $("visionOut").innerHTML=`<div class="smartCardTitle"><span>SCAN COMPLETE</span><span class="badge good">${safeText(type)}</span></div><div class="smartGrid">${gridCell("BEST READ", cleaned)}${gridCell("CANDIDATES", extractPartCandidates(raw).join(", ") || "No clean candidates")}</div><div class="smartNote">${safeText(String(raw).slice(0,900))}</div>`;
+  }catch(e){
+    if($("visionOut")) $("visionOut").textContent="Vision Scan Error: " + e.message;
+  }
+}
+function cleanVisionText(){
+  const raw=$("visionRaw")?.value || "";
+  const cleaned=bestVisionCandidate(raw);
+  setValue("visionClean", cleaned);
+  if($("visionOut")) $("visionOut").innerHTML=`<div class="smartCardTitle"><span>CLEANED TEXT</span><span class="badge good">READY</span></div><div class="smartGrid">${gridCell("BEST", cleaned)}${gridCell("CANDIDATES", extractPartCandidates(raw).join(", ") || "—")}</div>`;
+}
+function sendVisionToParts(){
+  const clean=$("visionClean")?.value.trim() || bestVisionCandidate($("visionRaw")?.value || "");
+  if(!clean){ alert("Scan or enter text first."); return; }
+  setValue("partq", clean);
+  setValue("manualPartNumber", clean);
+  const note=[$("partNote")?.value || "", "Vision scan: " + ($("visionNote")?.value || "")].filter(Boolean).join("\n");
+  setValue("partNote", note);
+  showScreen("parts");
+}
+async function lookupVisionPart(){
+  sendVisionToParts();
+  await askPart();
+}
+function addVisionPartToInvoice(){
+  const clean=$("visionClean")?.value.trim() || bestVisionCandidate($("visionRaw")?.value || "");
+  if(!clean){ alert("Scan or enter a part number first."); return; }
+  setValue("manualPartNumber", clean);
+  if(!$("manualPartName")?.value) setValue("manualPartName", $("visionType")?.value || "Scanned Part");
+  addManualPartToInvoice();
+  if($("visionOut")) $("visionOut").textContent="Scanned part added to invoice.";
+}
+function sendVisionToVin(){
+  const raw=normalizeScanText($("visionClean")?.value || $("visionRaw")?.value || "");
+  const vin=(raw.match(/\b[A-HJ-NPR-Z0-9]{17}\b/) || [raw])[0];
+  if(!vin){ alert("No VIN found. Correct CLEANED field first."); return; }
+  setValue("vinGlobal", vin);
+  setValue("invoiceVin", vin);
+  showScreen("vin");
+}
+async function saveVisionPhotoNote(){
+  const entry={
+    vin:activeVin(), truck:activeTruckSummary(), scan_type:$("visionType")?.value || "Photo",
+    cleaned_text:$("visionClean")?.value || "", raw_text:$("visionRaw")?.value || "",
+    note:$("visionNote")?.value || "", image:visionImageData(), saved_at:new Date().toLocaleString()
+  };
+  const list=getVisionScans(); list.unshift(entry); saveVisionScans(list);
+  try{ await cloudInsert("photo_notes", {vin:entry.vin, note_type:entry.scan_type, cleaned_text:entry.cleaned_text, raw_text:entry.raw_text, notes:entry.note}); }catch(e){}
+  if($("visionOut")) $("visionOut").innerHTML=`<span class="cloudOk">Photo note saved.</span>`;
+}
+function clearVisionScan(){
+  ["visionRaw","visionClean","visionNote"].forEach(id=>setValue(id,""));
+  localStorage.removeItem("currentVisionImage");
+  if($("visionPreview")){ $("visionPreview").src=""; $("visionPreview").style.display="none"; }
+  if($("visionImage")) $("visionImage").value="";
+  if($("visionOut")) $("visionOut").textContent="Camera OCR ready. Add a photo, then tap SCAN PHOTO.";
+}
+function renderVisionHistory(){
+  const box=$("visionHistoryOut"); if(!box) return;
+  const scans=getVisionScans();
+  if(!scans.length){ box.textContent="Vision scan history will appear here."; return; }
+  box.innerHTML=`<div class="smartCardTitle"><span>VISION HISTORY</span><span class="badge good">${scans.length}</span></div>` + scans.slice(0,8).map((s,i)=>`<div class="partLine"><b>${safeText(s.cleaned || s.cleaned_text || s.type || "Scan")}</b><small>${safeText(s.saved_at || "")} | VIN ${safeText(s.vin || "")}</small>${s.image?`<img class="partThumb" src="${s.image}" alt="scan">`:""}<button class="secondaryBtn" onclick="loadVisionScan(${i})">LOAD</button></div>`).join("");
+}
+function loadVisionScan(i){
+  const s=getVisionScans()[i]; if(!s) return;
+  setValue("visionType", s.type || s.scan_type || "Part Label");
+  setValue("visionRaw", s.raw || s.raw_text || "");
+  setValue("visionClean", s.cleaned || s.cleaned_text || "");
+  setValue("visionNote", s.note || s.notes || "");
+  if(s.image){ localStorage.setItem("currentVisionImage", s.image); if($("visionPreview")){ $("visionPreview").src=s.image; $("visionPreview").style.display="block"; } }
+  showScreen("visionPro");
+}
+window.addEventListener("DOMContentLoaded",()=>{ wireVisionPreview(); renderVisionHistory(); });
