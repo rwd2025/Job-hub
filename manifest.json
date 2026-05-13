@@ -1,1 +1,9 @@
-{"name":"Rolling Cecil AI Field Pro","short_name":"Cecil AI","start_url":"./index.html","display":"standalone","background_color":"#020507","theme_color":"#ff7b00","icons":[]}
+{
+  "name": "Rolling Cecil AI Phase 7 Backend Pro",
+  "short_name": "Cecil AI",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#020507",
+  "theme_color": "#ff7b00",
+  "icons": []
+}

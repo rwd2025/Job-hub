@@ -1081,3 +1081,28 @@ button:active{transform:translateY(1px);}
   .bottomNav button{font-size:17px;padding:9px 2px;}
   .bottomNav button span{font-size:8px;}
 }
+
+
+/* PHASE 7 BACKEND EXPANSION PRO */
+.backendPanel{
+  background:linear-gradient(180deg,#0b151d,#050b10);
+  border:1px solid #31505f;
+  border-radius:18px;
+  padding:14px;
+  margin:12px 0 16px;
+}
+.backendGrid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:12px;
+}
+.backendGrid div{
+  background:#06131b;
+  border:1px solid #24485a;
+  border-radius:14px;
+  padding:12px;
+}
+.backendGrid b{display:block;color:var(--orange);font-size:12px;margin-bottom:6px;}
+.backendGrid span{display:block;color:#d6e2e8;font-size:12px;line-height:1.25;}
+@media(max-width:700px){.backendGrid{grid-template-columns:1fr 1fr}.backendGrid b{font-size:11px}.backendGrid span{font-size:11px}}

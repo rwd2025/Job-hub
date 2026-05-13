@@ -567,3 +567,307 @@ create table if not exists photo_notes (
   notes text,
   created_at timestamptz default now()
 );
+
+
+-- =====================================================
+-- PHASE 7 BACKEND EXPANSION PRO
+-- Run this after earlier Phase 1-6 tables.
+-- Safe to run multiple times.
+-- =====================================================
+
+create table if not exists staging_catalog_imports (
+  id bigint generated always as identity primary key,
+  source_name text,
+  system_category text,
+  brand_a text,
+  part_a text,
+  brand_b text,
+  part_b text,
+  description text,
+  confidence numeric default 0.95,
+  raw_payload jsonb,
+  notes text,
+  processed boolean default false,
+  created_at timestamptz default now()
+);
+
+create table if not exists supplier_pricing (
+  id bigint generated always as identity primary key,
+  part_number text,
+  supplier_name text,
+  brand text,
+  price numeric,
+  availability text,
+  search_url text,
+  notes text,
+  created_at timestamptz default now()
+);
+
+create table if not exists repair_procedures (
+  id bigint generated always as identity primary key,
+  engine_family text,
+  component_name text,
+  procedure_name text,
+  steps text,
+  tools_required text,
+  warnings text,
+  source_name text,
+  created_at timestamptz default now()
+);
+
+create table if not exists known_failures (
+  id bigint generated always as identity primary key,
+  engine_family text,
+  platform text,
+  fault_code text,
+  symptom text,
+  likely_failure text,
+  common_fix text,
+  confidence_score numeric default 0.75,
+  notes text,
+  created_at timestamptz default now()
+);
+
+create table if not exists vin_history_expanded (
+  id bigint generated always as identity primary key,
+  vin text,
+  engine_family text,
+  event_type text,
+  part_number text,
+  fault_code text,
+  notes text,
+  confidence_score numeric,
+  created_at timestamptz default now()
+);
+
+-- Helpful indexes for field speed
+create index if not exists idx_parts_part_number on parts(part_number);
+create index if not exists idx_parts_description on parts(description);
+create index if not exists idx_part_cross_refs_part_id on part_cross_refs(part_id);
+create index if not exists idx_part_cross_refs_cross_ref_id on part_cross_refs(cross_ref_id);
+create index if not exists idx_repair_kits_component on repair_kits(component_name);
+create index if not exists idx_torque_specs_component on torque_specs(component_name);
+create index if not exists idx_labor_times_component on labor_times(component_name);
+create index if not exists idx_known_failures_fault on known_failures(fault_code);
+create index if not exists idx_staging_catalog_imports_processed on staging_catalog_imports(processed);
+create index if not exists idx_supplier_pricing_part on supplier_pricing(part_number);
+create index if not exists idx_vin_history_expanded_vin on vin_history_expanded(vin);
+
+-- Recursive interchange chain for normalized parts + part_cross_refs.
+create or replace function recursive_interchange_chain(search_text text)
+returns jsonb
+language plpgsql
+as $$
+declare
+  result jsonb;
+begin
+  with recursive seed as (
+    select p.id, p.part_number, coalesce(m.name,'UNKNOWN') as manufacturer, p.description
+    from parts p
+    left join manufacturers m on m.id = p.manufacturer_id
+    where p.part_number ilike '%' || search_text || '%'
+    limit 10
+  ), chain as (
+    select
+      s.id as source_id,
+      s.part_number as source_part,
+      s.manufacturer as source_brand,
+      p2.id as cross_id,
+      p2.part_number as cross_part,
+      coalesce(m2.name,'UNKNOWN') as cross_brand,
+      pcr.confidence_score,
+      1 as depth
+    from seed s
+    join part_cross_refs pcr on pcr.part_id = s.id
+    join parts p2 on p2.id = pcr.cross_ref_id
+    left join manufacturers m2 on m2.id = p2.manufacturer_id
+
+    union
+
+    select
+      c.cross_id as source_id,
+      c.cross_part as source_part,
+      c.cross_brand as source_brand,
+      p2.id as cross_id,
+      p2.part_number as cross_part,
+      coalesce(m2.name,'UNKNOWN') as cross_brand,
+      pcr.confidence_score,
+      c.depth + 1
+    from chain c
+    join part_cross_refs pcr on pcr.part_id = c.cross_id
+    join parts p2 on p2.id = pcr.cross_ref_id
+    left join manufacturers m2 on m2.id = p2.manufacturer_id
+    where c.depth < 5
+  )
+  select coalesce(jsonb_agg(to_jsonb(chain)), '[]'::jsonb) into result
+  from chain;
+
+  return result;
+end;
+$$;
+
+-- Expanded backend search. Returns grouped JSON for the app cards.
+create or replace function backend_expansion_search(search_text text)
+returns jsonb
+language plpgsql
+as $$
+declare
+  result jsonb;
+begin
+  result := jsonb_build_object(
+    'parts', (
+      select coalesce(jsonb_agg(jsonb_build_object(
+        'part_number', p.part_number,
+        'manufacturer', coalesce(m.name,'UNKNOWN'),
+        'description', p.description,
+        'category', p.category
+      )), '[]'::jsonb)
+      from parts p
+      left join manufacturers m on m.id = p.manufacturer_id
+      where p.part_number ilike '%' || search_text || '%'
+         or p.description ilike '%' || search_text || '%'
+         or p.category ilike '%' || search_text || '%'
+         or m.name ilike '%' || search_text || '%'
+      limit 25
+    ),
+    'cross_refs', (
+      select coalesce(jsonb_agg(jsonb_build_object(
+        'source_part', p1.part_number,
+        'source_brand', coalesce(m1.name,'UNKNOWN'),
+        'cross_part', p2.part_number,
+        'cross_brand', coalesce(m2.name,'UNKNOWN'),
+        'confidence_score', pcr.confidence_score
+      )), '[]'::jsonb)
+      from part_cross_refs pcr
+      join parts p1 on p1.id = pcr.part_id
+      join parts p2 on p2.id = pcr.cross_ref_id
+      left join manufacturers m1 on m1.id = p1.manufacturer_id
+      left join manufacturers m2 on m2.id = p2.manufacturer_id
+      where p1.part_number ilike '%' || search_text || '%'
+         or p2.part_number ilike '%' || search_text || '%'
+         or p1.description ilike '%' || search_text || '%'
+         or p2.description ilike '%' || search_text || '%'
+      limit 25
+    ),
+    'interchange_chains', recursive_interchange_chain(search_text),
+    'torque_specs', (
+      select coalesce(jsonb_agg(to_jsonb(t)), '[]'::jsonb)
+      from torque_specs t
+      where t.engine_family ilike '%' || search_text || '%'
+         or t.component_name ilike '%' || search_text || '%'
+         or t.fastener ilike '%' || search_text || '%'
+         or t.torque_value ilike '%' || search_text || '%'
+      limit 20
+    ),
+    'labor_times', (
+      select coalesce(jsonb_agg(to_jsonb(l)), '[]'::jsonb)
+      from labor_times l
+      where l.engine_family ilike '%' || search_text || '%'
+         or l.component_name ilike '%' || search_text || '%'
+         or l.labor_operation ilike '%' || search_text || '%'
+         or l.notes ilike '%' || search_text || '%'
+      limit 20
+    ),
+    'fluids_filters', (
+      select coalesce(jsonb_agg(to_jsonb(f)), '[]'::jsonb)
+      from fluids_filters f
+      where f.engine_family ilike '%' || search_text || '%'
+         or f.service_type ilike '%' || search_text || '%'
+         or f.oil_filter ilike '%' || search_text || '%'
+         or f.fuel_filter ilike '%' || search_text || '%'
+         or f.water_separator ilike '%' || search_text || '%'
+      limit 20
+    ),
+    'known_failures', (
+      select coalesce(jsonb_agg(to_jsonb(k)), '[]'::jsonb)
+      from known_failures k
+      where k.engine_family ilike '%' || search_text || '%'
+         or k.platform ilike '%' || search_text || '%'
+         or k.fault_code ilike '%' || search_text || '%'
+         or k.symptom ilike '%' || search_text || '%'
+         or k.likely_failure ilike '%' || search_text || '%'
+         or k.common_fix ilike '%' || search_text || '%'
+      limit 20
+    ),
+    'repair_procedures', (
+      select coalesce(jsonb_agg(to_jsonb(r)), '[]'::jsonb)
+      from repair_procedures r
+      where r.engine_family ilike '%' || search_text || '%'
+         or r.component_name ilike '%' || search_text || '%'
+         or r.procedure_name ilike '%' || search_text || '%'
+         or r.steps ilike '%' || search_text || '%'
+      limit 15
+    ),
+    'supplier_pricing', (
+      select coalesce(jsonb_agg(to_jsonb(s)), '[]'::jsonb)
+      from supplier_pricing s
+      where s.part_number ilike '%' || search_text || '%'
+         or s.supplier_name ilike '%' || search_text || '%'
+         or s.brand ilike '%' || search_text || '%'
+      limit 20
+    ),
+    'staging_imports', (
+      select coalesce(jsonb_agg(to_jsonb(si)), '[]'::jsonb)
+      from staging_catalog_imports si
+      where si.source_name ilike '%' || search_text || '%'
+         or si.system_category ilike '%' || search_text || '%'
+         or si.part_a ilike '%' || search_text || '%'
+         or si.part_b ilike '%' || search_text || '%'
+         or si.description ilike '%' || search_text || '%'
+      limit 15
+    )
+  );
+
+  return result;
+end;
+$$;
+
+-- Optional: import rows from staging_catalog_imports into normalized parts/cross refs.
+create or replace function process_staging_catalog_imports()
+returns integer
+language plpgsql
+as $$
+declare
+  processed_count integer := 0;
+  r record;
+  brand_a_id uuid;
+  brand_b_id uuid;
+  part_a_id uuid;
+  part_b_id uuid;
+begin
+  for r in select * from staging_catalog_imports where processed = false loop
+    if coalesce(r.brand_a,'') <> '' then
+      insert into manufacturers(name) values(r.brand_a) on conflict(name) do nothing;
+      select id into brand_a_id from manufacturers where name = r.brand_a limit 1;
+    end if;
+    if coalesce(r.brand_b,'') <> '' then
+      insert into manufacturers(name) values(r.brand_b) on conflict(name) do nothing;
+      select id into brand_b_id from manufacturers where name = r.brand_b limit 1;
+    end if;
+
+    if coalesce(r.part_a,'') <> '' then
+      insert into parts(part_number, manufacturer_id, description, category)
+      values(r.part_a, brand_a_id, r.description, r.system_category)
+      on conflict do nothing;
+      select id into part_a_id from parts where part_number = r.part_a and (manufacturer_id = brand_a_id or brand_a_id is null) limit 1;
+    end if;
+
+    if coalesce(r.part_b,'') <> '' then
+      insert into parts(part_number, manufacturer_id, description, category)
+      values(r.part_b, brand_b_id, r.description, r.system_category)
+      on conflict do nothing;
+      select id into part_b_id from parts where part_number = r.part_b and (manufacturer_id = brand_b_id or brand_b_id is null) limit 1;
+    end if;
+
+    if part_a_id is not null and part_b_id is not null then
+      insert into part_cross_refs(part_id, cross_ref_id, confidence_score)
+      values(part_a_id, part_b_id, coalesce(r.confidence,0.95))
+      on conflict do nothing;
+    end if;
+
+    update staging_catalog_imports set processed = true where id = r.id;
+    processed_count := processed_count + 1;
+  end loop;
+  return processed_count;
+end;
+$$;

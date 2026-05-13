@@ -26,7 +26,7 @@ function showScreen(id){
 
   document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
 
-  const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1,timeClock:5,fieldTools:5,visionPro:3};
+  const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1,timeClock:5,fieldTools:5,visionPro:3,backendPro:5};
   const index = map[id] || 1;
   const btn = document.querySelector(`.bottomNav button:nth-child(${index})`);
   if(btn) btn.classList.add("active");
@@ -43,7 +43,7 @@ function goBack(){
     document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
     if($(last)) $(last).classList.add("active");
     document.querySelectorAll(".bottomNav button").forEach(b=>b.classList.remove("active"));
-    const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1,timeClock:5,fieldTools:5,visionPro:3};
+    const map = {home:1,dieselAI:2,faultDoctor:2,parts:3,schematics:4,repairHud:4,settings:5,invoice:5,team:5,voice:5,vin:1,timeClock:5,fieldTools:5,visionPro:3,backendPro:5};
     const btn = document.querySelector(`.bottomNav button:nth-child(${map[last] || 1})`);
     if(btn) btn.classList.add("active");
     window.scrollTo({top:0,behavior:"smooth"});
@@ -1186,3 +1186,98 @@ function loadVisionScan(i){
   showScreen("visionPro");
 }
 window.addEventListener("DOMContentLoaded",()=>{ wireVisionPreview(); renderVisionHistory(); });
+
+
+// PHASE 7 BACKEND EXPANSION PRO
+async function backendExpansionSearch(term){
+  if(!supabaseClient) throw new Error("Supabase client not loaded.");
+  const search_text = String(term || "").trim();
+  if(!search_text) throw new Error("Enter backend search text.");
+  const { data, error } = await supabaseClient.rpc("backend_expansion_search", { search_text });
+  if(error) throw error;
+  return data || {};
+}
+
+async function recursiveInterchangeSearch(term){
+  if(!supabaseClient) throw new Error("Supabase client not loaded.");
+  const search_text = String(term || "").trim();
+  if(!search_text) throw new Error("Enter a part number for interchange chain.");
+  const { data, error } = await supabaseClient.rpc("recursive_interchange_chain", { search_text });
+  if(error) throw error;
+  return data || [];
+}
+
+function renderBackendObject(title, obj){
+  const blocks=[];
+  const order=[
+    ["parts","PARTS"], ["cross_refs","CROSS REFERENCES"], ["interchange_chains","INTERCHANGE CHAINS"],
+    ["torque_specs","TORQUE SPECS"], ["labor_times","LABOR TIMES"], ["fluids_filters","FLUIDS / FILTERS"],
+    ["known_failures","KNOWN FAILURES"], ["repair_procedures","REPAIR PROCEDURES"], ["supplier_pricing","SUPPLIER PRICING"],
+    ["staging_imports","STAGING IMPORTS"]
+  ];
+  for(const [key,label] of order){
+    const rows=asArray(obj?.[key]);
+    if(!rows.length) continue;
+    blocks.push(card(label,{text:`${rows.length}`,cls:"good"},`<div class="smartGrid">${rows.slice(0,8).map(r=>gridCell(
+      r.part_number || r.oem_part_number || r.component_name || r.engine_family || r.fault_code || r.procedure_name || r.supplier_name || r.source_name || "MATCH",
+      r.description || r.aftermarket_part_number || r.torque_value || (r.labor_hours ? r.labor_hours+" hrs" : "") || r.common_fix || r.price || r.notes || r.category || "Stored result"
+    )).join("")}</div>`));
+  }
+  if(!blocks.length){
+    blocks.push(card(title,{text:"NO HIT",cls:"warn"},`<div class="emptyNote">No expanded backend matches yet. Add records or import catalog rows into staging.</div>`));
+  }
+  return `<div class="resultGroup">${blocks.join("")}</div>`;
+}
+
+async function runBackendExpansionSearch(){
+  const q = $("backendSearchQ")?.value.trim() || $("partq")?.value.trim() || $("doctorAsk")?.value.trim() || "";
+  if(!q){ alert("Enter backend search text."); return; }
+  if($("backendOut")) $("backendOut").textContent="Searching expanded backend...";
+  try{
+    const data = await backendExpansionSearch(q);
+    $("backendOut").innerHTML = renderBackendObject("BACKEND EXPANSION", data);
+  }catch(e){
+    $("backendOut").innerHTML = card("BACKEND ERROR",{text:"ERROR",cls:"warn"},`<div class="emptyNote">${safeText(e.message)}</div>`);
+  }
+}
+
+async function runInterchangeChain(){
+  const q = $("backendSearchQ")?.value.trim() || $("partq")?.value.trim() || "";
+  if(!q){ alert("Enter a part number first."); return; }
+  if($("backendOut")) $("backendOut").textContent="Building interchange chain...";
+  try{
+    const chain = await recursiveInterchangeSearch(q);
+    if(!chain.length){
+      $("backendOut").innerHTML = card("INTERCHANGE CHAIN",{text:"NO CHAIN",cls:"warn"},`<div class="emptyNote">No chain found for ${safeText(q)} yet.</div>`);
+      return;
+    }
+    $("backendOut").innerHTML = card("RECURSIVE INTERCHANGE CHAIN",{text:`${chain.length} LINKS`,cls:"hot"},`<div class="smartGrid">${chain.slice(0,20).map(c=>gridCell(c.source_part || c.part_number || "SOURCE", `${c.cross_part || c.cross_ref_number || "MATCH"} ${c.confidence_score ? "("+c.confidence_score+")" : ""}`)).join("")}</div>`);
+  }catch(e){
+    $("backendOut").innerHTML = card("INTERCHANGE ERROR",{text:"ERROR",cls:"warn"},`<div class="emptyNote">${safeText(e.message)}</div>`);
+  }
+}
+
+function getImportQueue(){ return JSON.parse(localStorage.getItem("backendImportQueue") || "[]"); }
+function saveImportQueue(list){ localStorage.setItem("backendImportQueue", JSON.stringify(list.slice(0,80))); }
+async function queueStagingImport(){
+  const source=$("importSourceName")?.value.trim() || "Manual Field Import";
+  const category=$("importCategory")?.value.trim() || "Uncategorized";
+  const notes=$("importNotes")?.value.trim() || "";
+  if(!notes){ alert("Paste import notes or rows first."); return; }
+  const entry={source,category,notes,vin:activeVin(),created_at:new Date().toISOString()};
+  const q=getImportQueue(); q.unshift(entry); saveImportQueue(q);
+  try{ await cloudInsert("staging_catalog_imports", {source_name:source, system_category:category, raw_payload:entry, notes}); }catch(e){}
+  loadImportQueue();
+  if($("backendOut")) $("backendOut").innerHTML = card("IMPORT QUEUED",{text:"READY",cls:"good"},`<div class="smartGrid">${gridCell("SOURCE",source)}${gridCell("CATEGORY",category)}${gridCell("ROWS/NOTES",notes.slice(0,120))}</div>`);
+}
+function loadImportQueue(){
+  const box=$("importQueueOut"); if(!box) return;
+  const q=getImportQueue();
+  if(!q.length){ box.textContent="Import queue ready."; return; }
+  box.innerHTML=`<div class="smartCardTitle"><span>LOCAL IMPORT QUEUE</span><span class="badge good">${q.length}</span></div>`+q.slice(0,10).map((x,i)=>`<div class="partLine"><b>${safeText(x.source)}</b><small>${safeText(x.category)} | ${safeText(new Date(x.created_at).toLocaleString())}</small><p>${safeText(x.notes).slice(0,180)}</p></div>`).join("");
+}
+function clearBackendPro(){
+  ["backendSearchQ","importSourceName","importCategory","importNotes"].forEach(id=>setValue(id,""));
+  if($("backendOut")) $("backendOut").textContent="Backend expansion ready. Search a part, engine, system, fault, torque spec, labor job, or staged import.";
+}
+window.addEventListener("DOMContentLoaded",()=>{ loadImportQueue(); });
