@@ -447,6 +447,8 @@ const memoryContext = kbData.matches
     </div>
   `;
 }
+    const data = await callOracle({
+  part_query: q,
  question: `
 KNOWN SHOP MEMORY:
 ${memoryContext}
