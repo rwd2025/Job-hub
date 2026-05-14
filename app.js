@@ -152,7 +152,7 @@ async function callOracle(payload){
     make: payload.make ?? $("makeGlobal")?.value ?? getActiveTruck().make ?? "",
     model: payload.model ?? $("modelGlobal")?.value ?? getActiveTruck().model ?? "",
     engine: payload.engine ?? $("engine")?.value ?? getActiveTruck().engine ?? "",
-    mode: payload.mode || "diesel_doctor",
+    mode: payload.mode || "search",
     part_query: payload.part_query || payload.question || payload.query || "",
     question: payload.question || payload.part_query || payload.query || "",
     note: payload.note || "",
