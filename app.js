@@ -408,6 +408,7 @@ async function runDiag(){
   $("diagOut").textContent = "Fault Doctor running Oracle + Diesel Brain...";
   if($("intelOut")) $("intelOut").textContent = "Searching Diesel Brain memory...";
   try{
+    
     const kb = await fetch(
 "https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/embedding-router",
 {
@@ -428,7 +429,19 @@ const kbData = await kb.json();
 const memoryContext = kbData.matches
 ?.map(m => m.content)
 ?.join("\n\n") || "";
-    const data = await callOracle({part_query:q,question:q,note,mode:"fault_doctor"});
+    const data = await callOracle({
+  part_query: q,
+  question: `
+KNOWN SHOP MEMORY:
+${memoryContext}
+
+LIVE QUESTION:
+${q}
+
+TECH NOTES:
+${note}
+`
+});
     renderDiagnosticOracle("diagOut", data, q);
     await renderDieselIntelligence(q, note);
   }catch(e){
