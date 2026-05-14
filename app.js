@@ -447,6 +447,7 @@ const memoryContext = kbData.matches
     </div>
   `;
 }
+    try{
     const data = await callOracle({
   part_query: q,
  question: `
