@@ -429,6 +429,24 @@ const kbData = await kb.json();
 const memoryContext = kbData.matches
 ?.map(m => m.content)
 ?.join("\n\n") || "";
+    if(kbData?.matches?.length){
+  $("intelOut").innerHTML = `
+    <div class="oracleCard">
+      <div class="oracleTitle">
+        DIESEL BRAIN MEMORY (${kbData.matches.length} HITS)
+      </div>
+
+      ${kbData.matches.map(m => `
+        <div class="miniCard">
+          <strong>${m.source_name || "MEMORY"}</strong>
+          <div style="margin-top:8px;">
+            ${m.content || ""}
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
    console.log("KB DATA", kbData);
 console.log("MATCHES", kbData.matches); 
     const data = await callOracle({
