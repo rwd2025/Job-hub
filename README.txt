@@ -1,10 +1,22 @@
-Rolling Cecil AI – Embedding Router Patch
+Rolling Cecil AI — Embedding Router Vector Fix
 
-1. Open app.js
-2. Add the EMBEDDING_ROUTER_URL under API_URL
-3. Add the callEmbeddingRouter() function near callOracle()
-4. Replace the old homeAI() call section with the new block
-5. Save and upload app.js to GitHub
-6. Refresh the app
+This rebuild fixes the search issue where matches returned [].
 
-This patch connects the Doctor screen to the live Supabase Edge Function.
+What changed:
+- Search embeddings are converted to pgvector string format.
+- Search calls match_knowledge_base_v2.
+- Ingest still saves embeddings to knowledge_base_embeddings.
+
+Deploy:
+1. Open Supabase > Edge Functions > embedding-router > Code.
+2. Replace the whole index.ts with supabase/functions/embedding-router/index.ts.
+3. Deploy updates.
+4. Test with:
+
+{
+  "mode": "search",
+  "question": "X15 rough idle and stutter",
+  "match_count": 5
+}
+
+If search still returns empty, run supabase_vector_search_fix.sql in Supabase SQL Editor.
