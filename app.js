@@ -466,8 +466,11 @@ renderDiagnosticOracle("diagOut", data, q);
 if(kbData?.matches?.length){
   renderDieselIntelligence(q, note, kbData.matches);
 }  
+}catch(e){
+  $("diagOut").textContent = "DIAGNOSTIC ERROR: " + e.message;
+  try{ await renderDieselIntelligence(q, note); }catch(_){}
 }
-
+}
 
 function renderDiagnosticOracle(targetId, data, query){
   const d = data?.data || data || {};
