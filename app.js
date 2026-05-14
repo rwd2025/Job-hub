@@ -459,15 +459,13 @@ LIVE QUESTION:
 ${q}
 
 TECH NOTES:
-${note}
-`
 });
-    renderDiagnosticOracle("diagOut", data, q);
-    await renderDieselIntelligence(q, note);
-  }catch(e){
-    $("diagOut").textContent = "DIAGNOSTIC ERROR: " + e.message;
-    try{ await renderDieselIntelligence(q, note); }catch(_){}
-  }
+
+  renderDiagnosticOracle("diagOut", data, q);
+
+if(kbData?.matches?.length){
+  renderDieselIntelligence(q, note, kbData.matches);
+}
 }
 
 
