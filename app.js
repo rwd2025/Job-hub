@@ -16,6 +16,8 @@ function safeText(value){
   return String(value ?? "").replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c]));
 }
 
+function escapeHtml(value){ return safeText(value); }
+
 let currentScreen = "home";
 const screenHistory = [];
 
@@ -293,6 +295,55 @@ function renderRepairKit(targetId, kits){
   for(const k of list.slice(0,3)){
     $(targetId).innerHTML += card("SMART REPAIR KIT",{text:"KIT",cls:"good"},`<div class="smartGrid">${gridCell("COMPONENT",k.component_name)}${gridCell("ENGINE",k.engine_family)}${gridCell("OEM PART",k.oem_part_number)}${gridCell("LABOR",k.labor_hours ? k.labor_hours+" hrs" : "—")}${gridCell("GASKETS",k.gasket_set)}${gridCell("SEALS",k.seals)}${gridCell("O-RINGS",k.o_rings)}${gridCell("HARDWARE",k.hardware)}</div>`, `${k.torque_specs || ""}\n${k.repair_notes || ""}`.trim());
   }
+}
+
+
+function currentPartSearchTerm(){
+  return ($("partq")?.value || $("manualPartNumber")?.value || $("manualPartName")?.value || $("doctorAsk")?.value || $("diagq")?.value || "").trim();
+}
+
+function openSupplierSearch(source){
+  const term = currentPartSearchTerm() || activeTruckSummary?.() || "diesel truck parts";
+  const engine = ($("engine")?.value || getActiveTruck().engine || "").trim();
+  const q = [term, engine].filter(Boolean).join(" ");
+  const urls = {
+    fleetpride: `https://www.google.com/search?q=${encodeURIComponent(q + " FleetPride")}`,
+    napa: `https://www.google.com/search?q=${encodeURIComponent(q + " NAPA")}`,
+    oreilly: `https://www.google.com/search?q=${encodeURIComponent(q + " O'Reilly Auto Parts")}`,
+    google: `https://www.google.com/search?q=${encodeURIComponent(q)}`,
+    dealer: `https://www.google.com/search?q=${encodeURIComponent(q + " OEM dealer parts")}`
+  };
+  window.open(urls[source] || urls.google, "_blank");
+}
+
+async function runInterchangeOnly(){
+  const q = currentPartSearchTerm();
+  if(!q){ alert("Enter a part number or part name first."); return; }
+  if($("partOut")) $("partOut").textContent = "Building interchange chain...";
+  try{
+    const chain = await recursiveInterchangeSearch(q);
+    window.__lastInterchangeChain = Array.isArray(chain) ? chain : [];
+    if(!window.__lastInterchangeChain.length){
+      if($("partOut")) $("partOut").innerHTML = card("INTERCHANGE CHAIN", {text:"NO CHAIN", cls:"warn"}, `<div class="emptyNote">No interchange chain found for ${safeText(q)} yet.</div>`);
+      return;
+    }
+    if($("partOut")) $("partOut").innerHTML = card("INTERCHANGE CHAIN", {text:`${window.__lastInterchangeChain.length} LINKS`, cls:"hot"}, `<div class="smartGrid">${window.__lastInterchangeChain.slice(0,20).map(c=>gridCell(c.source_part || c.part_number || c.part_id || "SOURCE", `${c.cross_part || c.cross_ref_number || c.cross_ref_id || c.aftermarket_part_number || "MATCH"} ${c.confidence_score ? "("+c.confidence_score+")" : ""}`)).join("")}</div>`);
+  }catch(e){
+    if($("partOut")) $("partOut").textContent = "Interchange error: " + e.message;
+  }
+}
+
+function addBestInterchangeToInvoice(){
+  const chain = window.__lastInterchangeChain || [];
+  const best = chain[0];
+  const q = currentPartSearchTerm();
+  if(!best && !q){ alert("Run interchange or enter a part first."); return; }
+  const number = best?.cross_part || best?.cross_ref_number || best?.cross_ref_id || best?.part_number || q;
+  const name = best?.description || best?.component_name || q || "Interchange part";
+  setValue("manualPartNumber", number || "");
+  setValue("manualPartName", name || "Interchange part");
+  if(best?.supplier_name || best?.brand) setValue("manualPartSupplier", best.supplier_name || best.brand);
+  addManualPartToInvoice();
 }
 
 
@@ -1451,6 +1502,87 @@ function phase8ActionsHtml(q){
   </div>
   <div class="smartNote">Unified query: ${safe}</div>`;
 }
+
+async function masterJobWorkflowSearch(search){
+  if(!supabaseClient) throw new Error("Supabase client not loaded.");
+  const { data, error } = await supabaseClient.rpc("master_job_workflow", {
+    search_text: search,
+    vin_text: activeVin() || null
+  });
+  if(error) throw error;
+  return data || {};
+}
+
+function pickText(row, keys){
+  if(!row || typeof row !== "object") return "";
+  for(const k of keys){
+    if(row[k] !== undefined && row[k] !== null && String(row[k]).trim() !== "") return row[k];
+  }
+  return "";
+}
+
+function renderMasterWorkflowCards(workflow, q){
+  const data = workflow?.data || workflow || {};
+  const identified = data.identified_repair || {};
+  const parts = asArray(data.parts || data.repair_parts || data.required_parts);
+  const labor = asArray(data.labor_guide || data.labor_times || data.labor);
+  const kits = asArray(data.repair_kit || data.repair_kits || data.kits);
+  const torque = asArray(data.torque_specs || data.torque);
+  const failures = asArray(data.known_failures || data.common_failures || data.failures);
+  const diag = asArray(data.diagnostic_flow || data.diagnostic_tests || data.tests);
+  const supplier = asArray(data.supplier_pricing || data.supplier_links || data.suppliers);
+  const memory = asArray(data.repair_memory || data.repair_notes || data.memory);
+  const quote = data.quote || {};
+  let html = "";
+
+  html += card("MASTER JOB ENGINE", {text:data.status || "READY", cls:"good"}, `<div class="smartGrid">
+    ${gridCell("JOB", identified.job || identified.search || q || "—")}
+    ${gridCell("CONFIDENCE", identified.confidence || data.confidence || "workflow")}
+    ${gridCell("VIN", activeVin() || "NO VIN")}
+    ${gridCell("ENGINE", getActiveTruck().engine || $("engine")?.value || "UNKNOWN")}
+  </div>`, "Phase 14 combines labor, parts, repair kits, tests, failures, torque, suppliers, and shop memory into one repair workflow.");
+
+  if(labor.length){
+    html += card("BOOK LABOR", {text:`${labor.length} MATCH${labor.length>1?"ES":""}`, cls:"good"}, `<div class="smartGrid">${labor.slice(0,8).map(l=>gridCell(pickText(l,["labor_operation","component_name","operation","job"]) || "LABOR", `${pickText(l,["labor_hours","hours","book_hours"]) || "?"} hrs ${pickText(l,["difficulty","skill_level"]) || ""}`)).join("")}</div>`, "Book hours should be verified against the exact VIN/engine/service information before final quote.");
+  }else{
+    html += card("BOOK LABOR", {text:"NO MATCH", cls:"warn"}, `<div class="smartGrid">${gridCell("NEXT", "Add labor_times rows for this job/component")}</div>`);
+  }
+
+  if(parts.length){
+    html += card("PARTS NEEDED", {text:`${parts.length} HIT${parts.length>1?"S":""}`, cls:"hot"}, `<div class="smartGrid">${parts.slice(0,10).map(p=>gridCell(pickText(p,["part_id","part_number","oem_part_number","oem_part"]) || pickText(p,["brand","manufacturer"]) || "PART", [pickText(p,["description","component_name","category"]), pickText(p,["brand","manufacturer"]), pickText(p,["engine","engine_family"])].filter(Boolean).join(" | "))).join("")}</div>`);
+  }
+
+  if(kits.length){
+    html += card("SMART REPAIR KIT", {text:`${kits.length} KIT${kits.length>1?"S":""}`, cls:"good"}, `<div class="smartGrid">${kits.slice(0,6).map(k=>gridCell(k.component_name || k.oem_part_number || "KIT", [k.gasket_set, k.seals, k.o_rings, k.hardware, k.labor_hours ? k.labor_hours+" hrs" : ""].filter(Boolean).join(" | "))).join("")}</div>`);
+  }
+
+  if(torque.length){
+    html += card("TORQUE / SPECS", {text:"VERIFY", cls:"warn"}, `<div class="smartGrid">${torque.slice(0,8).map(t=>gridCell(t.fastener || t.component_name || "SPEC", `${t.torque_value || "UNKNOWN"} ${t.sequence_notes || ""}`)).join("")}</div>`);
+  }
+
+  if(failures.length){
+    html += card("KNOWN FAILURES", {text:`${failures.length} HIT${failures.length>1?"S":""}`, cls:"hot"}, `<div class="smartGrid">${failures.slice(0,8).map(f=>gridCell(f.fault_code || f.symptom || "FAILURE", `${f.likely_causes || ""} ${f.common_fix ? "→ "+f.common_fix : ""}`)).join("")}</div>`, "Use these as leads. Confirm with tests before replacing parts.");
+  }
+
+  if(diag.length){
+    html += card("GUIDED TEST PLAN", {text:"TEST FIRST", cls:"good"}, `<div class="smartGrid">${diag.slice(0,8).map(d=>gridCell(d.test_name || d.fault_code || d.symptom || "TEST", `${d.test_steps || ""} ${d.pass_fail_specs ? " | SPEC: "+d.pass_fail_specs : ""}`)).join("")}</div>`);
+  }
+
+  if(supplier.length){
+    html += card("SUPPLIER / PRICING", {text:`${supplier.length}`, cls:"good"}, `<div class="smartGrid">${supplier.slice(0,8).map(s=>gridCell(s.supplier_name || s.brand || "SUPPLIER", `${s.part_number || s.oem_part || ""} ${s.price ? " — "+money(s.price) : ""}`)).join("")}</div>`);
+  }
+
+  if(memory.length){
+    html += card("SHOP MEMORY", {text:`${memory.length}`, cls:"good"}, `<div class="smartGrid">${memory.slice(0,6).map(m=>gridCell(m.verified_fix ? "VERIFIED FIX" : "REPAIR MEMORY", `${m.symptom_text || m.symptom || m.fault_code || ""} → ${m.repair_action || m.notes || ""}`)).join("")}</div>`);
+  }
+
+  if(quote && Object.keys(quote).length){
+    html += card("AUTO QUOTE", {text:"DRAFT", cls:"good"}, `<div class="smartGrid">${Object.entries(quote).slice(0,8).map(([k,v])=>gridCell(k, typeof v === "number" ? money(v) : String(v))).join("")}</div>`);
+  }
+
+  return html;
+}
+
 async function phase8MasterSearch(){
   const q = phase8SearchInput();
   if(!q){
@@ -1467,8 +1599,11 @@ async function phase8MasterSearch(){
   session.last_search_at = new Date().toISOString();
   savePhase8Session(session);
 
-  let oracleData = null, universal = {}, brain = {}, kits = [];
-  let oracleErr = "", universalErr = "", brainErr = "";
+  let workflowData = null, oracleData = null, universal = {}, brain = {}, kits = [];
+  let workflowErr = "", oracleErr = "", universalErr = "", brainErr = "";
+
+  try{ workflowData = await masterJobWorkflowSearch(q); console.log("MASTER JOB WORKFLOW:", workflowData); }
+  catch(e){ workflowErr = e.message; }
 
   try{ oracleData = await callOracle({ part_query:q, question:q, note:ctx(), mode:"master_workflow" }); }
   catch(e){ oracleErr = e.message; }
@@ -1484,12 +1619,18 @@ async function phase8MasterSearch(){
   catch(e){ kits = []; }
 
   let html = `<div class="resultGroup phase8Results">`;
-  html += card("MASTER WORKFLOW", {text:"PHASE 8", cls:"good"}, `<div class="smartGrid">
+  html += card("MASTER WORKFLOW", {text:"PHASE 14", cls:"good"}, `<div class="smartGrid">
     ${gridCell("QUERY", q)}
     ${gridCell("SEARCH TERM", term)}
     ${gridCell("ACTIVE VIN", activeVin ? activeVin() : getActiveTruck().vin || "NO VIN")}
     ${gridCell("ACTIVE ENGINE", getActiveTruck().engine || $("engine")?.value || "UNKNOWN")}
-  </div>`, "One flow: Oracle + SQL database + Diesel Brain + repair kits + invoice/job tools.");
+  </div>`, "One TEXA-style flow: VIN context → job identification → book labor → parts needed → guided tests → quote → save verified fix.");
+
+  if(workflowData){
+    html += renderMasterWorkflowCards(workflowData, q);
+  }else if(workflowErr){
+    html += card("MASTER JOB ENGINE", {text:"RPC ERROR", cls:"warn"}, `<div class="smartGrid">${gridCell("ERROR", workflowErr)}</div>`, "Run the Phase 14 SQL function in Supabase, then try again.");
+  }
 
   if(oracleData){
     const d = oracleData.data || oracleData || {};
