@@ -400,57 +400,38 @@ async function homeAI(){
     $("homeAiOut").textContent = formatOracleData(data);
   }catch(e){ $("homeAiOut").textContent = "Diesel AI error: " + e.message; }
 }
-
 async function runDiag(){
   const q = $("diagq")?.value.trim() || "";
   const note = $("diagNote")?.value.trim() || "";
-  if(!q){ $("diagOut").textContent = "Enter fault code or symptom first."; return; }
+
+  if(!q){
+    $("diagOut").textContent = "Enter fault code or symptom first.";
+    return;
+  }
+
   $("diagOut").textContent = "Fault Doctor running Oracle + Diesel Brain...";
   if($("intelOut")) $("intelOut").textContent = "Searching Diesel Brain memory...";
+
   try{
-    
-    const kb = await fetch(
-"https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/embedding-router",
-{
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    mode: "search",
-    question: q,
-    match_count: 5
-  })
-}
-);
+    const kb = await fetch("https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/embedding-router", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        mode: "search",
+        question: q,
+        match_count: 5
+      })
+    });
 
-const kbData = await kb.json();
+    const kbData = await kb.json();
 
-const memoryContext = kbData.matches
-?.map(m => m.content)
-?.join("\n\n") || "";
-    if(kbData?.matches?.length){
-  $("intelOut").innerHTML = `
-    <div class="oracleCard">
-      <div class="oracleTitle">
-        DIESEL BRAIN MEMORY (${kbData.matches.length} HITS)
-      </div>
+    const memoryContext = kbData?.matches
+      ?.map(m => m.content)
+      ?.join("\n\n") || "";
 
-      ${kbData.matches.map(m => `
-        <div class="miniCard">
-          <strong>${m.source_name || "MEMORY"}</strong>
-          <div style="margin-top:8px;">
-            ${m.content || ""}
-          </div>
-        </div>
-      `).join("")}
-    </div>
-  `;
-}
-    try{
     const data = await callOracle({
-  part_query: q,
- question: `
+      part_query: q,
+      question: `
 KNOWN SHOP MEMORY:
 ${memoryContext}
 
@@ -460,19 +441,31 @@ ${q}
 TECH NOTES:
 ${note}
 `
-});
+    });
 
-renderDiagnosticOracle("diagOut", data, q);
+    renderDiagnosticOracle("diagOut", data, q);
 
-if(kbData?.matches?.length){
-  renderDieselIntelligence(q, note, kbData.matches);
-}  
-}catch(e){
-  $("diagOut").textContent = "DIAGNOSTIC ERROR: " + e.message;
-  try{ await renderDieselIntelligence(q, note); }catch(_){}
+    if(kbData?.matches?.length && $("intelOut")){
+      $("intelOut").innerHTML = `
+        <div class="oracleCard">
+          <div class="oracleTitle">DIESEL BRAIN MEMORY (${kbData.matches.length} HITS)</div>
+          ${kbData.matches.map(m => `
+            <div class="miniCard">
+              <strong>${m.source_name || "MEMORY"}</strong>
+              <div style="margin-top:8px;">${m.content || ""}</div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }else if($("intelOut")){
+      $("intelOut").textContent = "No Diesel Brain memory match yet.";
+    }
+
+  }catch(e){
+    $("diagOut").textContent = "DIAGNOSTIC ERROR: " + e.message;
+    if($("intelOut")) $("intelOut").textContent = "Diesel Brain error or no match.";
+  }
 }
-}
-
 function renderDiagnosticOracle(targetId, data, query){
   const d = data?.data || data || {};
   const answer = data?.answer || data?.message || d.answer || "";
