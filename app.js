@@ -459,6 +459,7 @@ LIVE QUESTION:
 ${q}
 
 TECH NOTES:
+`
 });
 
   renderDiagnosticOracle("diagOut", data, q);
