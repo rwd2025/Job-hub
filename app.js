@@ -447,11 +447,7 @@ const memoryContext = kbData.matches
     </div>
   `;
 }
-   console.log("KB DATA", kbData);
-console.log("MATCHES", kbData.matches); 
-    const data = await callOracle({
-  part_query: q,
-  question: `
+ question: `
 KNOWN SHOP MEMORY:
 ${memoryContext}
 
@@ -459,14 +455,15 @@ LIVE QUESTION:
 ${q}
 
 TECH NOTES:
+${note}
 `
 });
 
-  renderDiagnosticOracle("diagOut", data, q);
+renderDiagnosticOracle("diagOut", data, q);
 
 if(kbData?.matches?.length){
   renderDieselIntelligence(q, note, kbData.matches);
-}
+}  
 }
 
 
