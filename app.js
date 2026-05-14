@@ -429,6 +429,8 @@ const kbData = await kb.json();
 const memoryContext = kbData.matches
 ?.map(m => m.content)
 ?.join("\n\n") || "";
+   console.log("KB DATA", kbData);
+console.log("MATCHES", kbData.matches); 
     const data = await callOracle({
   part_query: q,
   question: `
