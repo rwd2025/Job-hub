@@ -1277,3 +1277,14 @@ body.master-mode .cecilDrop{display:block}
   .phase17 .clockButtonGrid{grid-template-columns:1fr 1fr;}
   .phase17 .bigClockBtn{min-height:58px;}
 }
+
+/* Phase 19 Parts Tech Answer Mode */
+.phase19TechAnswer .oracleTitle{letter-spacing:.04em}
+.partsTechMain{margin-top:14px;padding:16px;border:1px solid var(--accent,#ff6500);border-radius:18px;background:rgba(255,255,255,.04)}
+.partsTechMain h2{margin:6px 0 10px;font-size:21px;line-height:1.15}
+.partsTechLabel{font-size:12px;font-weight:900;color:var(--accent,#ff6500);text-transform:uppercase;letter-spacing:.08em}
+.partNumberBig{font-size:24px;font-weight:900;margin:10px 0;padding:12px;border-radius:14px;background:rgba(255,101,0,.14);border:1px solid rgba(255,101,0,.35)}
+.partNumberAlt{font-size:17px;font-weight:800;margin:8px 0;color:var(--text,#fff)}
+.warnBox{border-color:#e6a23c;background:rgba(230,162,60,.10)}
+.phase19Details{margin-top:12px;padding:12px;border-radius:14px;border:1px solid var(--line,#333);background:rgba(255,255,255,.03)}
+.phase19Details summary{font-weight:900;color:var(--accent,#ff6500);cursor:pointer}

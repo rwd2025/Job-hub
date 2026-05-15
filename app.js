@@ -2543,3 +2543,185 @@ askPart = async function(){
 window.addEventListener("DOMContentLoaded",()=>{
   try{ if($("debugVersion")) $("debugVersion").textContent = CECIL_PHASE18; }catch(e){}
 });
+
+/* =============================
+   PHASE 19 PARTS TECH ANSWER MODE
+   Clean parts-counter response + strict component intent
+============================= */
+const CECIL_PHASE19 = "19.0-parts-tech-answer";
+
+function phase19NormalizeText(s){
+  return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+}
+
+function phase19ExtractEngine(q){
+  const t = String(q || "").toUpperCase();
+  if(/\b(ISX15|X15|CM2350|CM2450)\b/.test(t)) return t.includes("ISX15") ? "ISX15" : "X15";
+  if(/\bDD15\b/.test(t)) return "DD15";
+  if(/\bDD13\b/.test(t)) return "DD13";
+  if(/\b(MX[- ]?13|MX13)\b/.test(t)) return "MX-13";
+  if(/\b(D13|VOLVO D13)\b/.test(t)) return "D13";
+  if(/\b(MP8|MACK MP8)\b/.test(t)) return "MP8";
+  return "";
+}
+
+function phase19ExtractComponent(q){
+  const t = phase19NormalizeText(q);
+  const patterns = [
+    ["water pump", ["water pump", "coolant pump", "engine water pump"]],
+    ["oil filter", ["oil filter", "lube filter", "lube oil filter"]],
+    ["fuel filter", ["fuel filter", "fuel filter kit", "secondary fuel filter"]],
+    ["fuel water separator", ["fuel water separator", "water separator", "fuel separator"]],
+    ["turbo actuator", ["turbo actuator", "vgt actuator", "e actuator", "electronic turbo actuator"]],
+    ["nox sensor", ["nox sensor", "outlet nox", "inlet nox"]],
+    ["egr differential pressure sensor", ["egr differential pressure", "delta pressure", "differential pressure sensor"]],
+    ["marker lamp", ["marker lamp", "corner lamp", "clearance lamp"]],
+    ["brake chamber", ["brake chamber", "spring brake"]],
+    ["air dryer", ["air dryer", "dryer cartridge"]]
+  ];
+  for(const [canon, words] of patterns){
+    if(words.some(w=>t.includes(w))) return canon;
+  }
+  // remove engine words so the component search is not polluted
+  return t.replace(/\b(x15|isx15|cm2350|cm2450|dd15|dd13|mx13|mx 13|mx 13|d13|mp8|cummins|detroit|paccar|volvo|mack)\b/g," ").replace(/\s+/g," ").trim() || t;
+}
+
+function phase19PartScore(p, component, q){
+  const c = phase19NormalizeText(component);
+  const pt = phase19NormalizeText(p.part_type || "");
+  const desc = phase19NormalizeText(p.description || "");
+  const oem = phase19NormalizeText(p.oem_number || p.part_number || "");
+  const cross = Array.isArray(p.cross_references) ? phase19NormalizeText(p.cross_references.join(" ")) : "";
+  let score = Number(p.confidence || 0.5) * 100;
+  if(pt === c) score += 500;
+  if(pt.includes(c)) score += 350;
+  if(desc.includes(c)) score += 225;
+  if(c.split(" ").every(w => pt.includes(w) || desc.includes(w))) score += 150;
+  if(oem && phase19NormalizeText(q).includes(oem)) score += 300;
+  if(cross && phase19NormalizeText(q).split(" ").some(w=>w.length>3 && cross.includes(w))) score += 50;
+
+  // Hard block common wrong-category bleed-over.
+  if(c.includes("water pump") && /fuel|filter|separator|module/.test(pt + " " + desc)) score -= 1000;
+  if(c.includes("fuel filter") && /water pump|coolant pump|turbo/.test(pt + " " + desc)) score -= 1000;
+  if(c.includes("oil filter") && /water pump|fuel module|turbo/.test(pt + " " + desc)) score -= 1000;
+  return score;
+}
+
+function phase19RankParts(parts, component, q){
+  return asArray(parts)
+    .map(p => ({...p, __score: phase19PartScore(p, component, q)}))
+    .filter(p => p.__score > -100)
+    .sort((a,b)=>b.__score-a.__score);
+}
+
+function phase19KnownFallback(engine, component){
+  const e = String(engine || "").toUpperCase();
+  const c = phase19NormalizeText(component);
+  if((e.includes("X15") || e.includes("ISX15")) && c === "water pump"){
+    return [{
+      oem_number:"3692580",
+      aftermarket_part_number:"3692580RX",
+      brand:"Cummins",
+      engine_family:"X15 / ISX15",
+      part_type:"Water Pump",
+      description:"Cummins X15 water pump. Standard fitment seen across multiple X15/ISX15 configurations including CM2350/CM2450. Verify by ESN/CPL before ordering.",
+      confidence:0.92,
+      notes:"Use 3692580RX as reman option when applicable. Verify by ESN/CPL."
+    }];
+  }
+  return [];
+}
+
+function phase19RenderPartsTechAnswer(targetId, payload, q, engine, component){
+  let parts = phase19RankParts(payload?.parts || [], component, q);
+  if(!parts.length){
+    parts = phase19KnownFallback(engine, component);
+  }
+  const best = parts[0] || null;
+  const norm = payload?.normalized_engine || {};
+  const engineLine = norm?.canonical_name
+    ? `${norm.manufacturer || ""} ${norm.canonical_name || ""}${norm.epa_standard ? " ("+norm.epa_standard+")" : ""}`
+    : (engine || payload?.raw_engine || "VERIFY ENGINE");
+
+  let html = `<div class="oracleCard phase19TechAnswer">
+    <div class="oracleTitle">PARTS TECH ANSWER</div>
+    <div class="smartGrid">
+      ${gridCell("REQUEST", q)}
+      ${gridCell("ENGINE", engineLine)}
+      ${gridCell("COMPONENT", component || "Part request")}
+      ${gridCell("MODE", "OEM-first / component-strict")}
+    </div>`;
+
+  if(best){
+    window.lastSmartPartMatch = best;
+    window.lastScannedPart = best.oem_number || best.aftermarket_part_number || window.lastScannedPart;
+    if($('manualPartNumber')) setValue('manualPartNumber', best.oem_number || best.aftermarket_part_number || '');
+    if($('manualPartName')) setValue('manualPartName', `${best.engine_family || ''} ${best.part_type || component}`.trim());
+
+    html += `<div class="partsTechMain">
+      <div class="partsTechLabel">${safeText(best.brand || "OEM")}</div>
+      <h2>${safeText(best.engine_family || engine || "")} ${safeText(best.part_type || component || "Part")}</h2>
+      <div class="partNumberBig">OEM: ${safeText(best.oem_number || best.part_number || "VERIFY")}</div>
+      ${best.aftermarket_part_number ? `<div class="partNumberAlt">REMAN / ALT: ${safeText(best.aftermarket_part_number)}</div>` : ""}
+      ${Array.isArray(best.cross_references) && best.cross_references.length ? `<div class="partNumberAlt">CROSS: ${safeText(best.cross_references.join(", "))}</div>` : ""}
+      <p>${safeText(best.description || best.notes || "Verify fitment before ordering.")}</p>
+    </div>
+    <div class="smartNote"><b>VERIFY:</b> Final part number must be confirmed by VIN / ESN / CPL before ordering.</div>
+    <div class="phase8ActionRow">
+      <button onclick="addBestSmartPartToInvoice()">ADD TO INVOICE</button>
+      <button onclick="openSupplierSearch()">SUPPLIER SEARCH</button>
+      <button onclick="showScreen('repairHud')">REPAIR GUIDE</button>
+    </div>`;
+  }else{
+    html += `<div class="partsTechMain warnBox">
+      <h2>No exact OEM number in local parts book yet.</h2>
+      <p>Cecil needs VIN, ESN/CPL, EPA year, or dealer catalog/API verification for this request.</p>
+    </div>
+    <div class="smartNote"><b>NEXT:</b> Add the verified number once found so Cecil learns it permanently.</div>`;
+  }
+
+  if(parts.length > 1){
+    html += `<details class="phase19Details"><summary>Other possible matches (${parts.length-1})</summary><div class="smartGrid">${parts.slice(1,8).map(p=>gridCell(p.oem_number || p.aftermarket_part_number || "PART", `${p.brand || ""} ${p.engine_family || ""} — ${p.part_type || p.description || ""}`)).join("")}</div></details>`;
+  }
+
+  if(payload?.warning){ html += `<div class="smartNote warnText">${safeText(payload.warning)}</div>`; }
+  html += `</div>`;
+  cecilSetHTML(targetId, html);
+}
+
+async function runPartsTechAnswer(){
+  const q = ($('partq')?.value || $('backendSearchQ')?.value || $('doctorAsk')?.value || $('brainSearchText')?.value || '').trim();
+  if(!q){ alert('Enter a part request first, like: X15 water pump.'); return; }
+  const engineFromQuestion = phase19ExtractEngine(q);
+  const activeEngine = ($('engine')?.value || getActiveTruck()?.engine || '').trim();
+  const engineText = engineFromQuestion || activeEngine || null;
+  const component = phase19ExtractComponent(q);
+  cecilSetText('partOut', 'Parts Tech Answer searching exact component first...');
+  try{
+    let data = null;
+    try{
+      data = await smartPartNumberLookup(component || q, engineText, typeof activeVin === 'function' ? activeVin() : null);
+    }catch(e1){
+      data = await smartPartNumberLookup(q, engineText, typeof activeVin === 'function' ? activeVin() : null);
+    }
+    phase19RenderPartsTechAnswer('partOut', data || {}, q, engineText, component);
+    return data;
+  }catch(e){
+    const fallback = {parts: phase19KnownFallback(engineText, component), raw_engine: engineText, warning:e.message};
+    phase19RenderPartsTechAnswer('partOut', fallback, q, engineText, component);
+    return fallback;
+  }
+}
+
+// Phase 19 override: Part lookup uses clean Parts Tech Answer first.
+const __phase19_oldAskPart = typeof askPart === 'function' ? askPart : null;
+askPart = async function(){
+  const q = $('partq')?.value.trim() || '';
+  const note = $('partNote')?.value.trim() || '';
+  if(!q && !note){ cecilSetText('partOut', 'Enter part number, part name, VIN, ESN, CPL, or description.'); return; }
+  return runPartsTechAnswer();
+};
+
+window.addEventListener('DOMContentLoaded',()=>{
+  try{ if($('debugVersion')) $('debugVersion').textContent = CECIL_PHASE19; }catch(e){}
+});
