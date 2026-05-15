@@ -16,8 +16,6 @@ function safeText(value){
   return String(value ?? "").replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c]));
 }
 
-function escapeHtml(value){ return safeText(value); }
-
 let currentScreen = "home";
 const screenHistory = [];
 
@@ -295,55 +293,6 @@ function renderRepairKit(targetId, kits){
   for(const k of list.slice(0,3)){
     $(targetId).innerHTML += card("SMART REPAIR KIT",{text:"KIT",cls:"good"},`<div class="smartGrid">${gridCell("COMPONENT",k.component_name)}${gridCell("ENGINE",k.engine_family)}${gridCell("OEM PART",k.oem_part_number)}${gridCell("LABOR",k.labor_hours ? k.labor_hours+" hrs" : "—")}${gridCell("GASKETS",k.gasket_set)}${gridCell("SEALS",k.seals)}${gridCell("O-RINGS",k.o_rings)}${gridCell("HARDWARE",k.hardware)}</div>`, `${k.torque_specs || ""}\n${k.repair_notes || ""}`.trim());
   }
-}
-
-
-function currentPartSearchTerm(){
-  return ($("partq")?.value || $("manualPartNumber")?.value || $("manualPartName")?.value || $("doctorAsk")?.value || $("diagq")?.value || "").trim();
-}
-
-function openSupplierSearch(source){
-  const term = currentPartSearchTerm() || activeTruckSummary?.() || "diesel truck parts";
-  const engine = ($("engine")?.value || getActiveTruck().engine || "").trim();
-  const q = [term, engine].filter(Boolean).join(" ");
-  const urls = {
-    fleetpride: `https://www.google.com/search?q=${encodeURIComponent(q + " FleetPride")}`,
-    napa: `https://www.google.com/search?q=${encodeURIComponent(q + " NAPA")}`,
-    oreilly: `https://www.google.com/search?q=${encodeURIComponent(q + " O'Reilly Auto Parts")}`,
-    google: `https://www.google.com/search?q=${encodeURIComponent(q)}`,
-    dealer: `https://www.google.com/search?q=${encodeURIComponent(q + " OEM dealer parts")}`
-  };
-  window.open(urls[source] || urls.google, "_blank");
-}
-
-async function runInterchangeOnly(){
-  const q = currentPartSearchTerm();
-  if(!q){ alert("Enter a part number or part name first."); return; }
-  if($("partOut")) $("partOut").textContent = "Building interchange chain...";
-  try{
-    const chain = await recursiveInterchangeSearch(q);
-    window.__lastInterchangeChain = Array.isArray(chain) ? chain : [];
-    if(!window.__lastInterchangeChain.length){
-      if($("partOut")) $("partOut").innerHTML = card("INTERCHANGE CHAIN", {text:"NO CHAIN", cls:"warn"}, `<div class="emptyNote">No interchange chain found for ${safeText(q)} yet.</div>`);
-      return;
-    }
-    if($("partOut")) $("partOut").innerHTML = card("INTERCHANGE CHAIN", {text:`${window.__lastInterchangeChain.length} LINKS`, cls:"hot"}, `<div class="smartGrid">${window.__lastInterchangeChain.slice(0,20).map(c=>gridCell(c.source_part || c.part_number || c.part_id || "SOURCE", `${c.cross_part || c.cross_ref_number || c.cross_ref_id || c.aftermarket_part_number || "MATCH"} ${c.confidence_score ? "("+c.confidence_score+")" : ""}`)).join("")}</div>`);
-  }catch(e){
-    if($("partOut")) $("partOut").textContent = "Interchange error: " + e.message;
-  }
-}
-
-function addBestInterchangeToInvoice(){
-  const chain = window.__lastInterchangeChain || [];
-  const best = chain[0];
-  const q = currentPartSearchTerm();
-  if(!best && !q){ alert("Run interchange or enter a part first."); return; }
-  const number = best?.cross_part || best?.cross_ref_number || best?.cross_ref_id || best?.part_number || q;
-  const name = best?.description || best?.component_name || q || "Interchange part";
-  setValue("manualPartNumber", number || "");
-  setValue("manualPartName", name || "Interchange part");
-  if(best?.supplier_name || best?.brand) setValue("manualPartSupplier", best.supplier_name || best.brand);
-  addManualPartToInvoice();
 }
 
 
@@ -1502,87 +1451,6 @@ function phase8ActionsHtml(q){
   </div>
   <div class="smartNote">Unified query: ${safe}</div>`;
 }
-
-async function masterJobWorkflowSearch(search){
-  if(!supabaseClient) throw new Error("Supabase client not loaded.");
-  const { data, error } = await supabaseClient.rpc("master_job_workflow", {
-    search_text: search,
-    vin_text: activeVin() || null
-  });
-  if(error) throw error;
-  return data || {};
-}
-
-function pickText(row, keys){
-  if(!row || typeof row !== "object") return "";
-  for(const k of keys){
-    if(row[k] !== undefined && row[k] !== null && String(row[k]).trim() !== "") return row[k];
-  }
-  return "";
-}
-
-function renderMasterWorkflowCards(workflow, q){
-  const data = workflow?.data || workflow || {};
-  const identified = data.identified_repair || {};
-  const parts = asArray(data.parts || data.repair_parts || data.required_parts);
-  const labor = asArray(data.labor_guide || data.labor_times || data.labor);
-  const kits = asArray(data.repair_kit || data.repair_kits || data.kits);
-  const torque = asArray(data.torque_specs || data.torque);
-  const failures = asArray(data.known_failures || data.common_failures || data.failures);
-  const diag = asArray(data.diagnostic_flow || data.diagnostic_tests || data.tests);
-  const supplier = asArray(data.supplier_pricing || data.supplier_links || data.suppliers);
-  const memory = asArray(data.repair_memory || data.repair_notes || data.memory);
-  const quote = data.quote || {};
-  let html = "";
-
-  html += card("MASTER JOB ENGINE", {text:data.status || "READY", cls:"good"}, `<div class="smartGrid">
-    ${gridCell("JOB", identified.job || identified.search || q || "—")}
-    ${gridCell("CONFIDENCE", identified.confidence || data.confidence || "workflow")}
-    ${gridCell("VIN", activeVin() || "NO VIN")}
-    ${gridCell("ENGINE", getActiveTruck().engine || $("engine")?.value || "UNKNOWN")}
-  </div>`, "Phase 14 combines labor, parts, repair kits, tests, failures, torque, suppliers, and shop memory into one repair workflow.");
-
-  if(labor.length){
-    html += card("BOOK LABOR", {text:`${labor.length} MATCH${labor.length>1?"ES":""}`, cls:"good"}, `<div class="smartGrid">${labor.slice(0,8).map(l=>gridCell(pickText(l,["labor_operation","component_name","operation","job"]) || "LABOR", `${pickText(l,["labor_hours","hours","book_hours"]) || "?"} hrs ${pickText(l,["difficulty","skill_level"]) || ""}`)).join("")}</div>`, "Book hours should be verified against the exact VIN/engine/service information before final quote.");
-  }else{
-    html += card("BOOK LABOR", {text:"NO MATCH", cls:"warn"}, `<div class="smartGrid">${gridCell("NEXT", "Add labor_times rows for this job/component")}</div>`);
-  }
-
-  if(parts.length){
-    html += card("PARTS NEEDED", {text:`${parts.length} HIT${parts.length>1?"S":""}`, cls:"hot"}, `<div class="smartGrid">${parts.slice(0,10).map(p=>gridCell(pickText(p,["part_id","part_number","oem_part_number","oem_part"]) || pickText(p,["brand","manufacturer"]) || "PART", [pickText(p,["description","component_name","category"]), pickText(p,["brand","manufacturer"]), pickText(p,["engine","engine_family"])].filter(Boolean).join(" | "))).join("")}</div>`);
-  }
-
-  if(kits.length){
-    html += card("SMART REPAIR KIT", {text:`${kits.length} KIT${kits.length>1?"S":""}`, cls:"good"}, `<div class="smartGrid">${kits.slice(0,6).map(k=>gridCell(k.component_name || k.oem_part_number || "KIT", [k.gasket_set, k.seals, k.o_rings, k.hardware, k.labor_hours ? k.labor_hours+" hrs" : ""].filter(Boolean).join(" | "))).join("")}</div>`);
-  }
-
-  if(torque.length){
-    html += card("TORQUE / SPECS", {text:"VERIFY", cls:"warn"}, `<div class="smartGrid">${torque.slice(0,8).map(t=>gridCell(t.fastener || t.component_name || "SPEC", `${t.torque_value || "UNKNOWN"} ${t.sequence_notes || ""}`)).join("")}</div>`);
-  }
-
-  if(failures.length){
-    html += card("KNOWN FAILURES", {text:`${failures.length} HIT${failures.length>1?"S":""}`, cls:"hot"}, `<div class="smartGrid">${failures.slice(0,8).map(f=>gridCell(f.fault_code || f.symptom || "FAILURE", `${f.likely_causes || ""} ${f.common_fix ? "→ "+f.common_fix : ""}`)).join("")}</div>`, "Use these as leads. Confirm with tests before replacing parts.");
-  }
-
-  if(diag.length){
-    html += card("GUIDED TEST PLAN", {text:"TEST FIRST", cls:"good"}, `<div class="smartGrid">${diag.slice(0,8).map(d=>gridCell(d.test_name || d.fault_code || d.symptom || "TEST", `${d.test_steps || ""} ${d.pass_fail_specs ? " | SPEC: "+d.pass_fail_specs : ""}`)).join("")}</div>`);
-  }
-
-  if(supplier.length){
-    html += card("SUPPLIER / PRICING", {text:`${supplier.length}`, cls:"good"}, `<div class="smartGrid">${supplier.slice(0,8).map(s=>gridCell(s.supplier_name || s.brand || "SUPPLIER", `${s.part_number || s.oem_part || ""} ${s.price ? " — "+money(s.price) : ""}`)).join("")}</div>`);
-  }
-
-  if(memory.length){
-    html += card("SHOP MEMORY", {text:`${memory.length}`, cls:"good"}, `<div class="smartGrid">${memory.slice(0,6).map(m=>gridCell(m.verified_fix ? "VERIFIED FIX" : "REPAIR MEMORY", `${m.symptom_text || m.symptom || m.fault_code || ""} → ${m.repair_action || m.notes || ""}`)).join("")}</div>`);
-  }
-
-  if(quote && Object.keys(quote).length){
-    html += card("AUTO QUOTE", {text:"DRAFT", cls:"good"}, `<div class="smartGrid">${Object.entries(quote).slice(0,8).map(([k,v])=>gridCell(k, typeof v === "number" ? money(v) : String(v))).join("")}</div>`);
-  }
-
-  return html;
-}
-
 async function phase8MasterSearch(){
   const q = phase8SearchInput();
   if(!q){
@@ -1599,11 +1467,8 @@ async function phase8MasterSearch(){
   session.last_search_at = new Date().toISOString();
   savePhase8Session(session);
 
-  let workflowData = null, oracleData = null, universal = {}, brain = {}, kits = [];
-  let workflowErr = "", oracleErr = "", universalErr = "", brainErr = "";
-
-  try{ workflowData = await masterJobWorkflowSearch(q); console.log("MASTER JOB WORKFLOW:", workflowData); }
-  catch(e){ workflowErr = e.message; }
+  let oracleData = null, universal = {}, brain = {}, kits = [];
+  let oracleErr = "", universalErr = "", brainErr = "";
 
   try{ oracleData = await callOracle({ part_query:q, question:q, note:ctx(), mode:"master_workflow" }); }
   catch(e){ oracleErr = e.message; }
@@ -1619,18 +1484,12 @@ async function phase8MasterSearch(){
   catch(e){ kits = []; }
 
   let html = `<div class="resultGroup phase8Results">`;
-  html += card("MASTER WORKFLOW", {text:"PHASE 14", cls:"good"}, `<div class="smartGrid">
+  html += card("MASTER WORKFLOW", {text:"PHASE 8", cls:"good"}, `<div class="smartGrid">
     ${gridCell("QUERY", q)}
     ${gridCell("SEARCH TERM", term)}
     ${gridCell("ACTIVE VIN", activeVin ? activeVin() : getActiveTruck().vin || "NO VIN")}
     ${gridCell("ACTIVE ENGINE", getActiveTruck().engine || $("engine")?.value || "UNKNOWN")}
-  </div>`, "One TEXA-style flow: VIN context → job identification → book labor → parts needed → guided tests → quote → save verified fix.");
-
-  if(workflowData){
-    html += renderMasterWorkflowCards(workflowData, q);
-  }else if(workflowErr){
-    html += card("MASTER JOB ENGINE", {text:"RPC ERROR", cls:"warn"}, `<div class="smartGrid">${gridCell("ERROR", workflowErr)}</div>`, "Run the Phase 14 SQL function in Supabase, then try again.");
-  }
+  </div>`, "One flow: Oracle + SQL database + Diesel Brain + repair kits + invoice/job tools.");
 
   if(oracleData){
     const d = oracleData.data || oracleData || {};
@@ -2139,12 +1998,12 @@ function renderPhase13RagCards(q, data){
   const kb = asArray(data.knowledge || data.knowledge_base || data.manuals);
   const memory = asArray(data.repair_memory || data.memory);
   const events = asArray(data.router_events || data.events);
-  let html = `<div class="oracleCard brainHeroCard"><div class="oracleTitle">PHASE 13 HYBRID RAG</div><div class="oracleNote">Query: ${escapeHtml(q)}<br>Knowledge hits: ${kb.length}<br>Repair memory hits: ${memory.length}<br>Router events: ${events.length}</div></div>`;
+  let html = `<div class="oracleCard brainHeroCard"><div class="oracleTitle">PHASE 13 HYBRID RAG</div><div class="oracleNote">Query: ${safeText(q)}<br>Knowledge hits: ${kb.length}<br>Repair memory hits: ${memory.length}<br>Router events: ${events.length}</div></div>`;
   if(kb.length){
-    html += `<div class="brainColumns">` + kb.slice(0,4).map(x=>`<div class="brainResultCard"><b>${escapeHtml(x.source_name || x.source_type || "Knowledge Source")}</b><p>${escapeHtml((x.content || x.raw_text || "").slice(0,520))}</p><small>${escapeHtml(JSON.stringify(x.metadata || {}))}</small></div>`).join("") + `</div>`;
+    html += `<div class="brainColumns">` + kb.slice(0,4).map(x=>`<div class="brainResultCard"><b>${safeText(x.source_name || x.source_type || "Knowledge Source")}</b><p>${safeText((x.content || x.raw_text || "").slice(0,520))}</p><small>${safeText(JSON.stringify(x.metadata || {}))}</small></div>`).join("") + `</div>`;
   }
   if(memory.length){
-    html += `<div class="brainColumns">` + memory.slice(0,4).map(x=>`<div class="brainResultCard verifiedFix"><b>Verified Fix / Repair Memory</b><p>${escapeHtml(x.symptom_text || x.fault_code || "Repair memory")}</p><p>${escapeHtml(x.repair_action || "")}</p><small>Score: ${escapeHtml(String(x.ranking_score ?? ""))}</small></div>`).join("") + `</div>`;
+    html += `<div class="brainColumns">` + memory.slice(0,4).map(x=>`<div class="brainResultCard verifiedFix"><b>Verified Fix / Repair Memory</b><p>${safeText(x.symptom_text || x.fault_code || "Repair memory")}</p><p>${safeText(x.repair_action || "")}</p><small>Score: ${safeText(String(x.ranking_score ?? ""))}</small></div>`).join("") + `</div>`;
   }
   if(!kb.length && !memory.length){
     html += `<div class="oracleCard"><div class="oracleTitle">No grounded records yet</div><div class="oracleNote">Queue manuals, field notes, TSB text, or verified repairs, then run the embedding Edge Function to populate vector search.</div></div>`;
@@ -2175,3 +2034,348 @@ RULES:
 - No exact part claims without source or VIN/ESN/CPL warning.
 `);
 }
+
+
+/* =========================================================
+   PHASE 15 FRONTEND INTEGRATION LAYER
+   Backend-first TEXA-style workflow wiring
+   - smart_workflow_engine()
+   - master_job_workflow()
+   - extract_vin_from_text()
+   - extract_part_numbers_from_text()
+   - add_scanned_parts_to_invoice()
+   - find_part_suppliers()
+   Safe override block: appended at bottom so existing buttons stay alive.
+   ========================================================= */
+
+function rwArray(x){ return Array.isArray(x) ? x : []; }
+function rwObj(x){ return x && typeof x === "object" ? x : {}; }
+function rwJsonPretty(x){ try{return JSON.stringify(x,null,2)}catch(e){return String(x)} }
+
+async function rpcJson(functionName, args){
+  if(!supabaseClient) throw new Error("Supabase client not loaded.");
+  const { data, error } = await supabaseClient.rpc(functionName, args || {});
+  if(error) throw error;
+  return data || {};
+}
+
+function rwFirstText(...vals){
+  for(const v of vals){
+    if(v !== undefined && v !== null && String(v).trim()) return String(v).trim();
+  }
+  return "";
+}
+
+function rwWorkflowMaster(data){
+  const d = rwObj(data);
+  return rwObj(d.master_job || d.master || d.workflow || d);
+}
+
+function rwRepairIntel(data){
+  const d = rwObj(data);
+  return rwObj(d.repair_intelligence || {});
+}
+
+function rwManualKnowledge(data){
+  const d = rwObj(data);
+  return rwObj(d.manual_knowledge || {});
+}
+
+function rwRenderList(title, rows, pick, emptyText){
+  rows = rwArray(rows);
+  if(!rows.length){
+    return card(title,{text:"0",cls:"warn"},`<div class="emptyNote">${safeText(emptyText || "No matches yet.")}</div>`);
+  }
+  return card(title,{text:`${rows.length} HIT${rows.length===1?"":"S"}`,cls:"good"},
+    `<div class="smartGrid">${rows.slice(0,8).map((r,i)=>{
+      const p = pick(r,i) || {};
+      return gridCell(p.k || `#${i+1}`, p.v || "Stored result");
+    }).join("")}</div>`);
+}
+
+function rwRenderUnifiedWorkflow(query, data){
+  const d = rwObj(data);
+  const master = rwWorkflowMaster(d);
+  const repairIntel = rwRepairIntel(d);
+  const manual = rwManualKnowledge(d);
+
+  const parts = rwArray(master.parts);
+  const kits = rwArray(master.repair_kits || master.repair_kit);
+  const labor = rwArray(master.labor_guide || master.labor_times);
+  const failures = rwArray(master.known_failures || master.common_failures);
+  const rules = rwArray(d.workflow_rules);
+  const intelligence = rwArray(repairIntel.intelligence);
+  const truckHistory = rwArray(repairIntel.truck_history);
+  const manuals = rwArray(manual.manuals);
+  const flow = rwArray(manual.diagnostic_flow);
+  const torque = rwArray(manual.torque_specs);
+
+  let html = `<div class="resultGroup phase15Results">`;
+  html += card("MASTER REPAIR WORKFLOW",{text:"LIVE",cls:"hot"},`<div class="smartGrid">
+    ${gridCell("QUERY", query)}
+    ${gridCell("VIN", activeVin ? activeVin() || "NO VIN" : "NO VIN")}
+    ${gridCell("ENGINE", getActiveTruck().engine || $("engine")?.value || d.engine || "UNKNOWN")}
+    ${gridCell("STATUS", d.status || master.status || "ok")}
+  </div>`,"One TEXA-style flow: vehicle context → workflow rules → repair intelligence → manuals → labor → parts → repair kit → quote.");
+
+  html += rwRenderList("WORKFLOW RULES", rules, r=>({
+    k: rwFirstText(r.fault_code,r.symptom,r.system,r.engine,"RULE"),
+    v: `${rwFirstText(r.likely_cause,"Likely cause not set")} | TEST: ${rwFirstText(r.test_step,"Add test step")} | CONF: ${rwFirstText(r.confidence,"-")}`
+  }), "No smart workflow rules match yet. Add smart_workflow_rules rows.");
+
+  html += rwRenderList("REPAIR INTELLIGENCE", intelligence, r=>({
+    k: rwFirstText(r.fault_code,r.symptom,r.engine,"INTEL"),
+    v: `${rwFirstText(r.likely_cause,"-")} → ${rwFirstText(r.confirmed_fix,"No confirmed fix yet")} | LABOR ${rwFirstText(r.labor_hours,"-")}`
+  }), "No AI repair intelligence rows yet.");
+
+  html += rwRenderList("LABOR BY THE BOOK / GUIDE", labor, r=>({
+    k: rwFirstText(r.component_name,r.labor_operation,r.job_name,"LABOR"),
+    v: `${rwFirstText(r.labor_hours,r.book_hours,r.hours,"?")} hrs | ${rwFirstText(r.difficulty,r.notes,r.engine_family,"")}`
+  }), "No labor guide match yet. Add labor_times rows for this job.");
+
+  html += rwRenderList("SMART REPAIR KIT", kits, r=>({
+    k: rwFirstText(r.component_name,"REPAIR KIT"),
+    v: `ENGINE ${rwFirstText(r.engine_family,"-")} | OEM ${rwFirstText(r.oem_part_number,"VERIFY")} | LABOR ${rwFirstText(r.labor_hours,"-")} | GASKETS ${rwFirstText(r.gasket_set,"-")} | SEALS ${rwFirstText(r.seals,"-")} | NOTES ${rwFirstText(r.repair_notes,"")}`
+  }), "No repair kit match yet. Add repair_kits rows.");
+
+  html += rwRenderList("PARTS FOUND", parts, r=>({
+    k: rwFirstText(r.part_id,r.part_number,r.oem_part_number,r.brand,"PART"),
+    v: `${rwFirstText(r.description,r.category,"-")} | ENGINE ${rwFirstText(r.engine,"-")} | BRAND ${rwFirstText(r.brand,"-")}`
+  }), "No parts match yet.");
+
+  html += rwRenderList("KNOWN FAILURES / WARNINGS", failures, r=>({
+    k: rwFirstText(r.fault_code,r.symptom,r.engine_family,"FAILURE"),
+    v: `${rwFirstText(r.likely_causes,r.common_fix,r.warning,"Check diagnostic data before parts")} `
+  }), "No common failure match yet.");
+
+  html += rwRenderList("MANUAL / KNOWLEDGE", manuals, r=>({
+    k: rwFirstText(r.title,r.source_name,r.source_type,"MANUAL"),
+    v: rwFirstText(r.content,r.symptom,r.fault_code,"Manual row found").slice(0,420)
+  }), "No manual knowledge match yet.");
+
+  html += rwRenderList("GUIDED TEST STEPS", flow, r=>({
+    k: `${rwFirstText(r.step_order,"#")} ${rwFirstText(r.test_name,"TEST")}`,
+    v: `${rwFirstText(r.test_instruction,"-")} | PASS: ${rwFirstText(r.pass_condition,"-")} | FAIL: ${rwFirstText(r.fail_condition,"-")}`
+  }), "No diagnostic flow steps yet.");
+
+  html += rwRenderList("TORQUE SPECS", torque, r=>({
+    k: rwFirstText(r.component,r.fastener,"TORQUE"),
+    v: `${rwFirstText(r.torque_value,"VERIFY BY MANUAL")} | ${rwFirstText(r.sequence_notes,r.notes,"")}`
+  }), "No torque spec match yet.");
+
+  html += rwRenderList("TRUCK HISTORY", truckHistory, r=>({
+    k: rwFirstText(r.vin,r.symptom,"HISTORY"),
+    v: `${rwFirstText(r.confirmed_fix,r.repair_action,r.notes,"Saved truck history")} | LABOR ${rwFirstText(r.labor_hours,"-")}`
+  }), "No truck-specific repair history yet.");
+
+  html += phase8ActionsHtml(query);
+  html += `</div>`;
+  return html;
+}
+
+// Override master search: one action calls the new backend brain first, then renders everything together.
+phase8MasterSearch = async function(){
+  const q = phase8SearchInput();
+  if(!q){ alert("Enter a part, fault code, VIN, symptom, repair, or quote note first."); return; }
+
+  startUnifiedSession();
+  phase8SetSearchEverywhere(q);
+  const out = $("doctorOut") || $("partOut") || $("diagOut");
+  if(out) out.innerHTML = `<div class="loadingCard">Running Cecil smart workflow engine...</div>`;
+
+  const session = phase8Session();
+  session.last_query = q;
+  session.last_search_at = new Date().toISOString();
+  savePhase8Session(session);
+
+  try{
+    let data;
+    try{
+      data = await rpcJson("smart_workflow_engine", {
+        search_text: q,
+        vin_text: activeVin ? activeVin() || null : null,
+        engine_text: getActiveTruck().engine || $("engine")?.value || null
+      });
+    }catch(primaryErr){
+      // Safe fallback if smart_workflow_engine is not installed yet.
+      const master = await rpcJson("master_job_workflow", {
+        search_text: q,
+        vin_text: activeVin ? activeVin() || null : null
+      });
+      data = { status:"ok", search:q, master_job: master, workflow_rules:[], repair_intelligence:{intelligence:[],truck_history:[]}, manual_knowledge:{manuals:[],diagnostic_flow:[],torque_specs:[]}, fallback_error: primaryErr.message };
+    }
+
+    const html = rwRenderUnifiedWorkflow(q, data);
+    if($("doctorOut")) $("doctorOut").innerHTML = html;
+    if($("partOut")) $("partOut").innerHTML = html;
+    if($("diagOut")) $("diagOut").innerHTML = html;
+    updatePhase8SessionBar();
+    showScreen("home");
+  }catch(e){
+    if(out) out.innerHTML = card("MASTER WORKFLOW ERROR",{text:"ERROR",cls:"warn"},`<div class="emptyNote">${safeText(e.message)}</div>`);
+  }
+};
+
+async function rwExtractVinBackend(raw){
+  return await rpcJson("extract_vin_from_text", { input_text: raw || "" });
+}
+
+async function rwExtractPartsBackend(raw, scanType){
+  return await rpcJson("extract_part_numbers_from_text", {
+    input_text: raw || "",
+    vin_text: activeVin ? activeVin() || null : null,
+    scan_type_text: scanType || "parts_photo"
+  });
+}
+
+async function rwFindPartSuppliersBackend(partNumber){
+  return await rpcJson("find_part_suppliers", { search_text: partNumber || "" });
+}
+
+function rwRenderSupplierCards(result){
+  const suppliers = rwArray(result.suppliers);
+  if(!suppliers.length) return `<div class="smartNote">No supplier locations saved yet.</div>`;
+  return `<div class="resultGroup">` + suppliers.slice(0,10).map(s=>card(
+    rwFirstText(s.supplier_name,"SUPPLIER"),
+    {text:rwFirstText(s.city,"LOCATION"),cls:"good"},
+    `<div class="smartGrid">
+      ${gridCell("CITY", `${rwFirstText(s.city,"-")}, ${rwFirstText(s.state,"")}`)}
+      ${gridCell("PHONE", rwFirstText(s.phone,"-"))}
+      ${gridCell("NOTES", rwFirstText(s.notes,"-"))}
+      ${gridCell("MAP", rwFirstText(s.search_url,"Open maps from supplier record"))}
+    </div>`
+  )).join("") + `</div>`;
+}
+
+function rwAddNumbersToLocalInvoice(numbers){
+  const list = typeof getInvoiceParts === "function" ? getInvoiceParts() : [];
+  for(const n of numbers){
+    list.push({
+      name: n,
+      number: n,
+      qty: 1,
+      price: 0,
+      supplier: "OCR Scan",
+      note: "Added from OCR scan. Verify before ordering.",
+      photo: typeof visionImageData === "function" ? visionImageData() : "",
+      truck: getActiveTruck(),
+      added_at: new Date().toLocaleString()
+    });
+  }
+  if(typeof saveInvoiceParts === "function") saveInvoiceParts(list);
+}
+
+// Override CLEAN TEXT: now also sends OCR text to backend extraction tables.
+cleanVisionText = async function(){
+  const raw = $("visionRaw")?.value || $("visionClean")?.value || "";
+  const type = $("visionType")?.value || "Part Label";
+  if(!raw.trim()){ alert("Paste OCR/raw text first, or scan a photo first."); return; }
+
+  if($("visionOut")) $("visionOut").textContent = "Cleaning text and saving scan to backend...";
+  try{
+    if(type.toLowerCase().includes("vin")){
+      const vinResult = await rwExtractVinBackend(raw);
+      setValue("visionClean", vinResult.vin || "");
+      if(vinResult.vin){ setValue("vinGlobal", vinResult.vin); setValue("invoiceVin", vinResult.vin); }
+      if($("]visionOut")){}
+      if($("visionOut")) $("visionOut").innerHTML = card("VIN OCR BACKEND",{text:vinResult.status || "ok",cls:vinResult.vin?"good":"warn"},`<div class="smartGrid">${gridCell("VIN", vinResult.vin || "No VIN found")}${gridCell("SCAN ID", vinResult.scan_id || "-")}</div>`);
+      return;
+    }
+
+    const partsResult = await rwExtractPartsBackend(raw,type);
+    const nums = rwArray(partsResult.part_numbers);
+    setValue("visionClean", nums.join("\n"));
+    localStorage.setItem("lastPartScanSession", partsResult.session_id || "");
+    localStorage.setItem("lastPartScanNumbers", JSON.stringify(nums));
+    if($("visionOut")) $("visionOut").innerHTML = card("PART OCR BACKEND",{text:`${nums.length} FOUND`,cls:nums.length?"good":"warn"},`<div class="smartGrid">${nums.map(n=>gridCell("PART", n)).join("")}</div>`, `Session: ${partsResult.session_id || "none"}`);
+  }catch(e){
+    if($("visionOut")) $("visionOut").textContent = "OCR backend error: " + e.message;
+  }
+};
+
+// Override scan photo: use existing image AI if available, then backend extraction.
+scanVisionPhoto = async function(){
+  const img = typeof visionImageData === "function" ? visionImageData() : "";
+  const rawManual = $("visionRaw")?.value.trim() || "";
+  const type = $("visionType")?.value || "Part Label";
+  if(!img && !rawManual){ alert("Add a photo or paste scan text first."); return; }
+  if($("visionOut")) $("visionOut").textContent = "Scanning photo/text, then saving OCR result to backend...";
+
+  try{
+    let raw = rawManual;
+    if(img && !raw){
+      const data = await callOracle({
+        mode:"vision_ocr_scan",
+        part_query:`OCR scan ${type}`,
+        question:`Read this ${type}. Extract ALL VINs, part numbers, brands, serials, quantities, prices if visible. Return plain text only.`,
+        note:{image:img.split(",")[1], scan_type:type, vehicleContext:ctx()}
+      });
+      raw = data?.answer || data?.message || data?.data?.text || data?.data?.notes?.join("\n") || JSON.stringify(data,null,2);
+      setValue("visionRaw", raw);
+    }
+    await cleanVisionText();
+  }catch(e){
+    if($("visionOut")) $("visionOut").textContent = "Vision Scan Error: " + e.message;
+  }
+};
+
+// Override add scanned part: backend invoice_parts + local invoice list.
+addVisionPartToInvoice = async function(){
+  let nums = [];
+  try{ nums = JSON.parse(localStorage.getItem("lastPartScanNumbers") || "[]"); }catch(e){ nums = []; }
+  if(!nums.length){
+    nums = ($("visionClean")?.value || "").split(/[\s,\n]+/).map(x=>x.trim()).filter(Boolean);
+  }
+  const sessionId = localStorage.getItem("lastPartScanSession") || "";
+  if(!nums.length && !sessionId){ alert("Scan or clean part numbers first."); return; }
+
+  try{
+    if(sessionId){
+      await rpcJson("add_scanned_parts_to_invoice", {
+        session_uuid: sessionId,
+        vin_text: activeVin ? activeVin() || null : null
+      });
+    }
+    rwAddNumbersToLocalInvoice(nums);
+    if($("visionOut")) $("visionOut").innerHTML += card("INVOICE UPDATED",{text:`${nums.length} LOCAL`,cls:"good"},`<div class="smartGrid">${nums.map(n=>gridCell("ADDED", n)).join("")}</div>`,"Verify part names, qty, supplier, and price before billing.");
+    showScreen("invoice");
+  }catch(e){
+    if($("visionOut")) $("visionOut").textContent = "Add scanned parts error: " + e.message;
+  }
+};
+
+async function findSuppliersForScannedParts(){
+  let nums = [];
+  try{ nums = JSON.parse(localStorage.getItem("lastPartScanNumbers") || "[]"); }catch(e){ nums = []; }
+  const clean = ($("visionClean")?.value || $("partq")?.value || "").trim();
+  if(!nums.length && clean) nums = clean.split(/[\s,\n]+/).filter(Boolean);
+  if(!nums.length){ alert("Scan or enter a part number first."); return; }
+
+  if($("visionOut")) $("visionOut").textContent = "Finding suppliers...";
+  try{
+    let html = "";
+    for(const n of nums.slice(0,5)){
+      const result = await rwFindPartSuppliersBackend(n);
+      html += card("SUPPLIER MATCH",{text:n,cls:"hot"},`<div class="smartGrid">${gridCell("PART", n)}${gridCell("PART MATCHES", rwArray(result.parts).length)}${gridCell("LOCATIONS", rwArray(result.suppliers).length)}</div>`);
+      html += rwRenderSupplierCards(result);
+    }
+    if($("visionOut")) $("visionOut").innerHTML = html;
+  }catch(e){
+    if($("visionOut")) $("visionOut").textContent = "Supplier lookup error: " + e.message;
+  }
+}
+
+// Add a supplier button into Vision screen without changing HTML manually.
+window.addEventListener("DOMContentLoaded",()=>{
+  try{
+    const row = document.querySelector("#visionPro .buttonRow");
+    if(row && !document.getElementById("findScanSuppliersBtn")){
+      const btn = document.createElement("button");
+      btn.id = "findScanSuppliersBtn";
+      btn.textContent = "FIND SUPPLIERS";
+      btn.onclick = findSuppliersForScannedParts;
+      row.appendChild(btn);
+    }
+  }catch(e){ console.warn("Phase 15 button inject failed", e.message); }
+});
+
