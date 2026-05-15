@@ -1,0 +1,4 @@
+// REMOVE DUPLICATE VARIABLE
+
+// Keep ONLY ONE of these in your entire app:
+let screenHistory = [];
