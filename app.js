@@ -1998,12 +1998,12 @@ function renderPhase13RagCards(q, data){
   const kb = asArray(data.knowledge || data.knowledge_base || data.manuals);
   const memory = asArray(data.repair_memory || data.memory);
   const events = asArray(data.router_events || data.events);
-  let html = `<div class="oracleCard brainHeroCard"><div class="oracleTitle">PHASE 13 HYBRID RAG</div><div class="oracleNote">Query: ${safeText(q)}<br>Knowledge hits: ${kb.length}<br>Repair memory hits: ${memory.length}<br>Router events: ${events.length}</div></div>`;
+  let html = `<div class="oracleCard brainHeroCard"><div class="oracleTitle">PHASE 13 HYBRID RAG</div><div class="oracleNote">Query: ${escapeHtml(q)}<br>Knowledge hits: ${kb.length}<br>Repair memory hits: ${memory.length}<br>Router events: ${events.length}</div></div>`;
   if(kb.length){
-    html += `<div class="brainColumns">` + kb.slice(0,4).map(x=>`<div class="brainResultCard"><b>${safeText(x.source_name || x.source_type || "Knowledge Source")}</b><p>${safeText((x.content || x.raw_text || "").slice(0,520))}</p><small>${safeText(JSON.stringify(x.metadata || {}))}</small></div>`).join("") + `</div>`;
+    html += `<div class="brainColumns">` + kb.slice(0,4).map(x=>`<div class="brainResultCard"><b>${escapeHtml(x.source_name || x.source_type || "Knowledge Source")}</b><p>${escapeHtml((x.content || x.raw_text || "").slice(0,520))}</p><small>${escapeHtml(JSON.stringify(x.metadata || {}))}</small></div>`).join("") + `</div>`;
   }
   if(memory.length){
-    html += `<div class="brainColumns">` + memory.slice(0,4).map(x=>`<div class="brainResultCard verifiedFix"><b>Verified Fix / Repair Memory</b><p>${safeText(x.symptom_text || x.fault_code || "Repair memory")}</p><p>${safeText(x.repair_action || "")}</p><small>Score: ${safeText(String(x.ranking_score ?? ""))}</small></div>`).join("") + `</div>`;
+    html += `<div class="brainColumns">` + memory.slice(0,4).map(x=>`<div class="brainResultCard verifiedFix"><b>Verified Fix / Repair Memory</b><p>${escapeHtml(x.symptom_text || x.fault_code || "Repair memory")}</p><p>${escapeHtml(x.repair_action || "")}</p><small>Score: ${escapeHtml(String(x.ranking_score ?? ""))}</small></div>`).join("") + `</div>`;
   }
   if(!kb.length && !memory.length){
     html += `<div class="oracleCard"><div class="oracleTitle">No grounded records yet</div><div class="oracleNote">Queue manuals, field notes, TSB text, or verified repairs, then run the embedding Edge Function to populate vector search.</div></div>`;
@@ -2036,346 +2036,174 @@ RULES:
 }
 
 
-/* =========================================================
-   PHASE 15 FRONTEND INTEGRATION LAYER
-   Backend-first TEXA-style workflow wiring
-   - smart_workflow_engine()
-   - master_job_workflow()
-   - extract_vin_from_text()
-   - extract_part_numbers_from_text()
-   - add_scanned_parts_to_invoice()
-   - find_part_suppliers()
-   Safe override block: appended at bottom so existing buttons stay alive.
-   ========================================================= */
-
-function rwArray(x){ return Array.isArray(x) ? x : []; }
-function rwObj(x){ return x && typeof x === "object" ? x : {}; }
-function rwJsonPretty(x){ try{return JSON.stringify(x,null,2)}catch(e){return String(x)} }
-
-async function rpcJson(functionName, args){
-  if(!supabaseClient) throw new Error("Supabase client not loaded.");
-  const { data, error } = await supabaseClient.rpc(functionName, args || {});
-  if(error) throw error;
-  return data || {};
+/* ===============================
+   PHASE 16 CLEAN UI + EMPLOYEE PAYROLL CLOCK + SAFE BUTTONS
+   =============================== */
+function setCecilLayoutMode(mode){
+  mode = mode === "master" ? "master" : "compact";
+  localStorage.setItem("cecil_layout_mode", mode);
+  document.body.classList.toggle("master-mode", mode === "master");
+  document.body.classList.toggle("compact-mode", mode !== "master");
+  const compactBtn = $("compactModeBtn");
+  const masterBtn = $("masterModeBtn");
+  if(compactBtn) compactBtn.classList.toggle("active", mode !== "master");
+  if(masterBtn) masterBtn.classList.toggle("active", mode === "master");
+}
+function setCecilTheme(theme){
+  const themes=["theme-orange","theme-blue","theme-green","theme-amber","theme-red","theme-light"];
+  theme = themes.includes(theme) ? theme : "theme-orange";
+  localStorage.setItem("cecil_theme", theme);
+  document.body.classList.remove(...themes);
+  document.body.classList.add(theme);
+  const sel=$("themeSelect"); if(sel) sel.value=theme;
+}
+function initCecilUiPrefs(){
+  setCecilTheme(localStorage.getItem("cecil_theme") || "theme-orange");
+  setCecilLayoutMode(localStorage.getItem("cecil_layout_mode") || "compact");
 }
 
-function rwFirstText(...vals){
-  for(const v of vals){
-    if(v !== undefined && v !== null && String(v).trim()) return String(v).trim();
-  }
-  return "";
-}
-
-function rwWorkflowMaster(data){
-  const d = rwObj(data);
-  return rwObj(d.master_job || d.master || d.workflow || d);
-}
-
-function rwRepairIntel(data){
-  const d = rwObj(data);
-  return rwObj(d.repair_intelligence || {});
-}
-
-function rwManualKnowledge(data){
-  const d = rwObj(data);
-  return rwObj(d.manual_knowledge || {});
-}
-
-function rwRenderList(title, rows, pick, emptyText){
-  rows = rwArray(rows);
-  if(!rows.length){
-    return card(title,{text:"0",cls:"warn"},`<div class="emptyNote">${safeText(emptyText || "No matches yet.")}</div>`);
-  }
-  return card(title,{text:`${rows.length} HIT${rows.length===1?"":"S"}`,cls:"good"},
-    `<div class="smartGrid">${rows.slice(0,8).map((r,i)=>{
-      const p = pick(r,i) || {};
-      return gridCell(p.k || `#${i+1}`, p.v || "Stored result");
-    }).join("")}</div>`);
-}
-
-function rwRenderUnifiedWorkflow(query, data){
-  const d = rwObj(data);
-  const master = rwWorkflowMaster(d);
-  const repairIntel = rwRepairIntel(d);
-  const manual = rwManualKnowledge(d);
-
-  const parts = rwArray(master.parts);
-  const kits = rwArray(master.repair_kits || master.repair_kit);
-  const labor = rwArray(master.labor_guide || master.labor_times);
-  const failures = rwArray(master.known_failures || master.common_failures);
-  const rules = rwArray(d.workflow_rules);
-  const intelligence = rwArray(repairIntel.intelligence);
-  const truckHistory = rwArray(repairIntel.truck_history);
-  const manuals = rwArray(manual.manuals);
-  const flow = rwArray(manual.diagnostic_flow);
-  const torque = rwArray(manual.torque_specs);
-
-  let html = `<div class="resultGroup phase15Results">`;
-  html += card("MASTER REPAIR WORKFLOW",{text:"LIVE",cls:"hot"},`<div class="smartGrid">
-    ${gridCell("QUERY", query)}
-    ${gridCell("VIN", activeVin ? activeVin() || "NO VIN" : "NO VIN")}
-    ${gridCell("ENGINE", getActiveTruck().engine || $("engine")?.value || d.engine || "UNKNOWN")}
-    ${gridCell("STATUS", d.status || master.status || "ok")}
-  </div>`,"One TEXA-style flow: vehicle context → workflow rules → repair intelligence → manuals → labor → parts → repair kit → quote.");
-
-  html += rwRenderList("WORKFLOW RULES", rules, r=>({
-    k: rwFirstText(r.fault_code,r.symptom,r.system,r.engine,"RULE"),
-    v: `${rwFirstText(r.likely_cause,"Likely cause not set")} | TEST: ${rwFirstText(r.test_step,"Add test step")} | CONF: ${rwFirstText(r.confidence,"-")}`
-  }), "No smart workflow rules match yet. Add smart_workflow_rules rows.");
-
-  html += rwRenderList("REPAIR INTELLIGENCE", intelligence, r=>({
-    k: rwFirstText(r.fault_code,r.symptom,r.engine,"INTEL"),
-    v: `${rwFirstText(r.likely_cause,"-")} → ${rwFirstText(r.confirmed_fix,"No confirmed fix yet")} | LABOR ${rwFirstText(r.labor_hours,"-")}`
-  }), "No AI repair intelligence rows yet.");
-
-  html += rwRenderList("LABOR BY THE BOOK / GUIDE", labor, r=>({
-    k: rwFirstText(r.component_name,r.labor_operation,r.job_name,"LABOR"),
-    v: `${rwFirstText(r.labor_hours,r.book_hours,r.hours,"?")} hrs | ${rwFirstText(r.difficulty,r.notes,r.engine_family,"")}`
-  }), "No labor guide match yet. Add labor_times rows for this job.");
-
-  html += rwRenderList("SMART REPAIR KIT", kits, r=>({
-    k: rwFirstText(r.component_name,"REPAIR KIT"),
-    v: `ENGINE ${rwFirstText(r.engine_family,"-")} | OEM ${rwFirstText(r.oem_part_number,"VERIFY")} | LABOR ${rwFirstText(r.labor_hours,"-")} | GASKETS ${rwFirstText(r.gasket_set,"-")} | SEALS ${rwFirstText(r.seals,"-")} | NOTES ${rwFirstText(r.repair_notes,"")}`
-  }), "No repair kit match yet. Add repair_kits rows.");
-
-  html += rwRenderList("PARTS FOUND", parts, r=>({
-    k: rwFirstText(r.part_id,r.part_number,r.oem_part_number,r.brand,"PART"),
-    v: `${rwFirstText(r.description,r.category,"-")} | ENGINE ${rwFirstText(r.engine,"-")} | BRAND ${rwFirstText(r.brand,"-")}`
-  }), "No parts match yet.");
-
-  html += rwRenderList("KNOWN FAILURES / WARNINGS", failures, r=>({
-    k: rwFirstText(r.fault_code,r.symptom,r.engine_family,"FAILURE"),
-    v: `${rwFirstText(r.likely_causes,r.common_fix,r.warning,"Check diagnostic data before parts")} `
-  }), "No common failure match yet.");
-
-  html += rwRenderList("MANUAL / KNOWLEDGE", manuals, r=>({
-    k: rwFirstText(r.title,r.source_name,r.source_type,"MANUAL"),
-    v: rwFirstText(r.content,r.symptom,r.fault_code,"Manual row found").slice(0,420)
-  }), "No manual knowledge match yet.");
-
-  html += rwRenderList("GUIDED TEST STEPS", flow, r=>({
-    k: `${rwFirstText(r.step_order,"#")} ${rwFirstText(r.test_name,"TEST")}`,
-    v: `${rwFirstText(r.test_instruction,"-")} | PASS: ${rwFirstText(r.pass_condition,"-")} | FAIL: ${rwFirstText(r.fail_condition,"-")}`
-  }), "No diagnostic flow steps yet.");
-
-  html += rwRenderList("TORQUE SPECS", torque, r=>({
-    k: rwFirstText(r.component,r.fastener,"TORQUE"),
-    v: `${rwFirstText(r.torque_value,"VERIFY BY MANUAL")} | ${rwFirstText(r.sequence_notes,r.notes,"")}`
-  }), "No torque spec match yet.");
-
-  html += rwRenderList("TRUCK HISTORY", truckHistory, r=>({
-    k: rwFirstText(r.vin,r.symptom,"HISTORY"),
-    v: `${rwFirstText(r.confirmed_fix,r.repair_action,r.notes,"Saved truck history")} | LABOR ${rwFirstText(r.labor_hours,"-")}`
-  }), "No truck-specific repair history yet.");
-
-  html += phase8ActionsHtml(query);
-  html += `</div>`;
-  return html;
-}
-
-// Override master search: one action calls the new backend brain first, then renders everything together.
-phase8MasterSearch = async function(){
-  const q = phase8SearchInput();
-  if(!q){ alert("Enter a part, fault code, VIN, symptom, repair, or quote note first."); return; }
-
-  startUnifiedSession();
-  phase8SetSearchEverywhere(q);
-  const out = $("doctorOut") || $("partOut") || $("diagOut");
-  if(out) out.innerHTML = `<div class="loadingCard">Running Cecil smart workflow engine...</div>`;
-
-  const session = phase8Session();
-  session.last_query = q;
-  session.last_search_at = new Date().toISOString();
-  savePhase8Session(session);
-
-  try{
-    let data;
-    try{
-      data = await rpcJson("smart_workflow_engine", {
-        search_text: q,
-        vin_text: activeVin ? activeVin() || null : null,
-        engine_text: getActiveTruck().engine || $("engine")?.value || null
-      });
-    }catch(primaryErr){
-      // Safe fallback if smart_workflow_engine is not installed yet.
-      const master = await rpcJson("master_job_workflow", {
-        search_text: q,
-        vin_text: activeVin ? activeVin() || null : null
-      });
-      data = { status:"ok", search:q, master_job: master, workflow_rules:[], repair_intelligence:{intelligence:[],truck_history:[]}, manual_knowledge:{manuals:[],diagnostic_flow:[],torque_specs:[]}, fallback_error: primaryErr.message };
-    }
-
-    const html = rwRenderUnifiedWorkflow(q, data);
-    if($("doctorOut")) $("doctorOut").innerHTML = html;
-    if($("partOut")) $("partOut").innerHTML = html;
-    if($("diagOut")) $("diagOut").innerHTML = html;
-    updatePhase8SessionBar();
-    showScreen("home");
-  }catch(e){
-    if(out) out.innerHTML = card("MASTER WORKFLOW ERROR",{text:"ERROR",cls:"warn"},`<div class="emptyNote">${safeText(e.message)}</div>`);
-  }
+// Hide truck detail clutter until VIN exists, but keep active truck access.
+const __phase16_updateActiveTruckBar = typeof updateActiveTruckBar === "function" ? updateActiveTruckBar : null;
+updateActiveTruckBar = function(){
+  if(__phase16_updateActiveTruckBar) __phase16_updateActiveTruckBar();
+  const vin = ($("activeVin")?.textContent || "").trim();
+  const card = document.querySelector(".truckCard");
+  if(card) card.classList.toggle("noTruck", !vin || vin === "NONE");
 };
 
-async function rwExtractVinBackend(raw){
-  return await rpcJson("extract_vin_from_text", { input_text: raw || "" });
+function getEmployeeClock(){
+  try{return JSON.parse(localStorage.getItem("employeeClock") || "{}");}catch(e){return {};}
+}
+function saveEmployeeClock(c){ localStorage.setItem("employeeClock", JSON.stringify(c || {})); }
+function getPayrollRecords(){
+  try{return JSON.parse(localStorage.getItem("payrollRecords") || "[]");}catch(e){return [];}
+}
+function savePayrollRecords(list){ localStorage.setItem("payrollRecords", JSON.stringify((list || []).slice(0,250))); }
+function currentEmployee(){
+  return {
+    employee_id: $("employeeId")?.value.trim() || "JAMES",
+    employee_name: $("employeeName")?.value.trim() || $("employeeId")?.value.trim() || "James",
+    hourly_rate: Number($("employeeRate")?.value || getShop().laborRate || 0)
+  };
+}
+function phase16BillableHours(c){
+  if(!c.clock_in) return 0;
+  const start = new Date(c.clock_in);
+  const stop = c.clock_out ? new Date(c.clock_out) : new Date();
+  let total = Math.max(0,(stop-start)/36e5);
+  let paused = Number(c.total_pause_minutes || 0) / 60;
+  if(c.status === "paused" && c.pause_start){ paused += Math.max(0,(new Date()-new Date(c.pause_start))/36e5); }
+  return Math.max(0,total-paused);
+}
+function phase16PausedMinutes(c){
+  let mins = Number(c.total_pause_minutes || 0);
+  if(c.status === "paused" && c.pause_start){ mins += Math.max(0,(new Date()-new Date(c.pause_start))/60000); }
+  return mins;
 }
 
-async function rwExtractPartsBackend(raw, scanType){
-  return await rpcJson("extract_part_numbers_from_text", {
-    input_text: raw || "",
-    vin_text: activeVin ? activeVin() || null : null,
-    scan_type_text: scanType || "parts_photo"
-  });
+// Override clock controls with pause/resume/employee support.
+clockIn = function(){
+  const e=currentEmployee();
+  const c={...e, vin: activeVin ? activeVin() : "", job_id:null, clock_in:new Date().toISOString(), clock_out:null, pause_start:null, total_pause_minutes:0, billable_hours:0, status:"clocked_in", notes:""};
+  saveEmployeeClock(c); renderClock(); saveTimeClockCloud(c,"clock_in");
+};
+function pauseClock(){
+  const c=getEmployeeClock();
+  if(!c.clock_in || c.status === "clocked_out"){ alert("Clock in first."); return; }
+  if(c.status === "paused"){ alert("Clock is already paused."); return; }
+  c.pause_start=new Date().toISOString(); c.status="paused"; saveEmployeeClock(c); renderClock(); saveTimeClockCloud(c,"pause");
 }
-
-async function rwFindPartSuppliersBackend(partNumber){
-  return await rpcJson("find_part_suppliers", { search_text: partNumber || "" });
+function resumeClock(){
+  const c=getEmployeeClock();
+  if(c.status !== "paused"){ alert("Clock is not paused."); return; }
+  const paused=(new Date()-new Date(c.pause_start))/60000;
+  c.total_pause_minutes=Number(c.total_pause_minutes||0)+Math.max(0,paused);
+  c.pause_start=null; c.status="clocked_in"; saveEmployeeClock(c); renderClock(); saveTimeClockCloud(c,"resume");
 }
-
-function rwRenderSupplierCards(result){
-  const suppliers = rwArray(result.suppliers);
-  if(!suppliers.length) return `<div class="smartNote">No supplier locations saved yet.</div>`;
-  return `<div class="resultGroup">` + suppliers.slice(0,10).map(s=>card(
-    rwFirstText(s.supplier_name,"SUPPLIER"),
-    {text:rwFirstText(s.city,"LOCATION"),cls:"good"},
-    `<div class="smartGrid">
-      ${gridCell("CITY", `${rwFirstText(s.city,"-")}, ${rwFirstText(s.state,"")}`)}
-      ${gridCell("PHONE", rwFirstText(s.phone,"-"))}
-      ${gridCell("NOTES", rwFirstText(s.notes,"-"))}
-      ${gridCell("MAP", rwFirstText(s.search_url,"Open maps from supplier record"))}
-    </div>`
-  )).join("") + `</div>`;
+clockOut = function(){
+  const c=getEmployeeClock();
+  if(!c.clock_in){ alert("Clock in first."); return; }
+  if(c.status === "paused" && c.pause_start){
+    const paused=(new Date()-new Date(c.pause_start))/60000;
+    c.total_pause_minutes=Number(c.total_pause_minutes||0)+Math.max(0,paused);
+    c.pause_start=null;
+  }
+  c.clock_out=new Date().toISOString();
+  c.billable_hours=phase16BillableHours(c);
+  c.status="clocked_out";
+  saveEmployeeClock(c); renderClock(); savePayrollRecord(); saveTimeClockCloud(c,"clock_out");
+};
+resetClock = function(){
+  if(!confirm("Reset employee clock on this device? Saved payroll records stay.")) return;
+  localStorage.removeItem("employeeClock"); renderClock();
+};
+renderClock = function(){
+  const c=getEmployeeClock();
+  const rate=Number(c.hourly_rate || $("employeeRate")?.value || getShop().laborRate || 0);
+  const hrs=phase16BillableHours(c);
+  if($("employeeId") && c.employee_id) setValue("employeeId", c.employee_id);
+  if($("employeeName") && c.employee_name) setValue("employeeName", c.employee_name);
+  if($("employeeRate") && c.hourly_rate) setValue("employeeRate", c.hourly_rate);
+  if($("clockStart")) $("clockStart").textContent=c.clock_in ? new Date(c.clock_in).toLocaleString() : "--";
+  if($("clockStop")) $("clockStop").textContent=c.clock_out ? new Date(c.clock_out).toLocaleString() : "--";
+  if($("clockPaused")) $("clockPaused").textContent=phase16PausedMinutes(c).toFixed(0)+" min";
+  if($("clockHours")) $("clockHours").textContent=hrs.toFixed(2);
+  if($("clockLabor")) $("clockLabor").textContent=money(hrs*rate);
+  if($("clockStatusText")) $("clockStatusText").textContent=(c.status || "clocked_out").replace(/_/g," ").toUpperCase();
+  if($("clockLiveTimer")) $("clockLiveTimer").textContent=hrs.toFixed(2)+" hrs";
+};
+function savePayrollRecord(){
+  const c=getEmployeeClock();
+  if(!c.clock_in){ alert("No clock record to save."); return; }
+  const rec={...c, billable_hours: phase16BillableHours(c), total_pause_minutes: phase16PausedMinutes(c), saved_at:new Date().toISOString(), total_pay: phase16BillableHours(c)*Number(c.hourly_rate||0)};
+  const list=getPayrollRecords(); list.unshift(rec); savePayrollRecords(list); renderPayrollSummary(); saveTimeClockCloud(rec,"payroll_save"); alert("Payroll record saved.");
 }
-
-function rwAddNumbersToLocalInvoice(numbers){
-  const list = typeof getInvoiceParts === "function" ? getInvoiceParts() : [];
-  for(const n of numbers){
-    list.push({
-      name: n,
-      number: n,
-      qty: 1,
-      price: 0,
-      supplier: "OCR Scan",
-      note: "Added from OCR scan. Verify before ordering.",
-      photo: typeof visionImageData === "function" ? visionImageData() : "",
-      truck: getActiveTruck(),
-      added_at: new Date().toLocaleString()
+function renderPayrollSummary(){
+  const out=$("payrollOut"); if(!out) return;
+  const list=getPayrollRecords();
+  if(!list.length){ out.textContent="No payroll records saved yet."; return; }
+  out.innerHTML=list.slice(0,10).map(r=>`<div class="payrollCard"><b>${safeText(r.employee_name || r.employee_id || "Employee")}</b><br><small>${safeText(r.clock_in ? new Date(r.clock_in).toLocaleString() : "")} → ${safeText(r.clock_out ? new Date(r.clock_out).toLocaleString() : "open")}</small><br><span>${Number(r.billable_hours||0).toFixed(2)} hrs • ${money(r.total_pay||0)}</span></div>`).join("");
+}
+function showPayrollSummary(){ renderPayrollSummary(); showScreen("timeClock"); }
+async function saveTimeClockCloud(c,eventType){
+  try{
+    if(!supabaseClient) return;
+    await supabaseClient.from("employee_time_clock").insert({
+      employee_id:c.employee_id || null,
+      employee_name:c.employee_name || null,
+      vin:c.vin || (activeVin ? activeVin() : null),
+      clock_in:c.clock_in || null,
+      clock_out:c.clock_out || null,
+      pause_start:c.pause_start || null,
+      total_pause_minutes:Number(c.total_pause_minutes||0),
+      billable_hours:Number(c.billable_hours || phase16BillableHours(c)),
+      hourly_rate:Number(c.hourly_rate||0),
+      status:c.status || eventType,
+      notes:eventType || "app_clock_event"
     });
-  }
-  if(typeof saveInvoiceParts === "function") saveInvoiceParts(list);
+  }catch(e){ console.warn("employee clock cloud save failed", e.message); }
 }
 
-// Override CLEAN TEXT: now also sends OCR text to backend extraction tables.
-cleanVisionText = async function(){
-  const raw = $("visionRaw")?.value || $("visionClean")?.value || "";
-  const type = $("visionType")?.value || "Part Label";
-  if(!raw.trim()){ alert("Paste OCR/raw text first, or scan a photo first."); return; }
-
-  if($("visionOut")) $("visionOut").textContent = "Cleaning text and saving scan to backend...";
-  try{
-    if(type.toLowerCase().includes("vin")){
-      const vinResult = await rwExtractVinBackend(raw);
-      setValue("visionClean", vinResult.vin || "");
-      if(vinResult.vin){ setValue("vinGlobal", vinResult.vin); setValue("invoiceVin", vinResult.vin); }
-      if($("]visionOut")){}
-      if($("visionOut")) $("visionOut").innerHTML = card("VIN OCR BACKEND",{text:vinResult.status || "ok",cls:vinResult.vin?"good":"warn"},`<div class="smartGrid">${gridCell("VIN", vinResult.vin || "No VIN found")}${gridCell("SCAN ID", vinResult.scan_id || "-")}</div>`);
-      return;
-    }
-
-    const partsResult = await rwExtractPartsBackend(raw,type);
-    const nums = rwArray(partsResult.part_numbers);
-    setValue("visionClean", nums.join("\n"));
-    localStorage.setItem("lastPartScanSession", partsResult.session_id || "");
-    localStorage.setItem("lastPartScanNumbers", JSON.stringify(nums));
-    if($("visionOut")) $("visionOut").innerHTML = card("PART OCR BACKEND",{text:`${nums.length} FOUND`,cls:nums.length?"good":"warn"},`<div class="smartGrid">${nums.map(n=>gridCell("PART", n)).join("")}</div>`, `Session: ${partsResult.session_id || "none"}`);
-  }catch(e){
-    if($("visionOut")) $("visionOut").textContent = "OCR backend error: " + e.message;
-  }
-};
-
-// Override scan photo: use existing image AI if available, then backend extraction.
-scanVisionPhoto = async function(){
-  const img = typeof visionImageData === "function" ? visionImageData() : "";
-  const rawManual = $("visionRaw")?.value.trim() || "";
-  const type = $("visionType")?.value || "Part Label";
-  if(!img && !rawManual){ alert("Add a photo or paste scan text first."); return; }
-  if($("visionOut")) $("visionOut").textContent = "Scanning photo/text, then saving OCR result to backend...";
-
-  try{
-    let raw = rawManual;
-    if(img && !raw){
-      const data = await callOracle({
-        mode:"vision_ocr_scan",
-        part_query:`OCR scan ${type}`,
-        question:`Read this ${type}. Extract ALL VINs, part numbers, brands, serials, quantities, prices if visible. Return plain text only.`,
-        note:{image:img.split(",")[1], scan_type:type, vehicleContext:ctx()}
-      });
-      raw = data?.answer || data?.message || data?.data?.text || data?.data?.notes?.join("\n") || JSON.stringify(data,null,2);
-      setValue("visionRaw", raw);
-    }
-    await cleanVisionText();
-  }catch(e){
-    if($("visionOut")) $("visionOut").textContent = "Vision Scan Error: " + e.message;
-  }
-};
-
-// Override add scanned part: backend invoice_parts + local invoice list.
-addVisionPartToInvoice = async function(){
-  let nums = [];
-  try{ nums = JSON.parse(localStorage.getItem("lastPartScanNumbers") || "[]"); }catch(e){ nums = []; }
-  if(!nums.length){
-    nums = ($("visionClean")?.value || "").split(/[\s,\n]+/).map(x=>x.trim()).filter(Boolean);
-  }
-  const sessionId = localStorage.getItem("lastPartScanSession") || "";
-  if(!nums.length && !sessionId){ alert("Scan or clean part numbers first."); return; }
-
-  try{
-    if(sessionId){
-      await rpcJson("add_scanned_parts_to_invoice", {
-        session_uuid: sessionId,
-        vin_text: activeVin ? activeVin() || null : null
-      });
-    }
-    rwAddNumbersToLocalInvoice(nums);
-    if($("visionOut")) $("visionOut").innerHTML += card("INVOICE UPDATED",{text:`${nums.length} LOCAL`,cls:"good"},`<div class="smartGrid">${nums.map(n=>gridCell("ADDED", n)).join("")}</div>`,"Verify part names, qty, supplier, and price before billing.");
-    showScreen("invoice");
-  }catch(e){
-    if($("visionOut")) $("visionOut").textContent = "Add scanned parts error: " + e.message;
-  }
-};
-
-async function findSuppliersForScannedParts(){
-  let nums = [];
-  try{ nums = JSON.parse(localStorage.getItem("lastPartScanNumbers") || "[]"); }catch(e){ nums = []; }
-  const clean = ($("visionClean")?.value || $("partq")?.value || "").trim();
-  if(!nums.length && clean) nums = clean.split(/[\s,\n]+/).filter(Boolean);
-  if(!nums.length){ alert("Scan or enter a part number first."); return; }
-
-  if($("visionOut")) $("visionOut").textContent = "Finding suppliers...";
-  try{
-    let html = "";
-    for(const n of nums.slice(0,5)){
-      const result = await rwFindPartSuppliersBackend(n);
-      html += card("SUPPLIER MATCH",{text:n,cls:"hot"},`<div class="smartGrid">${gridCell("PART", n)}${gridCell("PART MATCHES", rwArray(result.parts).length)}${gridCell("LOCATIONS", rwArray(result.suppliers).length)}</div>`);
-      html += rwRenderSupplierCards(result);
-    }
-    if($("visionOut")) $("visionOut").innerHTML = html;
-  }catch(e){
-    if($("visionOut")) $("visionOut").textContent = "Supplier lookup error: " + e.message;
-  }
+function openSupplierSearch(kind){
+  const q = encodeURIComponent(($("partq")?.value || $("backendSearchQ")?.value || $("visionClean")?.value || "truck parts").trim());
+  const map={fleetpride:"FleetPride",napa:"NAPA truck parts",oreilly:"O'Reilly Auto Parts",google:"heavy duty truck parts",dealer:"truck dealer parts"};
+  const label=encodeURIComponent(map[kind] || kind || "truck parts");
+  window.open(`https://www.google.com/maps/search/${label}+${q}`,"_blank");
+}
+function runInterchangeOnly(){
+  if(typeof runInterchangeChain === "function") return runInterchangeChain();
+  alert("Interchange chain is ready when backend RPC is installed.");
+}
+function addBestInterchangeToInvoice(){
+  const q=$("backendSearchQ")?.value || $("partq")?.value || "Best interchange";
+  setValue("manualPartName", q);
+  setValue("manualPartNumber", q);
+  if(typeof addManualPartToInvoice === "function") addManualPartToInvoice();
 }
 
-// Add a supplier button into Vision screen without changing HTML manually.
 window.addEventListener("DOMContentLoaded",()=>{
-  try{
-    const row = document.querySelector("#visionPro .buttonRow");
-    if(row && !document.getElementById("findScanSuppliersBtn")){
-      const btn = document.createElement("button");
-      btn.id = "findScanSuppliersBtn";
-      btn.textContent = "FIND SUPPLIERS";
-      btn.onclick = findSuppliersForScannedParts;
-      row.appendChild(btn);
-    }
-  }catch(e){ console.warn("Phase 15 button inject failed", e.message); }
+  initCecilUiPrefs();
+  try{ updateActiveTruckBar(); }catch(e){}
+  try{ renderClock(); setInterval(renderClock,15000); }catch(e){}
+  try{ renderPayrollSummary(); }catch(e){}
 });
-

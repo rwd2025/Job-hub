@@ -122,6 +122,74 @@
       Ready. Master Search runs Oracle + parts database + Diesel Brain + repair kits + job session memory.
     </section>
 
+
+    <!-- PHASE 16 CLEAN CONTROL CENTER -->
+    <section class="cecilControlDeck" id="cecilControlDeck">
+      <div class="layoutTopRow">
+        <button class="modeToggle active" id="compactModeBtn" onclick="setCecilLayoutMode('compact')">COMPACT</button>
+        <button class="modeToggle" id="masterModeBtn" onclick="setCecilLayoutMode('master')">MASTER</button>
+        <select id="themeSelect" onchange="setCecilTheme(this.value)">
+          <option value="theme-orange">Orange/Black</option>
+          <option value="theme-blue">Gunmetal Blue</option>
+          <option value="theme-green">Hi-Vis Green</option>
+          <option value="theme-amber">Steel Amber</option>
+          <option value="theme-red">Red Diagnostic</option>
+          <option value="theme-light">Clean Light</option>
+        </select>
+      </div>
+
+      <details class="cecilDrop" open>
+        <summary>⚡ Start Work</summary>
+        <div class="dropGrid">
+          <button onclick="phase8MasterSearch()">Master Workflow</button>
+          <button onclick="showScreen('vin')">VIN / Truck</button>
+          <button onclick="showScreen('timeClock')">Employee Clock</button>
+          <button onclick="showScreen('invoice')">Invoice / Quote</button>
+        </div>
+      </details>
+
+      <details class="cecilDrop">
+        <summary>⚙️ Parts</summary>
+        <div class="dropGrid">
+          <button onclick="showScreen('parts')">Parts Lookup</button>
+          <button onclick="showScreen('visionPro')">Camera / OCR Scan</button>
+          <button onclick="showScreen('backendPro')">Supplier + Interchange</button>
+          <button onclick="addLookupToInvoice()">Add Lookup to Invoice</button>
+        </div>
+      </details>
+
+      <details class="cecilDrop">
+        <summary>🛠️ Repair</summary>
+        <div class="dropGrid">
+          <button onclick="showScreen('faultDoctor')">Fault Doctor</button>
+          <button onclick="showScreen('repairHud')">Repair HUD</button>
+          <button onclick="runIntelligenceOnly()">Diesel Brain</button>
+          <button onclick="saveVerifiedFix()">Save Verified Fix</button>
+        </div>
+      </details>
+
+      <details class="cecilDrop">
+        <summary>🧠 AI Brain</summary>
+        <div class="dropGrid">
+          <button onclick="showScreen('aiBrainPro')">AI Brain Pro</button>
+          <button onclick="runHybridRagSearch()">Hybrid RAG</button>
+          <button onclick="showEmbeddingRouterPlan()">Router Plan</button>
+          <button onclick="showBrainRouterPlan()">AI Route</button>
+        </div>
+      </details>
+
+      <details class="cecilDrop">
+        <summary>🏁 Shop</summary>
+        <div class="dropGrid">
+          <button onclick="showScreen('fieldTools')">GPS / Field Tools</button>
+          <button onclick="loadJobHistoryCloud()">Cloud Job History</button>
+          <button onclick="showScreen('team')">Employees</button>
+          <button onclick="showScreen('settings')">Settings</button>
+        </div>
+      </details>
+    </section>
+
+
     <section class="toolGrid">
       <button class="toolCard" onclick="showScreen('vin')">
         <div class="toolIcon">🚛</div>
@@ -426,20 +494,37 @@
 
   <!-- TIME CLOCK -->
   <main id="timeClock" class="screen">
-    <h1 class="screenTitle">TIME CLOCK</h1>
-    <section class="resultBox">
+    <h1 class="screenTitle">EMPLOYEE TIME CLOCK</h1>
+    <section class="resultBox employeeClockPanel">
+      <div class="employeePicker">
+        <label>Employee ID<input id="employeeId" placeholder="JAMES, DAVID, STEPH"></label>
+        <label>Employee Name<input id="employeeName" placeholder="Employee name"></label>
+        <label>Hourly Rate<input id="employeeRate" type="number" placeholder="0.00"></label>
+      </div>
+      <div class="clockStatusHero">
+        <b id="clockStatusText">CLOCKED OUT</b>
+        <span id="clockLiveTimer">0.00 hrs</span>
+      </div>
       <div class="clockGrid">
         <div><b>START</b><span id="clockStart">--</span></div>
         <div><b>STOP</b><span id="clockStop">--</span></div>
+        <div><b>PAUSED</b><span id="clockPaused">0 min</span></div>
         <div><b>BILLABLE HOURS</b><span id="clockHours">0.00</span></div>
         <div><b>LABOR TOTAL</b><span id="clockLabor">$0.00</span></div>
       </div>
-      <div class="buttonRow">
-        <button onclick="clockIn()">CLOCK IN</button>
-        <button onclick="clockOut()">CLOCK OUT</button>
-        <button onclick="resetClock()">RESET CLOCK</button>
-        <button onclick="sendClockToInvoice()">SEND TO INVOICE</button>
+      <div class="clockButtonGrid">
+        <button class="bigClockBtn start" onclick="clockIn()">CLOCK IN</button>
+        <button class="bigClockBtn pause" onclick="pauseClock()">PAUSE</button>
+        <button class="bigClockBtn resume" onclick="resumeClock()">RESUME</button>
+        <button class="bigClockBtn stop" onclick="clockOut()">CLOCK OUT</button>
       </div>
+      <div class="buttonRow">
+        <button onclick="resetClock()">RESET</button>
+        <button onclick="sendClockToInvoice()">SEND TO INVOICE</button>
+        <button onclick="savePayrollRecord()">SAVE PAYROLL</button>
+        <button onclick="showPayrollSummary()">PAYROLL SUMMARY</button>
+      </div>
+      <section id="payrollOut" class="resultBox">Payroll/time records will appear here.</section>
     </section>
   </main>
 

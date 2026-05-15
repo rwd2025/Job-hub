@@ -1199,3 +1199,45 @@ button:active{transform:translateY(1px);}
   border-color:#2be65a;
   box-shadow:inset 0 0 15px rgba(43,230,90,.1);
 }
+
+
+/* ===============================
+   PHASE 16 CLEAN UI / THEMES / CLOCK
+   =============================== */
+:root{--cecilAccent:var(--orange,#ff6500);--cecilPanel:var(--panel,#0d0d0d);--cecilCard:var(--card,#141414);--cecilText:var(--text,#f5f5f5);--cecilMuted:var(--muted,#b8b8b8)}
+body.theme-orange{--cecilAccent:#ff6500;--bg:#050505;--panel:#0d0d0d;--card:#141414;--text:#f5f5f5;--muted:#b8b8b8}
+body.theme-blue{--cecilAccent:#3b82f6;--bg:#07111f;--panel:#0f1b2d;--card:#15243a;--text:#f3f8ff;--muted:#9fb0c8}
+body.theme-green{--cecilAccent:#39d353;--bg:#050807;--panel:#101816;--card:#17231f;--text:#f4fff8;--muted:#a7b7ae}
+body.theme-amber{--cecilAccent:#ffc247;--bg:#121416;--panel:#1b1f22;--card:#252a2e;--text:#f2f4f5;--muted:#b5bec6}
+body.theme-red{--cecilAccent:#ef4444;--bg:#090909;--panel:#171111;--card:#211818;--text:#fff6f6;--muted:#c2abab}
+body.theme-light{--cecilAccent:#ea580c;--bg:#f3f4f6;--panel:#ffffff;--card:#ffffff;--text:#111827;--muted:#6b7280}
+body[class*="theme-"]{background:var(--bg);color:var(--text)}
+body[class*="theme-"] .topBar, body[class*="theme-"] .sideMenu, body[class*="theme-"] .bottomNav{background:var(--panel)}
+body[class*="theme-"] .toolCard, body[class*="theme-"] .resultBox, body[class*="theme-"] .truckCard, body[class*="theme-"] .sessionBar, body[class*="theme-"] .cecilDrop, body[class*="theme-"] .searchPanel{background:var(--card);color:var(--text)}
+body[class*="theme-"] button{border-color:var(--cecilAccent)}
+body[class*="theme-"] .searchBtn, body[class*="theme-"] .bigClockBtn.start, body[class*="theme-"] .bigClockBtn.stop{background:var(--cecilAccent);color:#111}
+.layoutTopRow{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:8px;margin:12px 0}
+.modeToggle,#themeSelect{min-height:44px;border-radius:14px;background:var(--card);color:var(--text);border:1px solid var(--line);font-weight:800;padding:8px}
+.modeToggle.active{background:var(--cecilAccent);color:#111;border-color:var(--cecilAccent)}
+.cecilControlDeck{margin:14px 0;display:block}
+.cecilDrop{border:1px solid var(--line);border-radius:18px;margin:10px 0;overflow:hidden;background:var(--card)}
+.cecilDrop summary{cursor:pointer;list-style:none;padding:16px;font-weight:900;color:var(--text);border-left:4px solid var(--cecilAccent)}
+.cecilDrop summary::-webkit-details-marker{display:none}
+.dropGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px 14px}
+.dropGrid button{min-height:48px;border-radius:14px;background:var(--panel);color:var(--text);border:1px solid var(--line);font-weight:800}
+body.compact-mode #home .toolGrid, body.compact-mode #home .statusGrid{display:none!important}
+body.master-mode #home .toolGrid{display:grid!important}
+body.master-mode .cecilDrop{display:block}
+.truckCard.noTruck .truckData .dataCell:not(:first-child){display:none}
+.truckCard.noTruck .truckImage{opacity:.45}
+.truckCard.noTruck:after{content:"Scan or enter VIN to show full vehicle info";display:block;color:var(--muted);font-size:12px;margin:8px 0 0 12px}
+.employeePicker{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px}
+.employeePicker input{width:100%;box-sizing:border-box;min-height:42px;border-radius:12px;background:var(--panel);color:var(--text);border:1px solid var(--line);padding:10px}
+.clockStatusHero{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:18px;padding:16px;margin:10px 0;background:var(--panel)}
+.clockStatusHero b{font-size:18px;color:var(--cecilAccent)}
+.clockStatusHero span{font-size:22px;font-weight:900}
+.clockButtonGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.bigClockBtn{min-height:58px;border-radius:18px;font-size:16px;font-weight:900;background:var(--card);color:var(--text);border:2px solid var(--line)}
+.bigClockBtn.pause{border-color:#ffc247}.bigClockBtn.resume{border-color:#39d353}.bigClockBtn.stop{border-color:#ef4444}
+.payrollCard{border:1px solid var(--line);border-radius:14px;padding:12px;margin:8px 0;background:var(--panel)}
+@media(min-width:700px){.employeePicker{grid-template-columns:1fr 1fr 1fr}.dropGrid{grid-template-columns:repeat(4,1fr)}}
