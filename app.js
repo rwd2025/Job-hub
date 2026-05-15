@@ -17,7 +17,7 @@ function safeText(value){
 }
 
 let currentScreen = "home";
-const screenHistory = [];
+window.screenHistory = window.screenHistory || [];
 
 function showScreen(id){
   if(!$(id)) return;
