@@ -1,5 +1,17 @@
-// FIXED master_search_hook_patch.js
+/* =========================================================
+   MASTER SEARCH HOOK PATCH
+   Paste this INSIDE your existing runMasterSearch()
+   or masterSearch() function.
+   ========================================================= */
 
-window.rc21_runRepairKitPatch = async function () {
-  console.log("Repair kit patch running...");
-};
+const searchTerm =
+document.getElementById("masterSearch")?.value ||
+document.getElementById("masterInput")?.value ||
+document.getElementById("oracleSearch")?.value ||
+"";
+
+await rc21_runRepairKitPatch(searchTerm);
+
+/* =========================================================
+   END PATCH
+   ========================================================= */

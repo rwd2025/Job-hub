@@ -1,22 +1,39 @@
-ROLLING WRENCH DIESEL
-AUTO AI FALLBACK PATCH
+ROLLING CECIL AI
+MASTER SEARCH HOOK FIX
 
-1. Upload/replace this JS code into your app.js
-OR
-paste it near the bottom of app.js
+WHAT THIS FIXES:
+- Smart Repair Kit showing NO KIT
+- Local Database showing 0 HITS
+- Repair kits not loading
 
-2. Make sure your LOOKUP PART button says:
+WHY:
+The frontend patch exists already.
+But your main search function is NOT triggering it.
 
-<button onclick="lookupPart()">
-  LOOKUP PART
-</button>
+INSTALL:
+1. Open index.html in GitHub.
+2. Search:
+   runMasterSearch(
+   OR:
+   masterSearch(
+3. Inside that function:
+   paste contents of:
+   master_search_hook_patch.js
 
-3. Commit changes to GitHub.
+IMPORTANT:
+Paste it RIGHT AFTER searchTerm is created.
 
-4. Refresh app.
+THEN:
+Commit changes.
 
-This patch makes the app:
-- search local database first
-- automatically fall back to AI/web
-- auto-save AI answers into repair_memory
-- stop showing useless 0 HITS screens
+Open:
+https://rwd2025.github.io/Job-hub/?v=2102
+
+TEST:
+X15 water pump
+
+EXPECTED:
+- OEM 3692580
+- ALT 3692580RX
+- repair kit loads
+- local database populates
