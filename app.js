@@ -1,8 +1,8 @@
 const SUPABASE_URL = "https://uxpkqwcmvtqvubibbrek.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4cGtxd2NtdnRxdnViaWJicmVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMzk4NjQsImV4cCI6MjA5MjgxNTg2NH0.afiaSFqkRFEXW5nPQVRXKZcpKkS6iF3T_hTQC2P15HQ";
 const API_URL = "https://uxpkqwcmvtqvubibbrek.supabase.co/functions/v1/oracle-parts-search";
-const APP_VERSION = "13.0.0-embeddings-rag";
-const APP_RELEASE_NAME = "Rolling Cecil AI Live Retrieval";
+const APP_VERSION = "18.0.0-parts-book-ai";
+const APP_RELEASE_NAME = "Rolling Cecil AI Parts Book";
 
 const $ = id => document.getElementById(id);
 const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
@@ -2413,4 +2413,133 @@ window.addEventListener("DOMContentLoaded",()=>{
   try{ stabilizeCameraInputs(); }catch(e){}
   try{ renderPcAdminDashboard(); }catch(e){}
   try{ if($("debugVersion")) $("debugVersion").textContent = CECIL_PHASE17; }catch(e){}
+});
+
+
+/* =============================
+   PHASE 18 PARTS BOOK AI
+   VIN/engine normalization + smart part number answer
+============================= */
+const CECIL_PHASE18 = "18.0-parts-book-ai";
+
+function phase18ActiveEngineText(){
+  return (
+    $("engine")?.value ||
+    getActiveTruck()?.engine ||
+    $("brainSearchText")?.value ||
+    ""
+  ).trim();
+}
+
+async function smartPartNumberLookup(partQuery, rawEngineText=null, vinText=null){
+  if(!supabaseClient) throw new Error("Supabase client not loaded.");
+  const { data, error } = await supabaseClient.rpc("smart_part_number_lookup", {
+    part_query: partQuery,
+    raw_engine_text: rawEngineText || null,
+    vin_text: vinText || null
+  });
+  if(error) throw error;
+  return data;
+}
+
+function renderSmartPartsBook(targetId, data){
+  const parts = asArray(data?.parts);
+  const norm = data?.normalized_engine || {};
+  let html = `<div class="oracleCard phase18PartsBook">
+    <div class="oracleTitle">PARTS BOOK AI</div>
+    <div class="smartGrid">
+      ${gridCell("REQUEST", data?.part_request || "—")}
+      ${gridCell("ENGINE", norm?.canonical_name ? `${norm.manufacturer || ""} ${norm.canonical_name || ""} ${norm.epa_standard ? "("+norm.epa_standard+")" : ""}` : (data?.raw_engine || "UNKNOWN"))}
+      ${gridCell("VIN", data?.vin || activeVin?.() || "NO VIN")}
+      ${gridCell("CONFIDENCE", data?.confidence || "UNKNOWN")}
+    </div>
+    ${data?.warning ? `<div class="smartNote warnText">${safeText(data.warning)}</div>` : ""}
+  </div>`;
+
+  if(parts.length){
+    html += `<div class="resultGroup">`;
+    html += card("BEST PART NUMBER MATCHES", {text:`${parts.length} HIT${parts.length===1?"":"S"}`, cls:"good"},
+      `<div class="smartGrid">${parts.slice(0,12).map(p=>gridCell(
+        p.oem_number || p.part_number || p.aftermarket_part_number || "PART",
+        `${p.brand || ""} ${p.engine_family || ""} — ${p.part_type || p.description || ""}${p.cross_references?.length ? " | Cross: "+p.cross_references.join(", ") : ""}`
+      )).join("")}</div>`,
+      "Acts like a tech with the parts book open: local exact match first, broad fallback second, VIN/ESN/CPL verification always."
+    );
+    html += `</div>`;
+    const best = parts[0];
+    if(best){
+      window.lastSmartPartMatch = best;
+      window.lastScannedPart = best.oem_number || best.part_number || best.aftermarket_part_number || window.lastScannedPart;
+      if($("manualPartNumber")) setValue("manualPartNumber", best.oem_number || best.aftermarket_part_number || "");
+      if($("manualPartName")) setValue("manualPartName", best.part_type || best.description || data?.part_request || "Part");
+    }
+  }else{
+    html += card("NO EXACT LOCAL PART NUMBER YET", {text:"NEEDS VERIFY", cls:"warn"},
+      `<div class="smartGrid">${gridCell("NEXT", data?.tech_answer?.next_needed || "Need VIN / ESN / CPL / dealer catalog lookup")}${gridCell("RULE", "Do not guess exact OEM numbers without source")}</div>`,
+      "Cecil did not stop at nothing found. It logged the engine if unknown and gives the next verification step."
+    );
+  }
+
+  cecilSetHTML(targetId, html);
+}
+
+async function runPartsBookAI(){
+  const q = ($("partq")?.value || $("backendSearchQ")?.value || $("doctorAsk")?.value || $("brainSearchText")?.value || "").trim();
+  if(!q){ alert("Enter a part request first, like: X15 water pump or DD15 oil filter."); return; }
+  const engineText = phase18ActiveEngineText();
+  const vinText = typeof activeVin === "function" ? activeVin() : (getActiveTruck().vin || "");
+  cecilSetText("partOut", "Parts Book AI searching local parts, engine normalization, and fallback matches...");
+  try{
+    const data = await smartPartNumberLookup(q, engineText || null, vinText || null);
+    renderSmartPartsBook("partOut", data);
+    return data;
+  }catch(e){
+    cecilSetHTML("partOut", card("PARTS BOOK AI NOT INSTALLED", {text:"FALLBACK", cls:"warn"}, `<div class="smartNote">${safeText(e.message)}<br>Run phase18_parts_book_ai_backend.sql in Supabase, then try again.</div>`));
+    throw e;
+  }
+}
+
+function addBestSmartPartToInvoice(){
+  const p = window.lastSmartPartMatch;
+  if(!p){ alert("Run Parts Book AI first."); return; }
+  setValue("manualPartName", p.part_type || p.description || "Part");
+  setValue("manualPartNumber", p.oem_number || p.aftermarket_part_number || "");
+  setValue("manualPartSupplier", p.brand || "Parts Book AI");
+  setValue("manualPartQty", "1");
+  if(typeof addManualPartToInvoice === "function") addManualPartToInvoice();
+}
+
+// Override normal part lookup so Cecil always tries Parts Book AI before saying nothing found.
+const __phase18_oldAskPart = typeof askPart === "function" ? askPart : null;
+askPart = async function(){
+  const q = $("partq")?.value.trim() || "";
+  const note = $("partNote")?.value.trim() || "";
+  if(!q && !note){ cecilSetText("partOut", "Enter part number, part name, VIN, ESN, CPL, or description."); return; }
+
+  try{
+    const data = await runPartsBookAI();
+    // Still run universal/local database after the smart answer, but do not let it erase the smart answer.
+    const term = (data?.parts?.[0]?.oem_number || q || note || "").trim();
+    if(term){
+      try{
+        const universal = await universalSearch(term);
+        const before = $("partOut")?.innerHTML || "";
+        renderUniversalResults("partOut", universal, term);
+        if($("partOut") && before && !$("partOut").innerHTML.includes("PARTS BOOK AI")) $("partOut").innerHTML = before + $("partOut").innerHTML;
+      }catch(e){ console.warn("Universal after Parts Book AI failed", e.message); }
+      try{
+        const repair = await getRepairKit(term);
+        renderRepairKit("partOut", repair);
+      }catch(e){ console.warn("Repair kit after Parts Book AI failed", e.message); }
+    }
+    return;
+  }catch(e){
+    console.warn("Parts Book AI fallback to old askPart", e.message);
+    if(__phase18_oldAskPart) return __phase18_oldAskPart();
+    cecilSetText("partOut", "Part lookup error: "+e.message);
+  }
+};
+
+window.addEventListener("DOMContentLoaded",()=>{
+  try{ if($("debugVersion")) $("debugVersion").textContent = CECIL_PHASE18; }catch(e){}
 });
