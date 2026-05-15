@@ -10,7 +10,7 @@ document.getElementById("masterInput")?.value ||
 document.getElementById("oracleSearch")?.value ||
 "";
 
-await async function rc21_runRepairKitPatch(searchTerm){
+await rc21_runRepairKitPatch(searchTerm);
 
 /* =========================================================
    END PATCH
