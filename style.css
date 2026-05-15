@@ -1241,3 +1241,39 @@ body.master-mode .cecilDrop{display:block}
 .bigClockBtn.pause{border-color:#ffc247}.bigClockBtn.resume{border-color:#39d353}.bigClockBtn.stop{border-color:#ef4444}
 .payrollCard{border:1px solid var(--line);border-radius:14px;padding:12px;margin:8px 0;background:var(--panel)}
 @media(min-width:700px){.employeePicker{grid-template-columns:1fr 1fr 1fr}.dropGrid{grid-template-columns:repeat(4,1fr)}}
+
+/* ===============================
+   PHASE 17 FULL CONTROL UI PATCH
+   =============================== */
+.phase17 .layoutTopRow{grid-template-columns:1fr 1fr 1fr 1.5fr;}
+.cecilToast{position:fixed;left:50%;bottom:155px;transform:translateX(-50%) translateY(20px);background:#111;border:1px solid var(--cecilAccent,#ff6500);color:#fff;padding:12px 18px;border-radius:18px;z-index:9999;opacity:0;transition:.25s;box-shadow:0 0 24px rgba(0,0,0,.65);font-weight:800;letter-spacing:.04em}
+.cecilToast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.quickdock-hidden .quickDock{display:none!important}
+.phase17.compact-mode .fieldStrip,.phase17.compact-mode .sessionBar{display:none!important}
+.phase17.compact-mode #home .heroSubtitle{display:none!important}
+.phase17.compact-mode .cecilControlDeck{margin-bottom:10px}
+.phase17.compact-mode .cecilDrop:not([open]){margin:6px 0}
+.phase17.master-mode .fieldStrip,.phase17.master-mode .sessionBar{display:grid!important}
+.phase17.master-mode .quickDock{display:grid!important}
+.phase17 .cecilDrop summary{font-size:18px;display:flex;align-items:center;justify-content:space-between}
+.phase17 .cecilDrop summary:after{content:'OPEN';font-size:11px;color:var(--cecilAccent,#ff6500);letter-spacing:.12em}
+.phase17 .cecilDrop[open] summary:after{content:'CLOSE'}
+.phase17 .dropGrid button,.phase17 .buttonRow button{min-height:48px}
+.phase17 .clockButtonGrid{grid-template-columns:repeat(4,1fr);gap:10px}
+.phase17 .bigClockBtn{min-height:64px;font-size:16px;border-radius:18px}
+.phase17 .bigClockBtn.pause{background:linear-gradient(#ffc247,#d98b00);color:#111}
+.phase17 .bigClockBtn.resume{background:linear-gradient(#3b82f6,#174ea6);color:#fff}
+.phase17 .employeePicker{grid-template-columns:1fr 1fr 1fr;gap:10px}
+.phase17 .clockStatusHero{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:18px;padding:18px;background:linear-gradient(135deg,rgba(255,101,0,.18),rgba(0,0,0,.25));margin:12px 0}
+.phase17 .clockStatusHero b{font-size:20px;color:var(--cecilAccent,#ff6500)}
+.phase17 .clockStatusHero span{font-size:26px;font-weight:900}
+.phase17 #pcAdmin .releaseList span{display:block;padding:10px;border-bottom:1px solid var(--line)}
+.phase17 #pcAdminOut .smartGrid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.phase17 .truckCard.noTruck .truckData .dataCell:not(:first-child){display:none}
+.phase17 .truckCard.noTruck .changeTruckBtn:after{content:' / SCAN OR ENTER VIN'}
+@media(max-width:700px){
+  .phase17 .layoutTopRow{grid-template-columns:1fr 1fr;}
+  .phase17 .employeePicker{grid-template-columns:1fr;}
+  .phase17 .clockButtonGrid{grid-template-columns:1fr 1fr;}
+  .phase17 .bigClockBtn{min-height:58px;}
+}

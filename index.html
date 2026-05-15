@@ -43,6 +43,7 @@
     <button onclick="showScreen('debugPro')">🧪 Debug / QA</button>
     <button onclick="showScreen('releasePro')">🚀 Final Release</button>
     <button onclick="showScreen('aiBrainPro')">🧠 AI Brain / Vector Search</button>
+    <button onclick="openPcAdmin()">🖥️ PC Admin / Payroll</button>
     <button onclick="showScreen('team')">👥 Team / Tech Viewer</button>
     <button onclick="showScreen('voice')">🎙️ Voice Navigator</button>
     <button onclick="toggleSideMenu()">✖ Close</button>
@@ -128,6 +129,7 @@
       <div class="layoutTopRow">
         <button class="modeToggle active" id="compactModeBtn" onclick="setCecilLayoutMode('compact')">COMPACT</button>
         <button class="modeToggle" id="masterModeBtn" onclick="setCecilLayoutMode('master')">MASTER</button>
+        <button class="modeToggle" onclick="toggleQuickDock()">DOCK</button>
         <select id="themeSelect" onchange="setCecilTheme(this.value)">
           <option value="theme-orange">Orange/Black</option>
           <option value="theme-blue">Gunmetal Blue</option>
@@ -185,6 +187,7 @@
           <button onclick="loadJobHistoryCloud()">Cloud Job History</button>
           <button onclick="showScreen('team')">Employees</button>
           <button onclick="showScreen('settings')">Settings</button>
+          <button onclick="openPcAdmin()">PC Admin</button>
         </div>
       </details>
     </section>
@@ -907,6 +910,39 @@
 </section>
 
     <section id="brainOut" class="resultBox">Live Retrieval ready. Search symptoms, manuals, case notes, verified fixes, or component maps.</section>
+  </main>
+
+
+
+  <!-- PHASE 17 PC ADMIN / PAYROLL CONTROL CENTER -->
+  <main id="pcAdmin" class="screen">
+    <h1 class="screenTitle">PC ADMIN / PAYROLL CONTROL CENTER</h1>
+    <section class="resultBox compactIntro">
+      <h2>Bookkeeping + Shop Control</h2>
+      <p>Built for the phone now, ready to expand into a PC dashboard later. Tracks employee time, payroll export, invoice parts, offline queue, and job data.</p>
+      <div class="buttonRow">
+        <button onclick="renderPcAdminDashboard()">REFRESH ADMIN</button>
+        <button onclick="showPayrollSummary()">PAYROLL DASHBOARD</button>
+        <button onclick="exportPayrollCSV()">EXPORT PAYROLL CSV</button>
+        <button onclick="exportBookkeepingJSON()">EXPORT BOOKKEEPING JSON</button>
+        <button onclick="enableOfflineCaching()">ENABLE OFFLINE CACHE</button>
+        <button onclick="cacheCurrentJobOffline()">SAVE OFFLINE SNAPSHOT</button>
+      </div>
+    </section>
+    <section id="pcAdminOut" class="resultBox">PC Admin dashboard loading...</section>
+    <section class="resultBox">
+      <h2>Future PC Modules</h2>
+      <div class="releaseList">
+        <span>✓ Employee time cards</span>
+        <span>✓ Payroll export</span>
+        <span>✓ Job costing</span>
+        <span>✓ Supplier spend</span>
+        <span>✓ Invoice history</span>
+        <span>✓ Bookkeeping export</span>
+        <span>✓ Offline sync queue</span>
+        <span>✓ Repair history by VIN</span>
+      </div>
+    </section>
   </main>
 
   <!-- BOTTOM NAV -->

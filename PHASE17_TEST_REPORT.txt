@@ -1,0 +1,37 @@
+ROLLING CECIL PHASE 17 TEST REPORT
+
+Static checks run:
+- app.js syntax: PASS (node --check)
+- onclick handlers scanned: 181
+- unique button/function targets: 97
+- missing handlers: 0 []
+
+Included Phase 17 changes:
+- Compact/Master layout toggle retained and expanded
+- Color theme selector retained
+- Quick dock show/hide toggle
+- Collapsible workflow home sections
+- Employee ID/name/rate time clock
+- Pause/resume/clock out payroll flow
+- Payroll summary + CSV export
+- PC Admin/bookkeeping control center
+- Offline cache/register and offline job snapshot
+- Safer supplier search handler
+- Safer interchange handler
+- OCR cleanup AI fallback and SQL extraction hooks
+- VIN text extraction SQL hook
+- Camera input stabilization: accept image/* + environment capture
+- Hybrid RAG fallback when RPC is missing
+
+Live checks still required after GitHub upload:
+1. Open ?v=1700
+2. Run Debug > Full QA Check
+3. Test Master Search
+4. Test Part Lookup
+5. Test Camera/OCR with a part label
+6. Test Employee Clock: in/pause/resume/out/save payroll
+7. Test PC Admin exports
+8. Test Supplier Search and Interchange buttons
+
+Backend file to run in Supabase:
+- phase17_backend_control_center.sql

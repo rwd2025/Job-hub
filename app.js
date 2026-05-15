@@ -2207,3 +2207,210 @@ window.addEventListener("DOMContentLoaded",()=>{
   try{ renderClock(); setInterval(renderClock,15000); }catch(e){}
   try{ renderPayrollSummary(); }catch(e){}
 });
+
+
+/* ===============================
+   PHASE 17 FULL CONTROL RELEASE
+   Compact/Master UI, PC Admin, OCR stability, offline cache, safe handlers
+   =============================== */
+
+const CECIL_PHASE17 = "17.0-clean-control";
+
+function cecilToast(msg){
+  try{
+    let box=document.getElementById("cecilToast");
+    if(!box){ box=document.createElement("div"); box.id="cecilToast"; box.className="cecilToast"; document.body.appendChild(box); }
+    box.textContent=msg; box.classList.add("show"); setTimeout(()=>box.classList.remove("show"),2600);
+  }catch(e){ console.log(msg); }
+}
+
+function cecilSafeGet(id){ return document.getElementById(id); }
+function cecilSetHTML(id, html){ const el=cecilSafeGet(id); if(el) el.innerHTML=html; }
+function cecilSetText(id, text){ const el=cecilSafeGet(id); if(el) el.textContent=text; }
+
+function toggleCecilPanel(id){ const el=cecilSafeGet(id); if(el) el.classList.toggle("open"); }
+function openCecilPanel(id){ const el=cecilSafeGet(id); if(el) el.classList.add("open"); }
+function closeCecilPanel(id){ const el=cecilSafeGet(id); if(el) el.classList.remove("open"); }
+
+// Keep layout modes available from every screen.
+function toggleMasterCompact(){
+  const current = localStorage.getItem("cecil_layout_mode") || "compact";
+  setCecilLayoutMode(current === "master" ? "compact" : "master");
+}
+
+function setQuickDockMode(mode){
+  mode = mode === "hidden" ? "hidden" : "visible";
+  localStorage.setItem("cecil_quickdock", mode);
+  document.body.classList.toggle("quickdock-hidden", mode === "hidden");
+}
+function toggleQuickDock(){ setQuickDockMode((localStorage.getItem("cecil_quickdock")||"visible") === "visible" ? "hidden" : "visible"); }
+
+// Safer supplier/interchange handlers for all old buttons.
+function openSupplierSearch(kind){
+  const part = (($("partq")?.value || $("manualPartNumber")?.value || $("backendSearchQ")?.value || $("visionClean")?.value || window.lastScannedPart || "truck parts")+"").trim();
+  const map={fleetpride:"FleetPride",napa:"NAPA truck parts",oreilly:"O'Reilly Auto Parts",google:"heavy duty truck parts",dealer:"truck dealer parts",kenworth:"Kenworth parts",freightliner:"Freightliner parts",cummins:"Cummins parts"};
+  const label=map[kind] || kind || "heavy duty truck parts";
+  window.open(`https://www.google.com/maps/search/${encodeURIComponent(label + " " + part)}`,"_blank");
+}
+async function runInterchangeOnly(){
+  const q = ($("backendSearchQ")?.value || $("partq")?.value || $("manualPartNumber")?.value || window.lastScannedPart || "").trim();
+  if(!q){ alert("Enter or scan a part number first."); return; }
+  if($("backendSearchQ")) setValue("backendSearchQ", q);
+  if(typeof runInterchangeChain === "function") return runInterchangeChain();
+  cecilSetHTML("backendOut", `<div class="smartCard"><div class="smartCardTitle"><span>INTERCHANGE SEARCH</span><span class="badge warn">LOCAL</span></div><div class="smartNote">No recursive interchange RPC found on this build. Search: ${safeText(q)}</div></div>`);
+  showScreen("backendPro");
+}
+function addBestInterchangeToInvoice(){
+  const q = ($("backendSearchQ")?.value || $("partq")?.value || $("manualPartNumber")?.value || window.lastScannedPart || "Best Interchange").trim();
+  setValue("manualPartName", q); setValue("manualPartNumber", q);
+  if(typeof addManualPartToInvoice === "function") addManualPartToInvoice();
+}
+
+// Offline queue + service worker cache controls.
+function cacheCurrentJobOffline(){
+  const payload={
+    type:"offline_job_snapshot", at:new Date().toISOString(), activeTruck:getActiveTruck(), clock:getEmployeeClock ? getEmployeeClock() : {},
+    invoice: $("quoteOut")?.textContent || "", parts: typeof getInvoiceParts === "function" ? getInvoiceParts() : [], lastSearch: $("doctorAsk")?.value || $("partq")?.value || ""
+  };
+  const q=getOfflineQueue ? getOfflineQueue() : JSON.parse(localStorage.getItem("offlineQueue")||"[]"); q.unshift(payload);
+  if(typeof saveOfflineQueue === "function") saveOfflineQueue(q); else localStorage.setItem("offlineQueue", JSON.stringify(q.slice(0,100)));
+  cecilToast("Offline job snapshot saved.");
+}
+async function enableOfflineCaching(){
+  try{
+    if("serviceWorker" in navigator){ await navigator.serviceWorker.register("service-worker.js"); }
+    localStorage.setItem("cecil_offline_enabled","true"); cecilToast("Offline cache enabled.");
+  }catch(e){ alert("Offline cache setup failed: "+e.message); }
+}
+
+// OCR cleanup AI: backend SQL extraction first, then local fallback. No fragile JSON parsing.
+async function extractPartsBackendFromText(rawText, vinText=null, scanType="parts_photo"){
+  if(!supabaseClient) return null;
+  try{
+    const {data,error}=await supabaseClient.rpc("extract_part_numbers_from_text", {input_text: rawText, vin_text: vinText, scan_type_text: scanType});
+    if(error) throw error;
+    return data;
+  }catch(e){ console.warn("extract_part_numbers_from_text failed", e.message); return null; }
+}
+async function extractVinBackendFromText(rawText){
+  if(!supabaseClient) return null;
+  try{
+    const {data,error}=await supabaseClient.rpc("extract_vin_from_text", {input_text: rawText});
+    if(error) throw error;
+    return data;
+  }catch(e){ console.warn("extract_vin_from_text failed", e.message); return null; }
+}
+function ocrCleanupText(raw){
+  return normalizeScanText(String(raw||""))
+    .replace(/\bPACCAR\b/g,"PACCAR")
+    .replace(/\bPACC4R\b/g,"PACCAR")
+    .replace(/\b0TY\b/g,"QTY")
+    .trim();
+}
+function renderOcrExtractionResult(raw, backend, vinResult){
+  const localParts=extractPartCandidates(raw);
+  const nums=backend?.part_numbers || localParts;
+  const vin=vinResult?.vin || (normalizeScanText(raw).match(/\b[A-HJ-NPR-Z0-9]{17}\b/)||[])[0] || "";
+  const best=vin || nums[0] || bestVisionCandidate(raw);
+  setValue("visionClean", best);
+  window.lastScannedPart = nums[0] || best;
+  let html=`<div class="smartCardTitle"><span>OCR CLEANUP COMPLETE</span><span class="badge good">${nums.length} PARTS</span></div>`;
+  html += `<div class="smartGrid">${gridCell("BEST",best||"—")}${gridCell("VIN",vin||"—")}${gridCell("PARTS",nums.join(", ")||"—")}</div>`;
+  html += `<div class="smartNote">${safeText(String(raw).slice(0,900))}</div>`;
+  cecilSetHTML("visionOut", html);
+  return {best, vin, part_numbers:nums};
+}
+
+// Override scanVisionPhoto to avoid non-JSON OCR crashes and use SQL extraction.
+scanVisionPhoto = async function(){
+  const img=visionImageData();
+  const rawManual=$("visionRaw")?.value?.trim() || "";
+  const type=$("visionType")?.value || "Part Label";
+  if(!img && !rawManual){ alert("Add a photo or paste text first."); return; }
+  cecilSetText("visionOut", "Scanning / cleaning OCR...");
+  let raw=rawManual;
+  try{
+    if(img && !rawManual){
+      try{
+        const data=await callOracle({mode:"diesel_ai", part_query:`OCR scan ${type}`, question:`Read this ${type}. Extract only visible VINs, part numbers, brands, label text, and quantities. Return plain text.`, note:{image:img.split(",")[1], scan_type:type, vehicleContext:ctx()}});
+        raw = data?.answer || data?.message || data?.data?.text || data?.data?.notes?.join("\n") || "";
+      }catch(e){
+        raw = "OCR image AI unavailable. Paste or correct visible label text here, then tap CLEAN TEXT.";
+      }
+    }
+    raw=ocrCleanupText(raw);
+    setValue("visionRaw", raw);
+    const backend=await extractPartsBackendFromText(raw, activeVin ? activeVin() : null, type);
+    const vinResult=await extractVinBackendFromText(raw);
+    const result=renderOcrExtractionResult(raw, backend, vinResult);
+    const scans=getVisionScans();
+    scans.unshift({type, raw:String(raw).slice(0,1200), cleaned:result.best, note:$("visionNote")?.value || "", vin:result.vin || activeVin(), truck:activeTruckSummary(), image:img, saved_at:new Date().toLocaleString(), part_numbers:result.part_numbers});
+    saveVisionScans(scans);
+  }catch(e){ cecilSetText("visionOut", "OCR cleanup error: "+e.message); }
+};
+cleanVisionText = async function(){
+  const raw=ocrCleanupText($("visionRaw")?.value || "");
+  setValue("visionRaw", raw);
+  const backend=await extractPartsBackendFromText(raw, activeVin ? activeVin() : null, $("visionType")?.value || "parts_photo");
+  const vinResult=await extractVinBackendFromText(raw);
+  renderOcrExtractionResult(raw, backend, vinResult);
+};
+
+function stabilizeCameraInputs(){
+  ["visionImage","partPhoto","fieldPhoto","homeAiImage"].forEach(id=>{
+    const el=$(id); if(!el) return;
+    el.setAttribute("accept","image/*");
+    el.setAttribute("capture","environment");
+  });
+}
+
+// PC/Admin dashboard helpers.
+function renderPcAdminDashboard(){
+  const box=$("pcAdminOut"); if(!box) return;
+  const payroll=getPayrollRecords ? getPayrollRecords() : [];
+  const parts=typeof getInvoiceParts === "function" ? getInvoiceParts() : [];
+  const off=typeof getOfflineQueue === "function" ? getOfflineQueue() : [];
+  const totalHours=payroll.reduce((s,r)=>s+Number(r.billable_hours||0),0);
+  const totalPay=payroll.reduce((s,r)=>s+Number(r.total_pay||0),0);
+  box.innerHTML=`<div class="smartGrid">${gridCell("PAYROLL RECORDS",payroll.length)}${gridCell("TOTAL HOURS",totalHours.toFixed(2))}${gridCell("TOTAL PAY",money(totalPay))}${gridCell("INVOICE PARTS",parts.length)}${gridCell("OFFLINE QUEUE",off.length)}${gridCell("VERSION",CECIL_PHASE17)}</div>`;
+}
+function exportPayrollCSV(){
+  const rows=getPayrollRecords ? getPayrollRecords() : [];
+  const head=["employee_id","employee_name","clock_in","clock_out","pause_minutes","billable_hours","hourly_rate","total_pay","vin","status"];
+  const csv=[head.join(",")].concat(rows.map(r=>head.map(k=>`"${String(r[k]??"").replace(/"/g,'""')}"`).join(","))).join("\n");
+  navigator.clipboard?.writeText(csv);
+  const blob=new Blob([csv],{type:"text/csv"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`rolling-cecil-payroll-${Date.now()}.csv`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+function exportBookkeepingJSON(){
+  const data={at:new Date().toISOString(), payroll:getPayrollRecords?getPayrollRecords():[], invoices:JSON.parse(localStorage.getItem("savedInvoices")||"[]"), parts:typeof getInvoiceParts==="function"?getInvoiceParts():[], offline:typeof getOfflineQueue==="function"?getOfflineQueue():[]};
+  const text=JSON.stringify(data,null,2); navigator.clipboard?.writeText(text);
+  const blob=new Blob([text],{type:"application/json"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`rolling-cecil-bookkeeping-${Date.now()}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+function openPcAdmin(){ renderPcAdminDashboard(); showScreen("pcAdmin"); }
+
+// Safer RAG fallback so missing RPC does not show red dead-end.
+runHybridRagSearch = async function(){
+  const q = $("brainSearchText")?.value.trim() || $("doctorAsk")?.value.trim() || $("partq")?.value.trim() || "";
+  if(!q){ brainWrite("Enter a question first for Hybrid RAG Search."); return; }
+  brainWrite("Running Hybrid repair search...");
+  try{
+    let data=null;
+    try{
+      const r=await supabaseClient.rpc("rolling_cecil_hybrid_rag_search", {search_text:q, vin_text: activeVin() || null});
+      if(r.error) throw r.error; data=r.data;
+    }catch(missing){
+      const manual = await (supabaseClient ? supabaseClient.rpc("manual_knowledge_search", {search_text:q, engine_text:getActiveTruck().engine || null}).catch(()=>({data:null})) : {data:null});
+      const smart = await (supabaseClient ? supabaseClient.rpc("smart_workflow_engine", {search_text:q, vin_text:activeVin()||null, engine_text:getActiveTruck().engine||null}).catch(()=>({data:null})) : {data:null});
+      data={status:"ok", fallback:true, knowledge:manual.data?.manuals || [], repair_memory:smart.data?.repair_intelligence?.intelligence || [], route_plan:{route:"Fallback SQL/manual workflow"}};
+    }
+    brainWrite(renderPhase13RagCards(q, data || {}));
+  }catch(e){ brainWrite(renderErrorCard("Hybrid Search Error", e.message)); }
+};
+
+window.addEventListener("DOMContentLoaded",()=>{
+  try{ document.body.classList.add("phase17"); }catch(e){}
+  try{ setQuickDockMode(localStorage.getItem("cecil_quickdock") || "visible"); }catch(e){}
+  try{ stabilizeCameraInputs(); }catch(e){}
+  try{ renderPcAdminDashboard(); }catch(e){}
+  try{ if($("debugVersion")) $("debugVersion").textContent = CECIL_PHASE17; }catch(e){}
+});
