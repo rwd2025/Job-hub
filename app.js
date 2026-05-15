@@ -2723,5 +2723,45 @@ askPart = async function(){
 };
 
 window.addEventListener('DOMContentLoaded',()=>{
-  try{ if($('debugVersion')) $('debugVersion').textContent = CECIL_PHASE19; }catch(e){}
-});
+  try{ if($('debugVersion')) $('debugVersion').textContent = CECIL_PHASE19; }catch(
+
+
+/* ===============================
+   FIX FAKE 0 HITS AFTER ORACLE MATCH
+   =============================== */
+
+function cecilHasOracleAnswer(result){
+  return !!(
+    result?.success ||
+    result?.answer ||
+    result?.data?.oem_part ||
+    result?.parts?.length
+  );
+}
+
+const __oldPhase8MasterSearch = phase8MasterSearch;
+
+phase8MasterSearch = async function(){
+  const q = phase8SearchInput();
+
+  await __oldPhase8MasterSearch();
+
+  const partText = $("partOut")?.innerText || $("doctorOut")?.innerText || "";
+
+  const hasMatch =
+    partText.includes("PARTS TECH ANSWER") ||
+    partText.includes("Best OEM") ||
+    partText.includes("3692580") ||
+    partText.includes("smart_part_number_lookup");
+
+  if(hasMatch){
+    document.querySelectorAll(".badge").forEach(b=>{
+      if(b.textContent.trim() === "0 HITS" || b.textContent.trim() === "NO LOCAL MATCH"){
+        b.textContent = "MATCH FOUND";
+        b.classList.remove("warn");
+        b.classList.add("good");
+      }
+    });
+  }
+};
+
