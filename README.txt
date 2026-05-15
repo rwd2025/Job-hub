@@ -1,22 +1,39 @@
-Rolling Cecil AI — Embedding Router Vector Fix
+ROLLING CECIL AI
+MASTER SEARCH HOOK FIX
 
-This rebuild fixes the search issue where matches returned [].
+WHAT THIS FIXES:
+- Smart Repair Kit showing NO KIT
+- Local Database showing 0 HITS
+- Repair kits not loading
 
-What changed:
-- Search embeddings are converted to pgvector string format.
-- Search calls match_knowledge_base_v2.
-- Ingest still saves embeddings to knowledge_base_embeddings.
+WHY:
+The frontend patch exists already.
+But your main search function is NOT triggering it.
 
-Deploy:
-1. Open Supabase > Edge Functions > embedding-router > Code.
-2. Replace the whole index.ts with supabase/functions/embedding-router/index.ts.
-3. Deploy updates.
-4. Test with:
+INSTALL:
+1. Open index.html in GitHub.
+2. Search:
+   runMasterSearch(
+   OR:
+   masterSearch(
+3. Inside that function:
+   paste contents of:
+   master_search_hook_patch.js
 
-{
-  "mode": "search",
-  "question": "X15 rough idle and stutter",
-  "match_count": 5
-}
+IMPORTANT:
+Paste it RIGHT AFTER searchTerm is created.
 
-If search still returns empty, run supabase_vector_search_fix.sql in Supabase SQL Editor.
+THEN:
+Commit changes.
+
+Open:
+https://rwd2025.github.io/Job-hub/?v=2102
+
+TEST:
+X15 water pump
+
+EXPECTED:
+- OEM 3692580
+- ALT 3692580RX
+- repair kit loads
+- local database populates
