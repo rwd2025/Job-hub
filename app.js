@@ -2723,8 +2723,14 @@ askPart = async function(){
 };
 
 window.addEventListener('DOMContentLoaded',()=>{
-  try{ if($('debugVersion')) $('debugVersion').textContent = CECIL_PHASE19; }catch(
 
+  try{
+    if($('debugVersion')){
+      $('debugVersion').textContent = CECIL_PHASE19;
+    }
+  }catch(e){}
+
+});
 
 /* ===============================
    FIX FAKE 0 HITS AFTER ORACLE MATCH
