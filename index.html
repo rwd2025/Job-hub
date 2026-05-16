@@ -1090,9 +1090,7 @@ This provides the shared screen header used by workspace screens.
   <button class="rwWorkspaceClear" type="button" onclick="rwClearCurrentWorkspace()">CLEAR</button>
 </div>
 
-<!-- OPTIONAL QUICK TOOLS COLLAPSE
-Paste on HOME if you still want fast access without permanent clutter.
--->
+<!-- OPTIONAL QUICK TOOLS COLLAPSE -->
 <div class="rwQuickToolsCollapse"> 
   <button class="rwQuickToolsBtn" type="button" onclick="rwToggleQuickTools()">⚡ QUICK TOOLS</button>
   <div id="rwQuickToolsPanel" class="rwQuickToolsPanel">
@@ -1108,20 +1106,20 @@ Paste on HOME if you still want fast access without permanent clutter.
     <button onclick="rwGo('release','release')">RELEASE</button>
     <button onclick="rwGo('savejob','savejob')">SAVE JOB</button>
   </div>
+</div>
 
+<!-- THEME / GRAPHICS PANEL -->
+<!-- Paste contents of 01_theme_graphics_panel.html here -->
 
 <link rel="stylesheet" href="02_combined_ui_patch.css">
 <link rel="stylesheet" href="02_clean_home_overlay.css">
 <link rel="stylesheet" href="02_workspace_back_clear.css">
+<link rel="stylesheet" href="02_theme_graphics_engine.css">
 
 <script src="03_combined_ui_patch.js"></script>
 <script src="03_clean_home_overlay.js"></script>
 <script src="03_workspace_back_clear.js"></script>
+<script src="03_theme_graphics_engine.js"></script>
 
 </body>
-
-  
-</body
-
-  
 </html>
