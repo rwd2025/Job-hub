@@ -32,59 +32,87 @@
     <button class="iconBtn" onclick="showScreen('settings')">⚙️</button>
   </header>
 
-  <!-- SIDE MENU -->
-  <aside id="sideMenu" class="sideMenu">
-    <button onclick="showScreen('settings')">⚙️ Settings</button>
-    <button onclick="showScreen('invoice')">💵 Invoice / Quote</button>
-    <button onclick="showScreen('timeClock')">⏱️ Time Clock</button>
-    <button onclick="showScreen('fieldTools')">📍 Field Tools</button>
-    <button onclick="showScreen('visionPro')">📷 OCR / Vision Pro</button>
-    <button onclick="showScreen('backendPro')">🗄️ Backend Pro</button>
-    <button onclick="showScreen('debugPro')">🧪 Debug / QA</button>
-    <button onclick="showScreen('releasePro')">🚀 Final Release</button>
-    <button onclick="showScreen('aiBrainPro')">🧠 AI Brain / Vector Search</button>
-    <button onclick="openPcAdmin()">🖥️ PC Admin / Payroll</button>
-    <button onclick="showScreen('team')">👥 Team / Tech Viewer</button>
-    <button onclick="showScreen('voice')">🎙️ Voice Navigator</button>
-    <button onclick="toggleSideMenu()">✖ Close</button>
-  </aside>
+<!-- SIDE MENU -->
+<aside id="sideMenu" class="sideMenu">
 
-  <!-- ACTIVE TRUCK CARD -->
-  <section class="truckCard">
-    <div class="truckImage">🚛</div>
+  <button onclick="showScreen('settings')">◈ SETTINGS</button>
 
-    <div class="truckData">
-      <div class="dataCell">
-        <small>VIN</small>
-        <strong id="activeVin">NONE</strong>
-      </div>
-      <div class="dataCell">
-        <small>YEAR</small>
-        <strong id="activeYear">----</strong>
-      </div>
-      <div class="dataCell">
-        <small>MAKE</small>
-        <strong id="activeMake">----</strong>
-      </div>
-      <div class="dataCell">
-        <small>MODEL</small>
-        <strong id="activeModel">----</strong>
-      </div>
-      <div class="dataCell">
-        <small>ENGINE</small>
-        <strong id="activeEngine">----</strong>
-      </div>
-      <div class="dataCell">
-        <small>ESN</small>
-        <strong id="activeEsn">----</strong>
-      </div>
-      <div class="dataCell">
-        <small>CPL</small>
-        <strong id="activeCpl">----</strong>
-      </div>
-      <button class="changeTruckBtn" onclick="showScreen('vin')">CHANGE TRUCK</button>
+  <button onclick="showScreen('invoice')">◌ INVOICE / QUOTE</button>
+
+  <button onclick="showScreen('timeClock')">◍ TIME CLOCK</button>
+
+  <button onclick="showScreen('fieldTools')">◬ FIELD TOOLS</button>
+
+  <button onclick="showScreen('visionPro')">◐ OCR / VISION</button>
+
+  <button onclick="showScreen('backendPro')">▤ BACKEND PRO</button>
+
+  <button onclick="showScreen('debugPro')">✦ DEBUG / QA</button>
+
+  <button onclick="showScreen('releasePro')">✧ FINAL RELEASE</button>
+
+  <button onclick="showScreen('aiBrainPro')">⬡ AI BRAIN PRO</button>
+
+  <button onclick="openPcAdmin()">▣ PC ADMIN</button>
+
+  <button onclick="showScreen('team')">◎ TEAM VIEWER</button>
+
+  <button onclick="showScreen('voice')">◉ VOICE NAVIGATOR</button>
+
+  <button onclick="toggleSideMenu()">✕ CLOSE</button>
+
+</aside>
+
+
+<!-- ACTIVE TRUCK CARD -->
+<section class="truckCard">
+
+  <div class="truckImage">⬢</div>
+
+  <div class="truckData">
+
+    <div class="dataCell">
+      <small>VIN</small>
+      <strong id="activeVin">NONE</strong>
     </div>
-  </section>
+
+    <div class="dataCell">
+      <small>YEAR</small>
+      <strong id="activeYear">----</strong>
+    </div>
+
+    <div class="dataCell">
+      <small>MAKE</small>
+      <strong id="activeMake">----</strong>
+    </div>
+
+    <div class="dataCell">
+      <small>MODEL</small>
+      <strong id="activeModel">----</strong>
+    </div>
+
+    <div class="dataCell">
+      <small>ENGINE</small>
+      <strong id="activeEngine">----</strong>
+    </div>
+
+    <div class="dataCell">
+      <small>ESN</small>
+      <strong id="activeEsn">----</strong>
+    </div>
+
+    <div class="dataCell">
+      <small>CPL</small>
+      <strong id="activeCpl">----</strong>
+    </div>
+
+    <button class="changeTruckBtn" onclick="showScreen('vin')">
+      CHANGE TRUCK
+    </button>
+
+  </div>
+
+</section> 
 
 
   <section class="fieldStrip">
@@ -108,6 +136,91 @@
   
 <main id="home" class="screen active">
 
+<section class="toolGrid">
+
+  <button class="toolCard" onclick="showScreen('vin')">
+    <div class="toolIcon">⬢</div>
+    <h2>VIN LOOKUP</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('parts')">
+    <div class="toolIcon">◈</div>
+    <h2>PARTS</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('dieselAI')">
+    <div class="toolIcon">◎</div>
+    <h2>DIESEL AI</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('faultDoctor')">
+    <div class="toolIcon">✦</div>
+    <h2>FAULT DOCTOR</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('repairHud')">
+    <div class="toolIcon">⬣</div>
+    <h2>REPAIR HUD</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('schematics')">
+    <div class="toolIcon">⌬</div>
+    <h2>X-RAY / SCHEMATICS</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('voice')">
+    <div class="toolIcon">◉</div>
+    <h2>VOICE NAVIGATOR</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('team')">
+    <div class="toolIcon">▣</div>
+    <h2>TEAM VIEWER</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('invoice')">
+    <div class="toolIcon">◌</div>
+    <h2>INVOICE</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('timeClock')">
+    <div class="toolIcon">◍</div>
+    <h2>TIME CLOCK</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('visionPro')">
+    <div class="toolIcon">◐</div>
+    <h2>VISION</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('fieldTools')">
+    <div class="toolIcon">◬</div>
+    <h2>FIELD TOOLS</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('backendPro')">
+    <div class="toolIcon">▤</div>
+    <h2>BACKEND PRO</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('aiBrainPro')">
+    <div class="toolIcon">⬡</div>
+    <h2>AI BRAIN PRO</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('releasePro')">
+    <div class="toolIcon">✧</div>
+    <h2>FINAL RELEASE</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('settings')">
+    <div class="toolIcon">◈</div>
+    <h2>SETTINGS</h2>
+  </button>
+
+</section>
+
+  
   <section class="statusGrid">
     <div><b>☁️ CONNECTION</b><span>Online</span><small>All systems operational</small></div>
     <div><b>🛡️ OEM GATEWAY</b><span>Connected</span><small>PACCAR, Cummins, Detroit ready</small></div>
