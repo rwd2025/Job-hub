@@ -1,0 +1,133 @@
+
+/* =========================================================
+ROLLING WRENCH AI - MASTER CHAT BAR STYLE
+========================================================= */
+
+.rwMasterChatBar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  padding:10px 12px;
+  box-sizing:border-box;
+}
+
+.rwMasterPlus{
+  width:64px;
+  height:64px;
+  min-width:64px;
+  border-radius:50%;
+  border:none;
+  background:#f4f4f4;
+  color:#000;
+  font-size:48px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 3px 10px rgba(0,0,0,.25);
+}
+
+.rwMasterInputWrap{
+  flex:1;
+  min-height:64px;
+  border-radius:30px;
+  background:#f4f4f4;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:0 10px 0 16px;
+  box-shadow:0 3px 10px rgba(0,0,0,.25);
+}
+
+.rwMasterInput{
+  flex:1;
+  border:none;
+  outline:none;
+  background:transparent;
+  color:#111;
+  font-size:28px;
+  line-height:34px;
+  min-height:38px;
+  max-height:120px;
+  resize:none;
+  overflow:auto;
+  font-family:inherit;
+}
+
+.rwMasterInput::placeholder{
+  color:#8c8c8c;
+}
+
+.rwMasterMic{
+  width:46px;
+  height:46px;
+  min-width:46px;
+  border:none;
+  background:transparent;
+  color:#555;
+  font-size:30px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.rwMasterSend{
+  width:54px;
+  height:54px;
+  min-width:54px;
+  border-radius:50%;
+  border:none;
+  background:#000;
+  color:#fff;
+  font-size:24px;
+  font-weight:900;
+  letter-spacing:-6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding-right:6px;
+}
+
+.masterImagePreview{
+  display:none;
+  width:calc(100% - 24px);
+  max-height:220px;
+  object-fit:contain;
+  border-radius:16px;
+  margin:8px 12px 12px;
+  border:1px solid #333;
+  background:#080808;
+}
+
+/* Dark app wrapper support */
+body.dark .rwMasterPlus,
+body.dark .rwMasterInputWrap{
+  background:#f4f4f4;
+}
+
+/* Smaller phones */
+@media(max-width:420px){
+  .rwMasterPlus{
+    width:58px;
+    height:58px;
+    min-width:58px;
+    font-size:42px;
+  }
+
+  .rwMasterInputWrap{
+    min-height:58px;
+    border-radius:28px;
+  }
+
+  .rwMasterInput{
+    font-size:24px;
+    line-height:30px;
+  }
+
+  .rwMasterSend{
+    width:50px;
+    height:50px;
+    min-width:50px;
+  }
+}

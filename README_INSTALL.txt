@@ -1,56 +1,40 @@
-ROLLING WRENCH AI - COMBINED UI PATCH
 
-THIS ONE ZIP INCLUDES:
-✅ Top-right RW logo/settings button
-✅ Settings panel opens from top-right button
-✅ Compact / Master / Dock / Theme moved into settings
-✅ Master ChatGPT-style input bar
-✅ + image button for photo library/camera
-✅ Mic button
-✅ Send/AI button
-✅ Master image routing to Rolling Wrench AI Vision
-✅ Compact duplicate cleanup
-✅ App manifest renamed to Rolling Wrench AI / RW AI
+ROLLING WRENCH AI - MASTER CHAT BAR PATCH
+
+WHAT THIS DOES:
+- Replaces bulky MASTER input with ChatGPT-style bar
+- Big + button on left for camera/photo library
+- Large text box
+- Mic button
+- Black AI/send button
+- Routes attached image to Rolling Wrench AI Vision
+- Keeps MASTER clean and compact
 
 INSTALL:
-1. Replace old dead gear button with the top-right section from:
-   01_combined_ui_patch.html
+1. Replace old MASTER input/button area with:
+   01_master_chatbar.html
 
-2. Replace old MASTER input area with the MASTER CHAT BAR section from:
-   01_combined_ui_patch.html
+2. Paste:
+   02_master_chatbar.css
+   into CSS.
 
 3. Paste:
-   02_combined_ui_patch.css
-   into your CSS.
-
-4. Paste:
-   03_combined_ui_patch.js
+   03_master_chatbar.js
    before closing </script>.
 
-5. Use:
-   manifest.json
-   to replace your current manifest if it still says Cecil AI.
+4. IMPORTANT:
+   At the TOP of your existing runMasterSearch() function add:
 
-6. Remove or hide old big button block by adding one of these classes to its wrapper:
-   oldQuickButtonBlock
-   mainQuickButtons
-   fullHomeModules
+   if(await routeMasterSearchWithImage()) return;
 
-7. For clean compact launcher cards, add:
-   compactLauncher
-   to the wrapper with Start Work / Parts / Repair / AI Brain / Shop.
+Example:
+async function runMasterSearch(){
+  if(await routeMasterSearchWithImage()) return;
+  // old master logic here
+}
 
-IMPORTANT:
-At the TOP of your existing runMasterSearch() function add:
-
-if(await routeMasterSearchWithImage()) return;
-
-APP ICON NOTE:
-This zip includes manifest name changes, but not a final custom PNG icon.
-Use your final Rolling Wrench AI icon as:
-apple-touch-icon.png
-icon-192.png
-icon-512.png
-
-After uploading:
-Delete old Home Screen app from iPhone and re-add it from Safari so the icon/name refreshes.
+TEST:
+- Tap + button
+- Choose camera/photo library image
+- Type: What is this part?
+- Hit black AI button
