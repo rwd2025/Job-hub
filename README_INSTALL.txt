@@ -1,40 +1,30 @@
 
-ROLLING WRENCH AI - MASTER CHAT BAR PATCH
+ROLLING WRENCH AI FINAL TOP RIGHT PATCH
 
-WHAT THIS DOES:
-- Replaces bulky MASTER input with ChatGPT-style bar
-- Big + button on left for camera/photo library
-- Large text box
-- Mic button
-- Black AI/send button
-- Routes attached image to Rolling Wrench AI Vision
-- Keeps MASTER clean and compact
+THIS PATCH:
+- replaces dead gear button
+- uses Rolling Wrench AI logo button
+- opens quick settings panel
+- matches orange/black app theme
 
 INSTALL:
-1. Replace old MASTER input/button area with:
-   01_master_chatbar.html
+1. Paste:
+01_top_right_logo_button.html
+where the old dead gear button exists.
 
 2. Paste:
-   02_master_chatbar.css
-   into CSS.
+02_top_right_logo_button.css
+into your CSS.
 
 3. Paste:
-   03_master_chatbar.js
-   before closing </script>.
+03_top_right_logo_button.js
+before closing </script>.
 
-4. IMPORTANT:
-   At the TOP of your existing runMasterSearch() function add:
+4. Upload:
+rw_ai_topright_logo.png
+into same GitHub folder as index.html
 
-   if(await routeMasterSearchWithImage()) return;
+5. Remove old dead gear button HTML.
 
-Example:
-async function runMasterSearch(){
-  if(await routeMasterSearchWithImage()) return;
-  // old master logic here
-}
-
-TEST:
-- Tap + button
-- Choose camera/photo library image
-- Type: What is this part?
-- Hit black AI button
+BUTTON OPENS:
+toggleRwSettingsPanel()
