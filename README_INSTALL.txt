@@ -1,32 +1,15 @@
-ROLLING WRENCH AI - THEME / GRAPHICS ENGINE PATCH
+ROLLING WRENCH AI - CLEAN HOME OVERLAY PATCH
 
-Adds:
-- Rolling Wrench theme
-- CAT theme
-- Cummins theme
-- Detroit theme
-- PACCAR theme
-- Night Ops theme
-- Bright Shop theme
-- Carbon Steel theme
+Install:
+1. Paste 01_clean_home_overlay.html near bottom of index.html before </body>.
+2. Paste 02_clean_home_overlay.css at bottom of style.css.
+3. Paste 03_clean_home_overlay.js at bottom of app.js.
 
-Adds brightness modes:
-- Daylight
-- Shop
-- Night
-
-Adds logo styles:
-- Shop Pro
-- Chrome
-- Minimal
-- Industrial
-
-INSTALL:
-1. Paste 01_theme_graphics_panel.html inside the settings panel or near bottom of index.html before </body>.
-2. Paste 02_theme_graphics_engine.css at bottom of style.css.
-3. Paste 03_theme_graphics_engine.js at bottom of app.js.
-
-NOTES:
-These are color/style themes inspired by shop/OEM colors.
-Do not use OEM brand logos unless you have permission.
-The theme names/colors are for quick technician mode switching.
+What it does:
+- Home gets clean Ask Rolling Wrench AI bar.
+- Tap bar opens full-screen AI screen.
+- Back arrow top-left.
+- Clear button top-right.
+- Question/photo/answer stay until Clear.
+- Master Search becomes collapsed dropdown.
+- Old Home clutter gets hidden by CSS.
