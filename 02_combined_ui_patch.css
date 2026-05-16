@@ -1,0 +1,223 @@
+/* =========================================================
+ROLLING WRENCH AI - COMBINED UI PATCH CSS
+========================================================= */
+
+/* TOP RIGHT LOGO SETTINGS BUTTON */
+.rwTopRightSettings{
+  position:absolute;
+  top:12px;
+  right:12px;
+  width:72px;
+  height:72px;
+  border-radius:20px;
+  border:2px solid #ff6500;
+  background:#081018;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  box-shadow:0 0 20px rgba(255,100,0,.25), inset 0 0 10px rgba(255,255,255,.04);
+}
+
+.rwTopRightLogoText{
+  color:#fff;
+  font-weight:900;
+  font-size:24px;
+  letter-spacing:1px;
+  text-shadow:0 0 10px rgba(255,100,0,.65);
+}
+
+/* SETTINGS PANEL */
+.rwSettingsPanel{
+  position:fixed;
+  top:0;
+  right:-100%;
+  width:320px;
+  max-width:90vw;
+  height:100vh;
+  background:#081018;
+  border-left:2px solid #ff6500;
+  z-index:10000;
+  transition:right .25s ease;
+  padding:18px;
+  overflow:auto;
+}
+
+.rwSettingsPanel.open{
+  right:0;
+}
+
+.rwSettingsHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:#fff;
+  margin-bottom:18px;
+  gap:12px;
+}
+
+.rwSettingsHeader button{
+  border:1px solid #ff6500;
+  background:#111;
+  color:#fff;
+  border-radius:12px;
+  padding:8px 12px;
+}
+
+.rwSettingsGrid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+
+.rwSettingsGrid button,
+.rwSettingsGrid select{
+  min-height:58px;
+  border-radius:16px;
+  border:1px solid #ff6500;
+  background:#111820;
+  color:#fff;
+  font-weight:900;
+  letter-spacing:1px;
+  padding:12px;
+}
+
+/* MASTER CHAT BAR */
+.rwMasterChatBar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  padding:10px 12px;
+  box-sizing:border-box;
+}
+
+.rwMasterPlus{
+  width:64px;
+  height:64px;
+  min-width:64px;
+  border-radius:50%;
+  border:none;
+  background:#f4f4f4;
+  color:#000;
+  font-size:48px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 3px 10px rgba(0,0,0,.25);
+}
+
+.rwMasterInputWrap{
+  flex:1;
+  min-height:64px;
+  border-radius:30px;
+  background:#f4f4f4;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:0 10px 0 16px;
+  box-shadow:0 3px 10px rgba(0,0,0,.25);
+}
+
+.rwMasterInput{
+  flex:1;
+  border:none;
+  outline:none;
+  background:transparent;
+  color:#111;
+  font-size:28px;
+  line-height:34px;
+  min-height:38px;
+  max-height:120px;
+  resize:none;
+  overflow:auto;
+  font-family:inherit;
+}
+
+.rwMasterInput::placeholder{
+  color:#8c8c8c;
+}
+
+.rwMasterMic{
+  width:46px;
+  height:46px;
+  min-width:46px;
+  border:none;
+  background:transparent;
+  color:#555;
+  font-size:30px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.rwMasterSend{
+  width:54px;
+  height:54px;
+  min-width:54px;
+  border-radius:50%;
+  border:none;
+  background:#000;
+  color:#fff;
+  font-size:24px;
+  font-weight:900;
+  letter-spacing:-6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding-right:6px;
+}
+
+.masterImagePreview{
+  display:none;
+  width:calc(100% - 24px);
+  max-height:220px;
+  object-fit:contain;
+  border-radius:16px;
+  margin:8px 12px 12px;
+  border:1px solid #333;
+  background:#080808;
+}
+
+/* BUTTON MOVE / COMPACT CLEANUP */
+.rw-compact-mode .fullHomeModules,
+.rw-compact-mode .homeFullModules,
+.rw-compact-mode .duplicateHomeModules,
+.rw-compact-mode .oldQuickButtonBlock,
+.rw-compact-mode .mainQuickButtons{
+  display:none !important;
+}
+
+.rw-master-mode .compactLauncher{
+  display:none !important;
+}
+
+.theme-green-black{ --orange:#35d46a; }
+.theme-blue-black{ --orange:#2f73e8; }
+.theme-steel{ --orange:#aeb7c2; }
+
+@media(max-width:420px){
+  .rwMasterPlus{
+    width:58px;
+    height:58px;
+    min-width:58px;
+    font-size:42px;
+  }
+
+  .rwMasterInputWrap{
+    min-height:58px;
+    border-radius:28px;
+  }
+
+  .rwMasterInput{
+    font-size:24px;
+    line-height:30px;
+  }
+
+  .rwMasterSend{
+    width:50px;
+    height:50px;
+    min-width:50px;
+  }
+}

@@ -1,45 +1,56 @@
-ROLLING WRENCH AI VISION — TESTED ZIP
+ROLLING WRENCH AI - COMBINED UI PATCH
 
-WHAT THIS DOES:
-- Take a new picture from camera
-- Choose saved picture from phone
-- Ask a question about the image
-- Get useful repair/parts/diagnostic/procedure answer
-- Offers next actions: parts kit, quote, procedure, supplier check, another picture angle
+THIS ONE ZIP INCLUDES:
+✅ Top-right RW logo/settings button
+✅ Settings panel opens from top-right button
+✅ Compact / Master / Dock / Theme moved into settings
+✅ Master ChatGPT-style input bar
+✅ + image button for photo library/camera
+✅ Mic button
+✅ Send/AI button
+✅ Master image routing to Rolling Wrench AI Vision
+✅ Compact duplicate cleanup
+✅ App manifest renamed to Rolling Wrench AI / RW AI
 
-FRONTEND FILES:
-1. rolling_wrench_ai_vision_card.html
-2. rolling_wrench_ai_vision_frontend.js
-3. rolling_wrench_ai_vision_style.css
+INSTALL:
+1. Replace old dead gear button with the top-right section from:
+   01_combined_ui_patch.html
 
-BACKEND FILE:
-4. supabase_rolling_wrench_vision_ai_index.ts
+2. Replace old MASTER input area with the MASTER CHAT BAR section from:
+   01_combined_ui_patch.html
 
-INSTALL FRONTEND:
-1. Open index.html.
-2. Paste rolling_wrench_ai_vision_card.html where you want the photo AI box.
-3. Paste rolling_wrench_ai_vision_frontend.js before closing </script>.
-4. Paste rolling_wrench_ai_vision_style.css only if needed.
+3. Paste:
+   02_combined_ui_patch.css
+   into your CSS.
 
-INSTALL BACKEND:
-1. Supabase > Edge Functions > New Function
-2. Name it exactly:
-   rolling-wrench-vision-ai
-3. Paste supabase_rolling_wrench_vision_ai_index.ts into index.ts
-4. Deploy
+4. Paste:
+   03_combined_ui_patch.js
+   before closing </script>.
 
-REQUIRED SECRET:
-OPENAI_API_KEY
+5. Use:
+   manifest.json
+   to replace your current manifest if it still says Cecil AI.
 
-TEST QUESTIONS:
-- What is this part?
-- Is this leaking?
-- How do I remove this?
-- What should I inspect?
-- What part number do I need?
-- Can you build a quote from this?
-- Should I check FleetPride or dealer inventory?
+6. Remove or hide old big button block by adding one of these classes to its wrapper:
+   oldQuickButtonBlock
+   mainQuickButtons
+   fullHomeModules
 
-TEST STATUS:
-Frontend JavaScript syntax checked with Node.
-Edge TypeScript structure checked for required sections.
+7. For clean compact launcher cards, add:
+   compactLauncher
+   to the wrapper with Start Work / Parts / Repair / AI Brain / Shop.
+
+IMPORTANT:
+At the TOP of your existing runMasterSearch() function add:
+
+if(await routeMasterSearchWithImage()) return;
+
+APP ICON NOTE:
+This zip includes manifest name changes, but not a final custom PNG icon.
+Use your final Rolling Wrench AI icon as:
+apple-touch-icon.png
+icon-192.png
+icon-512.png
+
+After uploading:
+Delete old Home Screen app from iPhone and re-add it from Safari so the icon/name refreshes.

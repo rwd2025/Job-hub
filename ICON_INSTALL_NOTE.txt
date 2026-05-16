@@ -1,0 +1,16 @@
+
+UPDATED ICON PACK INCLUDED
+
+This zip now includes:
+- apple-touch-icon.png
+- icon-192.png
+- icon-512.png
+
+using your selected Shop Pro AI / Rolling Wrench Diesel icon concept.
+
+After upload:
+1. Delete old app from iPhone home screen
+2. Open app in Safari
+3. Share -> Add to Home Screen
+
+This refreshes the cached icon/name.
