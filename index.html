@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Rolling Wrench AI</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="stylesheet" href="style.css" />
+<meta name="theme-color" content="#050608" />
+</head>
+<body>
+<div class="phoneApp">
+  <header class="topbar">
+    <button class="squareBtn" id="menuBtn">☰</button>
+    <button class="squareBtn" id="backBtn">←</button>
+    <div class="brand">
+      <div><span>ROLLING</span> WRENCH AI</div>
+      <small>DIESEL DIAGNOSTICS & REPAIR PLATFORM</small>
+    </div>
+    <button class="squareBtn" data-screen="settings">⚙</button>
+  </header>
+
+  <main id="home" class="screen active">
+    <section class="statusStrip">
+      <span class="greenDot"></span><b>ACTIVE TRUCK</b><i></i>
+      <b id="stripEngine">CUMMINS X15</b><i></i>
+      <b id="stripVin">VIN: 1XP4D49X8KD123456</b>
+      <em>🔗 CONNECTED</em>
+    </section>
+
+    <section class="askBar" id="askBar">
+      <div class="rwMini">RW</div>
+      <div class="askText">
+        <b>Ask Rolling Wrench AI...</b>
+        <span>VIN, part number, fault code, symptom, repair, quote note...</span>
+      </div>
+      <button id="voiceBtn">🎙</button>
+      <button id="listBtn">☷</button>
+      <button id="cameraBtn">📷</button>
+      <input id="scannerInput" type="file" accept="image/*" capture="environment" hidden />
+    </section>
+
+    <section class="truckCard">
+      <div class="truckArt"><div class="truckEmoji">🚛</div></div>
+      <div class="truckInfo">
+        <div class="truckHeader">
+          <h1 id="truckTitle">2020 Freightliner Cascadia</h1>
+          <button data-screen="vin">SCAN / CHANGE TRUCK</button>
+        </div>
+        <div class="truckGrid">
+          <div><small>VIN</small><strong id="activeVin">1XP4D49X8KD123456</strong></div>
+          <div><small>ENGINE</small><strong id="activeEngine">CUMMINS X15</strong></div>
+          <div><small>ESN</small><strong id="activeEsn">79876562</strong></div>
+          <div><small>CPL</small><strong id="activeCpl">4342</strong></div>
+          <div><small>EPA FAMILY</small><strong id="activeEpa">LCEXH0912XAP</strong></div>
+          <div><small>ODOMETER</small><strong id="activeOdo">453,213 MI</strong></div>
+          <div><small>HOURS</small><strong id="activeHours">8,912 HRS</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="masterPanel">
+      <div class="searchIcon">⌕</div>
+      <div class="masterBody">
+        <h2>MASTER SEARCH</h2>
+        <div class="chips">
+          <button data-fill="VIN lookup">▥ VIN</button>
+          <button data-fill="Part number lookup">⚙ PART #</button>
+          <button data-fill="SPN FMI diagnostic">☑ SPN / FMI</button>
+          <button data-fill="Symptom diagnostic">🩺 SYMPTOM</button>
+          <button data-fill="Repair procedure">🔧 REPAIR</button>
+          <button data-fill="Quote note">▤ QUOTE NOTE</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="toolGrid">
+      <button class="toolCard" data-screen="vin"><div class="toolImg truck"></div><h3>VIN LOOKUP</h3><p>Decode VIN, ESN, CPL, specs & info</p></button>
+      <button class="toolCard" data-screen="parts"><div class="toolImg parts"></div><h3>OEM PARTS</h3><p>OEM parts lookup, interchange & kits</p></button>
+      <button class="toolCard" data-screen="doctor"><div class="toolImg doctor"></div><h3>DIESEL DOCTOR</h3><p>Fault code lookup, SPN, FMI, diagnostics</p></button>
+      <button class="toolCard" data-screen="brain"><div class="toolImg brain"></div><h3>REPAIR BRAIN</h3><p>AI repair assistant & troubleshooting</p></button>
+      <button class="toolCard small" data-screen="quotes"><div class="toolImg quote"></div><h3>SMART QUOTES</h3><p>Build quotes, parts, labor & markup</p></button>
+      <button class="toolCard small" data-screen="clock"><div class="toolImg clock"></div><h3>JOB CLOCK</h3><p>Track time, jobs & labor</p></button>
+      <button class="toolCard small" data-screen="vision"><div class="toolImg vision"></div><h3>VISION / OCR</h3><p>Scan codes, parts, documents, labels</p></button>
+      <button class="toolCard small" data-screen="manuals"><div class="toolImg manuals"></div><h3>SERVICE MANUALS</h3><p>OEM manuals & procedures</p></button>
+      <button class="toolCard small" data-screen="field"><div class="toolImg gps"></div><h3>DOT / GPS</h3><p>GPS, routes, ELD, logs & location</p></button>
+      <button class="toolCard small" data-screen="memory"><div class="toolImg memory"></div><h3>REPAIR MEMORY</h3><p>Saved repairs, history & notes</p></button>
+    </section>
+
+    <section class="systemStatus">
+      <div class="statusHero"><b>SYSTEM STATUS</b><span>⌁</span><em>All systems<br>operational</em></div>
+      <button><span>🚛</span><b>OEM GATEWAY</b><em>CONNECTED</em></button>
+      <button><span>🧠</span><b>AI SYSTEM</b><em>ONLINE</em></button>
+      <button><span>☁️</span><b>SUPABASE SYNC</b><em>SYNCED</em></button>
+      <button><span>💼</span><b>REPAIR MEMORY</b><em>ACTIVE</em></button>
+      <button id="scannerStatus"><span>▣</span><b>SCANNER</b><em>CONNECTED</em></button>
+      <button><span>⌁</span><b>OFFLINE MODE</b><em>READY</em></button>
+    </section>
+  </main>
+
+  <main id="vin" class="screen"><div class="page"><h1>VIN / Truck Lookup</h1><label>VIN<input id="vinInput" placeholder="Enter or scan VIN"></label><label>Engine<input id="engineInput" placeholder="Cummins X15"></label><button class="primary" id="saveTruck">SAVE ACTIVE TRUCK</button><button class="primary ghost" id="scanVin">OPEN CAMERA SCANNER</button><div class="result" id="vinResult">Scanner uses your phone camera/file picker and sends the result into this screen.</div></div></main>
+  <main id="parts" class="screen"><div class="page"><h1>OEM Parts</h1><textarea id="partsInput" placeholder="Part number, part name, VIN, ESN, CPL..."></textarea><button class="primary">LOOKUP PART</button><div class="result">Ready for OEM, interchange, repair kit, and supplier lookup.</div></div></main>
+  <main id="doctor" class="screen"><div class="page"><h1>Diesel Doctor</h1><textarea placeholder="SPN/FMI, fault code, symptom..."></textarea><button class="primary">RUN DIAGNOSTIC</button><div class="result">Fault diagnostics ready.</div></div></main>
+  <main id="brain" class="screen"><div class="page"><h1>Repair Brain</h1><textarea placeholder="Ask repair memory, manuals, confirmed fixes..."></textarea><button class="primary">ASK REPAIR BRAIN</button><div class="result">AI repair assistant ready.</div></div></main>
+  <main id="quotes" class="screen"><div class="page"><h1>Smart Quotes</h1><label>Labor Hours<input type="number" placeholder="0.0"></label><label>Parts Total<input type="number" placeholder="0.00"></label><button class="primary">BUILD QUOTE</button><div class="result">Invoice and quote builder ready.</div></div></main>
+  <main id="clock" class="screen"><div class="page"><h1>Job Clock</h1><button class="primary">START CLOCK</button><button class="primary ghost">STOP CLOCK</button><div class="result">0.00 billable hours</div></div></main>
+  <main id="vision" class="screen"><div class="page"><h1>Vision / OCR Scanner</h1><button class="primary" id="openScanner">OPEN SCANNER CAMERA</button><input id="visionFile" type="file" accept="image/*" capture="environment" hidden><img id="visionPreview" class="preview" alt=""><div class="result" id="visionResult">Scan labels, VIN plates, receipts, and part numbers.</div></div></main>
+  <main id="manuals" class="screen"><div class="page"><h1>Service Manuals</h1><textarea placeholder="Search repair procedure, torque, test steps..."></textarea><button class="primary">SEARCH MANUALS</button><div class="result">Manual/RAG hooks ready.</div></div></main>
+  <main id="field" class="screen"><div class="page"><h1>DOT / GPS</h1><button class="primary" id="gpsBtn">DROP GPS PIN</button><div class="result" id="gpsResult">GPS/DOT field tools ready.</div></div></main>
+  <main id="memory" class="screen"><div class="page"><h1>Repair Memory</h1><textarea placeholder="Save confirmed fix or search VIN history..."></textarea><button class="primary">SAVE FIX</button><div class="result">Repair memory ready.</div></div></main>
+  <main id="settings" class="screen"><div class="page settings"><h1>Settings</h1><div class="settingsGrid"><button>Rolling Wrench</button><button>CAT</button><button>Cummins</button><button>Detroit</button><button>PACCAR</button><button>Night Ops</button></div><div class="result">Theme, layout, diagnostics, scanner, and backend controls will live here.</div></div></main>
+
+  <nav class="bottomNav">
+    <button class="active" data-screen="home"><span>⌂</span>HOME</button>
+    <button data-screen="doctor"><span>🩺</span>DOCTOR</button>
+    <button data-screen="parts"><span>⚙</span>PARTS</button>
+    <button data-screen="brain"><span>🔧</span>REPAIR</button>
+    <button data-screen="settings"><span>•••</span>MORE</button>
+  </nav>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
