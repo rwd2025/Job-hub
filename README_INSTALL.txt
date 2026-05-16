@@ -1,30 +1,49 @@
 
-ROLLING WRENCH AI FINAL TOP RIGHT PATCH
+ROLLING WRENCH AI - SETTINGS GEAR PATCH
 
-THIS PATCH:
-- replaces dead gear button
-- uses Rolling Wrench AI logo button
-- opens quick settings panel
-- matches orange/black app theme
+THIS VERSION CHANGES:
+- Removes floating quick action drawer
+- Uses the TOP RIGHT gear button instead
+- Gear button opens fast settings panel
+- Compact/Master/Dock/Theme moved into gear settings
+- + IMAGE added to MASTER
+- Compact duplicate screen cleanup included
 
 INSTALL:
+
 1. Paste:
-01_top_right_logo_button.html
-where the old dead gear button exists.
+01_top_right_settings_gear.html
+near your existing top right gear button area.
 
 2. Paste:
-02_top_right_logo_button.css
-into your CSS.
+02_master_plus_image.html
+inside your MASTER card.
 
 3. Paste:
-03_top_right_logo_button.js
-before closing </script>.
+rolling_wrench_settings_patch.js
+before </script>
 
-4. Upload:
-rw_ai_topright_logo.png
-into same GitHub folder as index.html
+4. Paste:
+rolling_wrench_settings_patch.css
+into your CSS.
 
-5. Remove old dead gear button HTML.
+IMPORTANT:
+Remove old:
+- Compact buttons from home
+- Dock button from home
+- Theme selector from home
+- Dead gear button
 
-BUTTON OPENS:
-toggleRwSettingsPanel()
+MASTER IMAGE HOOK:
+At top of existing master search function add:
+
+if(await routeMasterSearchWithImage()) return;
+
+COMPACT FIX:
+Add class:
+compactLauncher
+to clean launcher cards.
+
+Add class:
+fullHomeModules
+to giant duplicate cards wrapper.

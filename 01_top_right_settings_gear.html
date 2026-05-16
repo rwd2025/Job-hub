@@ -1,0 +1,51 @@
+
+<!-- ROLLING WRENCH AI - TOP RIGHT SETTINGS GEAR -->
+<button id="rwGearBtn" class="rwGearBtn" onclick="toggleRwSettingsPanel()">
+  ⚙️
+</button>
+
+<div id="rwSettingsPanel" class="rwSettingsPanel">
+  <div class="rwSettingsHeader">
+    <strong>⚙️ QUICK SETTINGS</strong>
+    <button onclick="toggleRwSettingsPanel()">✕</button>
+  </div>
+
+  <div class="rwSettingsGrid">
+
+    <button onclick="setRwDisplayMode('compact')">
+      COMPACT
+    </button>
+
+    <button onclick="setRwDisplayMode('master')">
+      MASTER
+    </button>
+
+    <button onclick="toggleRwDockMode()">
+      DOCK
+    </button>
+
+    <select id="rwThemeSelect" onchange="setRwTheme(this.value)">
+      <option value="orange-black">Orange/Black</option>
+      <option value="green-black">Green/Black</option>
+      <option value="blue-black">Blue/Black</option>
+      <option value="steel">Steel</option>
+    </select>
+
+    <button onclick="openSectionSafe('backend')">
+      BACKEND
+    </button>
+
+    <button onclick="openSectionSafe('debug')">
+      DEBUG
+    </button>
+
+    <button onclick="openSectionSafe('release')">
+      RELEASE
+    </button>
+
+    <button onclick="openSectionSafe('savejob')">
+      SAVE JOB
+    </button>
+
+  </div>
+</div>
