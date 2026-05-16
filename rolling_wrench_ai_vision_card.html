@@ -1,0 +1,26 @@
+<!-- =========================================================
+ROLLING WRENCH AI VISION CARD
+Take a picture, upload saved pictures, ask a question, get a useful repair answer.
+Paste this where you want the camera/photo AI box.
+========================================================= -->
+<div class="smartCard" id="rwVisionCard">
+  <div class="cardTitleRow">
+    <h2>📸 ROLLING WRENCH AI VISION</h2>
+    <span class="pill green">PHOTO + QUESTION</span>
+  </div>
+
+  <label>Take picture / choose saved picture</label>
+  <input id="rwVisionImage" type="file" accept="image/*" capture="environment" onchange="previewRollingWrenchVisionImage()">
+
+  <img id="rwVisionPreview" style="display:none; width:100%; max-height:320px; object-fit:contain; border-radius:14px; margin:12px 0; border:1px solid #333;">
+
+  <label>Ask about the picture</label>
+  <textarea id="rwVisionQuestion" placeholder="What is this part? How do I remove it? Is this leaking? What should I check? What part number do I need?"></textarea>
+
+  <div class="row">
+    <button class="success" onclick="askRollingWrenchVisionAI()">ASK ROLLING WRENCH AI</button>
+    <button onclick="clearRollingWrenchVisionAI()">CLEAR</button>
+  </div>
+
+  <div id="rwVisionOut" class="result">Take or upload a picture and ask Rolling Wrench AI what you need to know.</div>
+</div>
