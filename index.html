@@ -1044,6 +1044,48 @@ Includes:
 <script src="03_combined_ui_patch.js"></script>
 <script src="03_clean_home_overlay.js"></script>
 <script src="03_workspace_back_clear.js"></script>
+<!-- ROLLING WRENCH AI - CLEAN HOME + FULL SCREEN AI OVERLAY -->
+<div id="rwHomeAskBar" class="rwHomeAskBar" onclick="openRollingWrenchAIOverlay()">
+  <button class="rwHomePlus" type="button" onclick="event.stopPropagation();openRollingWrenchAIOverlay(true);">+</button>
+  <div class="rwHomeAskText">Ask Rolling Wrench AI</div>
+  <div class="rwHomeMic">🎙️</div>
+  <div class="rwHomeSend">▌▌▌</div>
+</div>
+
+<div id="rwMasterDropBox" class="rwMasterDropBox">
+  <button class="rwMasterDropBtn" type="button" onclick="toggleRwMasterDrop()">🔎 MASTER SEARCH</button>
+  <div id="rwMasterDropContent" class="rwMasterDropContent">
+    <textarea id="rwMasterDropInput" placeholder="VIN, part number, fault code, symptom, repair, quote note..."></textarea>
+    <button class="rwRunMasterBtn" type="button" onclick="runRwMasterDropSearch()">RUN MASTER SEARCH</button>
+    <div id="rwMasterDropResult" class="rwMasterDropResult">Results will show here.</div>
+  </div>
+</div>
+
+<div id="rwAiOverlay" class="rwAiOverlay">
+  <div class="rwAiOverlayTop">
+    <button class="rwAiBackBtn" type="button" onclick="closeRollingWrenchAIOverlay()">←</button>
+    <div class="rwAiOverlayTitle">Rolling Wrench AI</div>
+    <button class="rwAiClearBtn" type="button" onclick="clearRollingWrenchAIOverlay()">CLEAR</button>
+  </div>
+
+  <div class="rwAiOverlayBody">
+    <div id="rwAiPhotoPreviewWrap" class="rwAiPhotoPreviewWrap">
+      <img id="rwAiPhotoPreview" class="rwAiPhotoPreview" alt="Selected photo">
+    </div>
+    <div id="rwAiOverlayAnswer" class="rwAiOverlayAnswer">
+      Ask a question, add a picture if needed, and Rolling Wrench AI will answer here.
+    </div>
+  </div>
+
+  <div class="rwAiOverlayInputBar">
+    <button class="rwAiPlusBtn" type="button" onclick="document.getElementById('rwAiImageInput').click()">+</button>
+    <textarea id="rwAiQuestionInput" class="rwAiQuestionInput" rows="1" placeholder="Ask Rolling Wrench AI" oninput="rwAiAutoGrow(this);saveRwAiOverlayState();"></textarea>
+    <button class="rwAiMicBtn" type="button" onclick="startRwOverlayVoice()">🎙️</button>
+    <button class="rwAiSendBtn" type="button" onclick="askRollingWrenchAIOverlay()">▌▌▌</button>
+    <input id="rwAiImageInput" type="file" accept="image/*" style="display:none" onchange="rwAiOverlayImageSelected()">
+  </div>
+</div>
+
 
   
 </body
