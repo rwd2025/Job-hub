@@ -2748,6 +2748,9 @@ function cecilHasOracleAnswer(result){
 const __oldPhase8MasterSearch = phase8MasterSearch;
 
 phase8MasterSearch = async function(){
+
+if(await routeMasterSearchWithImage()) return;
+  
   const q = phase8SearchInput();
 
   await __oldPhase8MasterSearch();
