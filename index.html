@@ -1096,7 +1096,25 @@ This provides the shared screen header used by workspace screens.
   <button class="rwWorkspaceClear" type="button" onclick="rwClearCurrentWorkspace()">CLEAR</button>
 </div>
 
-
+<!-- OPTIONAL QUICK TOOLS COLLAPSE
+Paste on HOME if you still want fast access without permanent clutter.
+-->
+<div class="rwQuickToolsCollapse"> 
+  <button class="rwQuickToolsBtn" type="button" onclick="rwToggleQuickTools()">⚡ QUICK TOOLS</button>
+  <div id="rwQuickToolsPanel" class="rwQuickToolsPanel">
+    <button onclick="rwGo('master','home')">MASTER</button>
+    <button onclick="rwGo('parts','parts')">+ PART</button>
+    <button onclick="rwGo('shop','quote')">+ LABOR</button>
+    <button onclick="rwGo('clock','clock')">START CLOCK</button>
+    <button onclick="rwGo('vin','vin')">VIN</button>
+    <button onclick="rwGo('camera','camera')">CAMERA</button>
+    <button onclick="rwGo('shop','gps')">GPS/DOT</button>
+    <button onclick="rwGo('backend','backend')">BACKEND</button>
+    <button onclick="rwGo('debug','debug')">DEBUG</button>
+    <button onclick="rwGo('release','release')">RELEASE</button>
+    <button onclick="rwGo('savejob','savejob')">SAVE JOB</button>
+  </div>
+</div>
 
   
 </body
