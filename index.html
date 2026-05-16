@@ -632,11 +632,61 @@
       <label>DEFAULT SERVICE CALL<input id="defaultServiceCall" value="250"></label>
       <label>DEFAULT TAX %<input id="defaultTax" value="0"></label>
       <label>DEFAULT CARD FEE %<input id="defaultCardFee" value="0"></label>
-    </div>
     <label>TERMS<textarea id="shopTerms">Payment due upon completion. Parts and labor warranty subject to shop policy.</textarea></label>
     <button onclick="saveSettings()">SAVE SETTINGS</button>
-    <section id="settingsOut" class="resultBox">Settings ready.</section>
-  </main>
+<section id="settingsOut" class="resultBox">
+  Settings ready.
+</section>
+
+<div id="rwThemeEnginePanel" class="rwThemeEnginePanel">
+
+  <div class="rwThemeHeader">
+    <strong>🎨 VISUAL SYSTEM</strong>
+    <span>Rolling Wrench AI</span>
+  </div>
+
+  <label>Brand Theme</label>
+
+  <div class="rwThemeGrid">
+    <button onclick="setRwBrandTheme('rolling')">Rolling Wrench</button>
+    <button onclick="setRwBrandTheme('cat')">CAT</button>
+    <button onclick="setRwBrandTheme('cummins')">Cummins</button>
+    <button onclick="setRwBrandTheme('detroit')">Detroit</button>
+    <button onclick="setRwBrandTheme('paccar')">PACCAR</button>
+    <button onclick="setRwBrandTheme('nightops')">Night Ops</button>
+    <button onclick="setRwBrandTheme('brightshop')">Bright Shop</button>
+    <button onclick="setRwBrandTheme('carbon')">Carbon Steel</button>
+  </div>
+
+  <label>Brightness Mode</label>
+
+  <div class="rwThemeGrid three">
+    <button onclick="setRwLightMode('day')">Daylight</button>
+    <button onclick="setRwLightMode('shop')">Shop</button>
+    <button onclick="setRwLightMode('night')">Night</button>
+  </div>
+
+  <label>Logo Style</label>
+
+  <div class="rwThemeGrid">
+    <button onclick="setRwLogoStyle('shoppro')">Shop Pro</button>
+    <button onclick="setRwLogoStyle('chrome')">Chrome</button>
+    <button onclick="setRwLogoStyle('minimal')">Minimal</button>
+    <button onclick="setRwLogoStyle('industrial')">Industrial</button>
+  </div>
+
+  <div class="rwThemePreview">
+    <div class="rwPreviewLogo" id="rwPreviewLogo">RW</div>
+
+    <div>
+      <strong>Preview</strong>
+      <p>Buttons, cards, AI panels, and tool screens update instantly.</p>
+    </div>
+  </div>
+
+</div>
+
+</main>
 
 
 
@@ -996,52 +1046,7 @@ This provides the shared screen header used by workspace screens.
   </div>
 </div>
 
-<!-- THEME / GRAPHICS PANEL -->
-<!-- Paste contents of 01_theme_graphics_panel.html here -->
-<!-- =========================================================
-ROLLING WRENCH AI - THEME / GRAPHICS ENGINE PANEL
-Paste inside your Settings panel, or near bottom before </body>.
-========================================================= -->
-
-<div id="rwThemeEnginePanel" class="rwThemeEnginePanel">
-  <div class="rwThemeHeader">
-    <strong>🎨 VISUAL SYSTEM</strong>
-    <span>Rolling Wrench AI</span>
-  </div>
-
-  <label>Brand Theme</label>
-  <div class="rwThemeGrid">
-    <button onclick="setRwBrandTheme('rolling')">Rolling Wrench</button>
-    <button onclick="setRwBrandTheme('cat')">CAT</button>
-    <button onclick="setRwBrandTheme('cummins')">Cummins</button>
-    <button onclick="setRwBrandTheme('detroit')">Detroit</button>
-    <button onclick="setRwBrandTheme('paccar')">PACCAR</button>
-    <button onclick="setRwBrandTheme('nightops')">Night Ops</button>
-    <button onclick="setRwBrandTheme('brightshop')">Bright Shop</button>
-    <button onclick="setRwBrandTheme('carbon')">Carbon Steel</button>
-  </div>
-
-  <label>Brightness Mode</label>
-  <div class="rwThemeGrid three">
-    <button onclick="setRwLightMode('day')">Daylight</button>
-    <button onclick="setRwLightMode('shop')">Shop</button>
-    <button onclick="setRwLightMode('night')">Night</button>
-  </div>
-
-  <label>Logo Style</label>
-  <div class="rwThemeGrid">
-    <button onclick="setRwLogoStyle('shoppro')">Shop Pro</button>
-    <button onclick="setRwLogoStyle('chrome')">Chrome</button>
-    <button onclick="setRwLogoStyle('minimal')">Minimal</button>
-    <button onclick="setRwLogoStyle('industrial')">Industrial</button>
-  </div>
-
-  <div class="rwThemePreview">
-    <div class="rwPreviewLogo" id="rwPreviewLogo">RW</div>
-    <div>
-      <strong>Preview</strong>
-      <p>Buttons, cards, AI panels, and tool screens update instantly.</p>
-    </div>
+<!
   </div>
 </div>
 <link rel="stylesheet" href="02_combined_ui_patch.css">
