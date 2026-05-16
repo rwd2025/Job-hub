@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Rolling Wrench AI</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="manifest" href="manifest.json" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+<div class="appShell">
+
+  <!-- TOP HEADER -->
+  <header class="topBar">
+    <button class="iconBtn" onclick="toggleSideMenu()">☰</button>
+    <button class="iconBtn" onclick="goBack()">←</button>
+
+    <div class="brandBlock">
+      <div class="brandMain">
+        <span>ROLLING</span> WRENCH
+      </div>
+      <div class="brandSub">ROLLING WRENCH AI</div>
+    </div>
+
+    <div class="topStatus">
+      <span class="onlineDot"></span>
+      <span>ONLINE</span>
+    </div>
+
+    <button class="iconBtn" onclick="showScreen('settings')">⚙️</button>
+  </header>
+
+<!-- SIDE MENU -->
+<aside id="sideMenu" class="sideMenu">
+
+  <button onclick="showScreen('settings')">◈ SETTINGS</button>
+
+  <button onclick="showScreen('invoice')">◌ INVOICE / QUOTE</button>
+
+  <button onclick="showScreen('timeClock')">◍ TIME CLOCK</button>
+
+  <button onclick="showScreen('fieldTools')">◬ FIELD TOOLS</button>
+
+  <button onclick="showScreen('visionPro')">◐ OCR / VISION</button>
+
+  <button onclick="showScreen('backendPro')">▤ BACKEND PRO</button>
+
+  <button onclick="showScreen('debugPro')">✦ DEBUG / QA</button>
+
+  <button onclick="showScreen('releasePro')">✧ FINAL RELEASE</button>
+
+  <button onclick="showScreen('aiBrainPro')">⬡ AI BRAIN PRO</button>
+
+  <button onclick="openPcAdmin()">▣ PC ADMIN</button>
+
+  <button onclick="showScreen('team')">◎ TEAM VIEWER</button>
+
+  <button onclick="showScreen('voice')">◉ VOICE NAVIGATOR</button>
+
+  <button onclick="toggleSideMenu()">✕ CLOSE</button>
+
+</aside>
+
+
+<!-- ACTIVE TRUCK CARD -->
+<section class="truckCard">
+
+  <div class="truckImage">⬢</div>
+
+  <div class="truckData">
+
+    <div class="dataCell">
+      <small>VIN</small>
+      <strong id="activeVin">NONE</strong>
+    </div>
+
+    <div class="dataCell">
+      <small>YEAR</small>
+      <strong id="activeYear">----</strong>
+    </div>
+
+    <div class="dataCell">
+      <small>MAKE</small>
+      <strong id="activeMake">----</strong>
+    </div>
+
+    <div class="dataCell">
+      <small>MODEL</small>
+      <strong id="activeModel">----</strong>
+    </div>
+
+    <div class="dataCell">
+      <small>ENGINE</small>
+      <strong id="activeEngine">----</strong>
+    </div>
+
+    <div class="dataCell">
+      <small>ESN</small>
+      <strong id="activeEsn">----</strong>
+    </div>
+
+    <div class="dataCell">
+      <small>CPL</small>
+      <strong id="activeCpl">----</strong>
+    </div>
+
+    <button class="changeTruckBtn" onclick="showScreen('vin')">
+      CHANGE TRUCK
+    </button>
+
+  </div>
+
+</section> 
+
+
+  <section class="fieldStrip">
+    <div><b>FIELD MODE</b><span>Ready for roadside/shop use</span></div>
+    <div><b>LOOKUP FLOW</b><span>Oracle + Database + Repair Kit</span></div>
+    <div><b>SHOP TOOLS</b><span>Clock • Parts • Invoice • Saved Jobs</span></div>
+  </section>
+
+  <section class="sessionBar phase8Session">
+    <div>
+      <small>ACTIVE JOB SESSION</small>
+      <strong id="sessionTitle">No active job</strong>
+      <span id="sessionMeta">Start from VIN, master search, invoice, or clock.</span>
+    </div>
+    <div class="sessionActions">
+      <button onclick="startUnifiedSession()">START SESSION</button>
+      <button onclick="saveUnifiedJob()">SAVE / SYNC</button>
+      <button onclick="clearUnifiedSession()">CLEAR SESSION</button>
+    </div>
+  </section>
+  
+<main id="home" class="screen active">
+
+<section class="toolGrid">
+
+  <button class="toolCard" onclick="showScreen('vin')">
+    <div class="toolIcon">⬢</div>
+    <h2>VIN LOOKUP</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('parts')">
+    <div class="toolIcon">◈</div>
+    <h2>PARTS</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('dieselAI')">
+    <div class="toolIcon">◎</div>
+    <h2>DIESEL AI</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('faultDoctor')">
+    <div class="toolIcon">✦</div>
+    <h2>FAULT DOCTOR</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('repairHud')">
+    <div class="toolIcon">⬣</div>
+    <h2>REPAIR HUD</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('schematics')">
+    <div class="toolIcon">⌬</div>
+    <h2>X-RAY / SCHEMATICS</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('voice')">
+    <div class="toolIcon">◉</div>
+    <h2>VOICE NAVIGATOR</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('team')">
+    <div class="toolIcon">▣</div>
+    <h2>TEAM VIEWER</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('invoice')">
+    <div class="toolIcon">◌</div>
+    <h2>INVOICE</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('timeClock')">
+    <div class="toolIcon">◍</div>
+    <h2>TIME CLOCK</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('visionPro')">
+    <div class="toolIcon">◐</div>
+    <h2>VISION</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('fieldTools')">
+    <div class="toolIcon">◬</div>
+    <h2>FIELD TOOLS</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('backendPro')">
+    <div class="toolIcon">▤</div>
+    <h2>BACKEND PRO</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('aiBrainPro')">
+    <div class="toolIcon">⬡</div>
+    <h2>AI BRAIN PRO</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('releasePro')">
+    <div class="toolIcon">✧</div>
+    <h2>FINAL RELEASE</h2>
+  </button>
+
+  <button class="toolCard" onclick="showScreen('settings')">
+    <div class="toolIcon">◈</div>
+    <h2>SETTINGS</h2>
+  </button>
+
+</section>
+
+  
+  <section class="statusGrid">
+    <div><b>☁️ CONNECTION</b><span>Online</span><small>All systems operational</small></div>
+    <div><b>🛡️ OEM GATEWAY</b><span>Connected</span><small>PACCAR, Cummins, Detroit ready</small></div>
+    <div><b>🗄️ DIESEL BRAIN</b><span>Ready</span><small>Diagnostics + parts + repair memory</small></div>
+    <div><b>🧠 REPAIR INSIGHTS</b><span>Ready</span><small>Rolling Wrench AI active</small></div>
+  </section>
+  <!-- VIN SCREEN -->
+  <main id="vin" class="screen">
+    <h1 class="screenTitle">VIN / TRUCK LOOKUP</h1>
+
+    <div class="formGrid">
+      <label>VIN<input id="vinGlobal" placeholder="Enter VIN"></label>
+      <label>YEAR<input id="yearGlobal" placeholder="2019"></label>
+      <label>MAKE<input id="makeGlobal" placeholder="International"></label>
+      <label>MODEL<input id="modelGlobal" placeholder="LT625"></label>
+      <label>ENGINE<input id="engine" placeholder="Cummins X15"></label>
+      <label>ESN<input id="esnGlobal" placeholder="Engine serial"></label>
+      <label>CPL<input id="cplGlobal" placeholder="CPL"></label>
+    </div>
+
+    <div class="buttonRow">
+      <button onclick="decodeVin()">DECODE VIN</button>
+      <button onclick="saveActiveTruck()">SAVE ACTIVE TRUCK</button>
+    </div>
+    <button class="secondaryBtn" onclick="clearVehicleData()">CLEAR VIN / TRUCK</button>
+
+    <section id="vinOut" class="resultBox">Enter VIN and decode or save active truck.</section>
+  </main>
+
+  <!-- PARTS SCREEN -->
+  <main id="parts" class="screen">
+    <h1 class="screenTitle">OEM PARTS LOOKUP</h1>
+
+    <label>PART NUMBER / PART NAME<textarea id="partq" placeholder="Example: 2022 PACCAR MX-13 water pump, 5633513, rear main seal"></textarea></label>
+    <label>NOTES / VIN / ESN / CPL<textarea id="partNote" placeholder="Add VIN, ESN, CPL, symptoms, measurements, supplier notes"></textarea></label>
+
+    <div class="formGrid">
+      <label>PART NAME<input id="manualPartName" placeholder="Water pump, rear main seal, air dryer"></label>
+      <label>PART NUMBER<input id="manualPartNumber" placeholder="OEM or aftermarket #"></label>
+      <label>QTY<input id="manualPartQty" type="number" step="1" value="1"></label>
+      <label>UNIT PRICE<input id="manualPartPrice" type="number" step="0.01" placeholder="0.00"></label>
+      <label>SUPPLIER / BRAND<input id="manualPartSupplier" placeholder="FleetPride, Cummins, Bendix, NAPA"></label>
+      <label class="fileLabel fullWidth">ADD PART PICTURE<input id="partPhoto" type="file" accept="image/*"></label>
+    </div>
+
+    <img id="partPhotoPreview" class="previewImg" alt="Part picture preview">
+
+    <section class="partsProPanel">
+      <div class="panelHead">
+        <b>PHASE 2 PARTS INTELLIGENCE</b>
+        <span>OEM • aftermarket • interchange • supplier shortcuts • confidence ranking</span>
+      </div>
+      <div class="supplierButtons">
+        <button onclick="openSupplierSearch('fleetpride')">FleetPride</button>
+        <button onclick="openSupplierSearch('napa')">NAPA</button>
+        <button onclick="openSupplierSearch('oreilly')">O’Reilly</button>
+        <button onclick="openSupplierSearch('google')">Google</button>
+        <button onclick="openSupplierSearch('dealer')">Dealer Search</button>
+      </div>
+    </section>
+
+    <div class="buttonRow featureButtons">
+      <button onclick="askPart()">LOOKUP PART</button>
+      <button onclick="runInterchangeOnly()">INTERCHANGE CHAIN</button>
+      <button onclick="addManualPartToInvoice()">ADD PART TO INVOICE</button>
+      <button onclick="addLookupToInvoice()">ADD LOOKUP RESULT</button>
+      <button onclick="addBestInterchangeToInvoice()">ADD BEST INTERCHANGE</button>
+      <button onclick="saveCurrentPart()">SAVE PART</button>
+      <button onclick="startPartVoiceInput()">SAY PART NAME / NUMBER</button>
+      <button onclick="showScreen('visionPro')">SCAN PART PHOTO</button>
+      <button onclick="clearPartFields()">CLEAR PARTS</button>
+      <button onclick="findNearestDealer()">FIND NEAREST PARTS / DEALER</button>
+      <button onclick="showScreen('invoice')">GO TO INVOICE</button>
+    </div>
+
+    <section id="partOut" class="resultBox">Enter a part, VIN, ESN, CPL, or description.</section>
+    <section id="invoicePartsOut" class="resultBox smallBox">Invoice parts will appear here.</section>
+    <section id="savedPartsOut" class="resultBox smallBox">Saved parts will appear here.</section>
+  </main>
+
+  <!-- DIESEL AI SCREEN -->
+  <main id="dieselAI" class="screen">
+    <h1 class="screenTitle">DIESEL AI</h1>
+    <label>ASK DIESEL AI<textarea id="homeAiAsk" placeholder="Ask a diagnostic, repair, parts, or truck question"></textarea></label>
+    <label class="fileLabel">PICTURE<input id="homeAiImage" type="file" accept="image/*"></label>
+    <img id="homeAiPreview" class="previewImg" alt="">
+    <div class="buttonRow">
+      <button onclick="homeAI()">SEND</button>
+      <button onclick="startVoiceInput()">VOICE</button>
+    </div>
+    <section id="homeAiOut" class="resultBox">Ask Diesel AI anything.</section>
+  </main>
+
+  <!-- FAULT DOCTOR -->
+  <main id="faultDoctor" class="screen">
+    <h1 class="screenTitle">FAULT DOCTOR</h1>
+    <section class="intelPanel">
+      <div class="panelHead">
+        <b>PHASE 3 DIESEL INTELLIGENCE</b>
+        <span>SPN/FMI • likely causes • common fixes • verified repair memory • Buddy warnings</span>
+      </div>
+      <div class="intelGrid">
+        <div><b>ROOT CAUSE</b><span>Ranks likely failures</span></div>
+        <div><b>COMMON FIX</b><span>Shows shop-proven repairs</span></div>
+        <div><b>VIN MEMORY</b><span>Pulls previous notes</span></div>
+        <div><b>WARNINGS</b><span>Flags common misdiagnosis</span></div>
+      </div>
+    </section>
+    <label>FAULT CODE / SYMPTOM<textarea id="diagq" placeholder="SPN 5246 FMI 15, derate, regen issue, NOx efficiency, EGR delta pressure..."></textarea></label>
+    <label>NOTES<textarea id="diagNote" placeholder="Engine, symptoms, readings, tests already done, VIN/ESN/CPL, temps, pressures"></textarea></label>
+    <div class="buttonRow featureButtons">
+      <button onclick="runDiag()">RUN FAULT DOCTOR</button>
+      <button onclick="runIntelligenceOnly()">DIESEL BRAIN ONLY</button>
+      <button onclick="saveVerifiedFix()">SAVE VERIFIED FIX</button>
+      <button onclick="saveRepairNoteCloud()">SAVE REPAIR NOTE</button>
+      <button onclick="clearDiagFields()">CLEAR DIAG</button>
+      <button onclick="showScreen('invoice')">GO TO INVOICE</button>
+    </div>
+    <section id="diagOut" class="resultBox">Enter fault code or symptom.</section>
+    <section id="intelOut" class="resultBox smallBox">Diesel Brain results will appear here.</section>
+  </main>
+
+  <!-- REPAIR HUD -->
+  <main id="repairHud" class="screen">
+    <h1 class="screenTitle">REPAIR HUD</h1>
+    <section class="resultBox">
+      <h2>Repair HUD Ready</h2>
+      <p>This screen is prepared for step-by-step repairs, torque sequence, Buddy tips, OEM bulletins, part verification, and completion reports.</p>
+      <button onclick="underConstruction('Repair HUD Backend')">START REPAIR SESSION</button>
+    </section>
+  </main>
+
+  <!-- SCHEMATICS -->
+  <main id="schematics" class="screen">
+    <h1 class="screenTitle">LIVE SCHEMATICS</h1>
+    <section class="schematicBox">
+      <div class="xrayHeader">Interactive Repair Catalog</div>
+      <svg viewBox="0 0 800 420" class="demoSchematic">
+        <rect x="40" y="60" width="720" height="280" rx="24"></rect>
+        <circle class="neonPulse" cx="230" cy="180" r="26"></circle>
+        <circle class="neonPulse delay" cx="420" cy="240" r="22"></circle>
+        <circle class="neonPulse delay2" cx="585" cy="155" r="24"></circle>
+        <text x="210" y="185">#1</text>
+        <text x="400" y="245">#2</text>
+        <text x="565" y="160">#3</text>
+      </svg>
+      <div id="part-hud">
+        Tap hotspots later to show OEM part, interchange, torque, dealer stock, and Buddy warnings.
+      </div>
+      <button onclick="underConstruction('Live Schematics Backend')">LOAD OEM DIAGRAM</button>
+    </section>
+  </main>
+
+  <!-- VOICE -->
+  <main id="voice" class="screen">
+    <h1 class="screenTitle">VOICE NAVIGATOR</h1>
+    <section class="resultBox">
+      <h2>Under Construction</h2>
+      <p>This button is ready. Voice-to-voice repair guidance will plug in here.</p>
+      <button id="voice-toggle" onclick="VoiceNavigator.toggle()">VOICE: OFF</button>
+    </section>
+  </main>
+
+  <!-- TEAM -->
+  <main id="team" class="screen">
+    <h1 class="screenTitle">TEAM / TECH VIEWER</h1>
+    <section class="resultBox">
+      <h2>Under Construction</h2>
+      <p>This button is ready. Team viewer, master tech support, shared screens, and tech status will plug in here.</p>
+    </section>
+  </main>
+
+
+
+  <!-- TIME CLOCK -->
+  <main id="timeClock" class="screen">
+    <h1 class="screenTitle">EMPLOYEE TIME CLOCK</h1>
+    <section class="resultBox employeeClockPanel">
+      <div class="employeePicker">
+        <label>Employee ID<input id="employeeId" placeholder="JAMES, DAVID, STEPH"></label>
+        <label>Employee Name<input id="employeeName" placeholder="Employee name"></label>
+        <label>Hourly Rate<input id="employeeRate" type="number" placeholder="0.00"></label>
+      </div>
+      <div class="clockStatusHero">
+        <b id="clockStatusText">CLOCKED OUT</b>
+        <span id="clockLiveTimer">0.00 hrs</span>
+      </div>
+      <div class="clockGrid">
+        <div><b>START</b><span id="clockStart">--</span></div>
+        <div><b>STOP</b><span id="clockStop">--</span></div>
+        <div><b>PAUSED</b><span id="clockPaused">0 min</span></div>
+        <div><b>BILLABLE HOURS</b><span id="clockHours">0.00</span></div>
+        <div><b>LABOR TOTAL</b><span id="clockLabor">$0.00</span></div>
+      </div>
+      <div class="clockButtonGrid">
+        <button class="bigClockBtn start" onclick="clockIn()">CLOCK IN</button>
+        <button class="bigClockBtn pause" onclick="pauseClock()">PAUSE</button>
+        <button class="bigClockBtn resume" onclick="resumeClock()">RESUME</button>
+        <button class="bigClockBtn stop" onclick="clockOut()">CLOCK OUT</button>
+      </div>
+      <div class="buttonRow">
+        <button onclick="resetClock()">RESET</button>
+        <button onclick="sendClockToInvoice()">SEND TO INVOICE</button>
+        <button onclick="savePayrollRecord()">SAVE PAYROLL</button>
+        <button onclick="showPayrollSummary()">PAYROLL SUMMARY</button>
+      </div>
+      <section id="payrollOut" class="resultBox">Payroll/time records will appear here.</section>
+    </section>
+  </main>
+
+
+  <!-- FIELD TOOLS PRO -->
+  <main id="fieldTools" class="screen">
+    <h1 class="screenTitle">FIELD TOOLS PRO</h1>
+
+    <section class="fieldProPanel">
+      <div class="panelHead">
+        <b>PHASE 4 FIELD OPERATIONS</b>
+        <span>GPS • roadside mode • DOT checklist • photo notes • offline queue • customer updates</span>
+      </div>
+      <div class="fieldToolGrid">
+        <button onclick="dropGpsPin()">📍 DROP GPS PIN</button>
+        <button onclick="openCurrentGpsMap()">🗺️ OPEN MAP</button>
+        <button onclick="saveFieldJobLocal()">💾 SAVE FIELD JOB</button>
+        <button onclick="queueOfflineSync()">☁️ QUEUE OFFLINE SYNC</button>
+        <button onclick="copyCustomerUpdate()">📲 COPY CUSTOMER UPDATE</button>
+        <button onclick="copyText('quoteOut')">📋 COPY INVOICE</button>
+      </div>
+    </section>
+
+    <div class="formGrid">
+      <label>JOB SITE / LOCATION<input id="fieldLocationName" placeholder="Customer yard, roadside mile marker, shop bay"></label>
+      <label>GPS COORDINATES<input id="fieldGps" placeholder="Tap DROP GPS PIN"></label>
+      <label>ROADSIDE STATUS<select id="roadsideStatus"><option>Not Started</option><option>En Route</option><option>On Site</option><option>Diagnosing</option><option>Waiting on Parts</option><option>Repairing</option><option>Complete</option></select></label>
+      <label>ETA / UPDATE<input id="customerEta" placeholder="Example: On site now, parts run, 45 minutes"></label>
+    </div>
+
+    <div class="formGrid">
+      <label>FIELD NOTE<textarea id="fieldNote" placeholder="Roadside notes, safety issues, location details, customer update"></textarea></label>
+      <label>PHOTO NOTE<input id="fieldPhoto" type="file" accept="image/*"><img id="fieldPhotoPreview" class="previewImg" alt="Field photo preview"></label>
+    </div>
+
+    <section class="checklistPanel">
+      <div class="smartCardTitle"><span>DOT / FIELD CHECKLIST</span><span class="badge good">Tap items done</span></div>
+      <div class="checkGrid">
+        <label><input type="checkbox" class="dotCheck" value="Lights checked"> Lights</label>
+        <label><input type="checkbox" class="dotCheck" value="Brakes inspected"> Brakes</label>
+        <label><input type="checkbox" class="dotCheck" value="Air leaks checked"> Air Leaks</label>
+        <label><input type="checkbox" class="dotCheck" value="Tires inspected"> Tires</label>
+        <label><input type="checkbox" class="dotCheck" value="Fluids checked"> Fluids</label>
+        <label><input type="checkbox" class="dotCheck" value="Leaks inspected"> Leaks</label>
+        <label><input type="checkbox" class="dotCheck" value="Battery/charging checked"> Battery</label>
+        <label><input type="checkbox" class="dotCheck" value="Road test completed"> Road Test</label>
+      </div>
+      <div class="buttonRow">
+        <button onclick="buildDotChecklistNote()">BUILD CHECKLIST NOTE</button>
+        <button onclick="addChecklistToInvoice()">ADD TO INVOICE NOTES</button>
+      </div>
+    </section>
+
+    <section id="fieldOut" class="resultBox">Field tools ready. Drop GPS pin or build a checklist.</section>
+    <section id="offlineQueueOut" class="resultBox smallBox">Offline queue ready.</section>
+  </main>
+
+
+  <!-- OCR / VISION PRO -->
+  <main id="visionPro" class="screen">
+    <h1 class="screenTitle">OCR / VISION PRO</h1>
+
+    <section class="visionPanel">
+      <div class="panelHead">
+        <b>PHASE 5 CAMERA TOOLS</b>
+        <span>Part labels • VIN plates • receipts • work-order photos • scan → lookup → invoice</span>
+      </div>
+      <div class="visionGrid">
+        <div><b>PART LABEL</b><span>Read part numbers and brand names</span></div>
+        <div><b>VIN PLATE</b><span>Clean VIN text and send to truck lookup</span></div>
+        <div><b>RECEIPT</b><span>Pull part cost notes into invoice</span></div>
+        <div><b>JOB PHOTO</b><span>Attach image note to work order</span></div>
+      </div>
+    </section>
+
+    <label class="fileLabel fullWidth">SCAN PHOTO / CAMERA
+      <input id="visionImage" type="file" accept="image/*" capture="environment">
+    </label>
+    <img id="visionPreview" class="previewImg" alt="Vision preview">
+
+    <div class="formGrid">
+      <label>SCAN TYPE
+        <select id="visionType">
+          <option>Part Label</option>
+          <option>VIN Plate</option>
+          <option>Receipt</option>
+          <option>Work Order Photo</option>
+          <option>Sensor / Component</option>
+        </select>
+      </label>
+      <label>OCR / AI RAW TEXT<textarea id="visionRaw" placeholder="Scanned text or AI output appears here. You can paste or correct it too."></textarea></label>
+      <label>CLEANED PART / VIN / NOTE<textarea id="visionClean" placeholder="Cleaned scan result appears here. Correct before sending."></textarea></label>
+      <label>PHOTO NOTE<textarea id="visionNote" placeholder="Where picture was taken, unit, part location, symptoms, receipt notes"></textarea></label>
+    </div>
+
+    <div class="buttonRow featureButtons">
+      <button onclick="scanVisionPhoto()">SCAN PHOTO</button>
+      <button onclick="cleanVisionText()">CLEAN TEXT</button>
+      <button onclick="sendVisionToParts()">SEND TO PART LOOKUP</button>
+      <button onclick="lookupVisionPart()">LOOKUP SCANNED PART</button>
+      <button onclick="addVisionPartToInvoice()">ADD SCAN TO INVOICE</button>
+      <button onclick="sendVisionToVin()">SEND VIN TO TRUCK</button>
+      <button onclick="saveVisionPhotoNote()">SAVE PHOTO NOTE</button>
+      <button onclick="clearVisionScan()">CLEAR SCAN</button>
+    </div>
+
+    <section id="visionOut" class="resultBox">Camera OCR ready. Add a photo, then tap SCAN PHOTO.</section>
+    <section id="visionHistoryOut" class="resultBox smallBox">Vision scan history will appear here.</section>
+  </main>
+
+
+  <!-- BACKEND EXPANSION PRO -->
+  <main id="backendPro" class="screen">
+    <h1 class="screenTitle">BACKEND EXPANSION PRO</h1>
+
+    <section class="backendPanel">
+      <div class="panelHead">
+        <b>PHASE 7 DATABASE ENGINE</b>
+        <span>Indexed search • staging imports • recursive interchanges • torque • labor • fluids • failures</span>
+      </div>
+      <div class="backendGrid">
+        <div><b>RECURSIVE INTERCHANGE</b><span>Find OEM → aftermarket chains</span></div>
+        <div><b>IMPORT PIPELINE</b><span>Catalog/PDF staging tables</span></div>
+        <div><b>SPECS DATABASE</b><span>Torque, labor, fluids, filters</span></div>
+        <div><b>RANKING ENGINE</b><span>Confidence + VIN context</span></div>
+      </div>
+    </section>
+
+    <div class="formGrid">
+      <label>BACKEND SEARCH<input id="backendSearchQ" placeholder="Example: 5633513, water pump, X15, SPN 5246"></label>
+      <label>IMPORT SOURCE<input id="importSourceName" placeholder="Example: Fleetguard PDF, dealer catalog, manual seed"></label>
+      <label>IMPORT CATEGORY<input id="importCategory" placeholder="Filtration, Brakes, Engine, Diagnostic"></label>
+      <label>IMPORT NOTES<textarea id="importNotes" placeholder="Paste rows, catalog notes, PDF extraction notes, or manual seed comments"></textarea></label>
+    </div>
+
+    <div class="buttonRow featureButtons">
+      <button onclick="runBackendExpansionSearch()">RUN BACKEND SEARCH</button>
+      <button onclick="runInterchangeChain()">INTERCHANGE CHAIN</button>
+      <button onclick="queueStagingImport()">QUEUE IMPORT NOTE</button>
+      <button onclick="loadImportQueue()">LOAD IMPORT QUEUE</button>
+      <button onclick="copyText('backendOut')">COPY RESULTS</button>
+      <button onclick="clearBackendPro()">CLEAR BACKEND</button>
+    </div>
+
+    <section id="backendOut" class="resultBox">Backend expansion ready. Search a part, engine, system, fault, torque spec, labor job, or staged import.</section>
+    <section id="importQueueOut" class="resultBox smallBox">Import queue ready.</section>
+  </main>
+
+  <!-- INVOICE -->
+  <main id="invoice" class="screen">
+    <h1 class="screenTitle">INVOICE / QUOTE</h1>
+    <div class="formGrid">
+      <label>CUSTOMER<input id="custName" placeholder="Customer name"></label>
+      <label>PHONE<input id="custPhone" placeholder="Customer phone"></label>
+      <label>TRUCK<input id="invoiceTruck" placeholder="Year make model / unit"></label>
+      <label>VIN<input id="invoiceVin" placeholder="VIN"></label>
+      <label>LABOR HOURS<input id="laborHours" type="number" step="0.1"></label>
+      <label>LABOR RATE<input id="laborRate" type="number"></label>
+      <label>SERVICE CALL<input id="serviceCall" type="number"></label>
+      <label>EXTRA PARTS COST<input id="partsCost" type="number" placeholder="Manual extra parts"></label>
+      <label>TAX %<input id="taxRate" type="number"></label>
+      <label>CARD FEE %<input id="cardFee" type="number"></label>
+    </div>
+    <div class="formGrid">
+      <label>COMPLAINT<textarea id="complaintText" placeholder="Customer complaint / symptom"></textarea></label>
+      <label>CAUSE<textarea id="causeText" placeholder="Root cause / test results"></textarea></label>
+      <label>CORRECTION<textarea id="correctionText" placeholder="Correction / repair performed"></textarea></label>
+      <label>WORK / PARTS DESCRIPTION<textarea id="laborDesc" placeholder="Extra work notes, parts notes, warranty notes"></textarea></label>
+    </div>
+
+    <section id="invoicePartsOutInvoice" class="resultBox smallBox">Invoice parts will appear here.</section>
+
+    <div class="buttonRow featureButtons">
+      <button onclick="buildInvoice()">BUILD INVOICE</button>
+      <button onclick="saveInvoice()">SAVE INVOICE</button>
+      <button onclick="saveJobCloud()">SAVE JOB CLOUD</button>
+      <button onclick="copyText('quoteOut')">COPY INVOICE</button>
+      <button onclick="sendClockToInvoice()">ADD CLOCK HOURS</button>
+      <button onclick="clearInvoiceForm()">CLEAR INVOICE</button>
+      <button onclick="loadLastInvoice()">LOAD LAST INVOICE</button>
+      <button onclick="loadJobHistoryCloud()">LOAD CLOUD HISTORY</button>
+      <button onclick="clearInvoiceParts()">CLEAR PARTS LIST</button>
+      <button onclick="showScreen('parts')">ADD MORE PARTS</button>
+    </div>
+
+    <section id="quoteOut" class="resultBox">Invoice output will appear here.</section>
+    <section id="savedInvoicesOut" class="resultBox smallBox">Saved invoices will appear here.</section>
+    <section id="cloudHistoryOut" class="resultBox smallBox">Cloud job history will appear here.</section>
+  </main>
+
+  <!-- SETTINGS -->
+  <main id="settings" class="screen">
+    <h1 class="screenTitle">SETTINGS</h1>
+    <div class="formGrid">
+      <label>SHOP NAME<input id="shopName" value="Rolling Wrench Diesel LLC"></label>
+      <label>PHONE<input id="shopPhone" value="260-502-6222"></label>
+      <label>WEBSITE<input id="shopWebsite" value="www.rollingwrenchdiesel.com"></label>
+      <label>DEFAULT LABOR RATE<input id="defaultLaborRate" value="135"></label>
+      <label>DEFAULT SERVICE CALL<input id="defaultServiceCall" value="250"></label>
+      <label>DEFAULT TAX %<input id="defaultTax" value="0"></label>
+      <label>DEFAULT CARD FEE %<input id="defaultCardFee" value="0"></label>
+      </div>
+    <label>TERMS<textarea id="shopTerms">Payment due upon completion. Parts and labor warranty subject to shop policy.</textarea></label>
+    <button onclick="saveSettings()">SAVE SETTINGS</button>
+<section id="settingsOut" class="resultBox">
+  Settings ready.
+</section>
+
+
+<div id="rwThemeEnginePanel" class="rwThemeEnginePanel">
+
+  <div class="rwThemeHeader">
+    <strong>🎨 VISUAL SYSTEM</strong>
+    <span>Rolling Wrench AI</span>
+  </div>
+
+  <label>Brand Theme</label>
+
+  <div class="rwThemeGrid">
+    <button onclick="setRwBrandTheme('rolling')">Rolling Wrench</button>
+    <button onclick="setRwBrandTheme('cat')">CAT</button>
+    <button onclick="setRwBrandTheme('cummins')">Cummins</button>
+    <button onclick="setRwBrandTheme('detroit')">Detroit</button>
+    <button onclick="setRwBrandTheme('paccar')">PACCAR</button>
+    <button onclick="setRwBrandTheme('nightops')">Night Ops</button>
+    <button onclick="setRwBrandTheme('brightshop')">Bright Shop</button>
+    <button onclick="setRwBrandTheme('carbon')">Carbon Steel</button>
+  </div>
+
+  <label>Brightness Mode</label>
+
+  <div class="rwThemeGrid three">
+    <button onclick="setRwLightMode('day')">Daylight</button>
+    <button onclick="setRwLightMode('shop')">Shop</button>
+    <button onclick="setRwLightMode('night')">Night</button>
+  </div>
+
+  <label>Logo Style</label>
+
+  <div class="rwThemeGrid">
+    <button onclick="setRwLogoStyle('shoppro')">Shop Pro</button>
+    <button onclick="setRwLogoStyle('chrome')">Chrome</button>
+    <button onclick="setRwLogoStyle('minimal')">Minimal</button>
+    <button onclick="setRwLogoStyle('industrial')">Industrial</button>
+  </div>
+
+  <div class="rwThemePreview">
+    <div class="rwPreviewLogo" id="rwPreviewLogo">RW</div>
+
+    <div>
+      <strong>Preview</strong>
+      <p>Buttons, cards, AI panels, and tool screens update instantly.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 9 QA / DEBUG / STABILITY PRO -->
+  <main id="debugPro" class="screen">
+    <h1 class="screenTitle">QA / DEBUG / STABILITY PRO</h1>
+
+    <section class="debugHero">
+      <div>
+        <b>APP VERSION</b>
+        <span id="debugVersion">Phase 9</span>
+      </div>
+      <div>
+        <b>SUPABASE</b>
+        <span id="debugSupabaseStatus">Not tested</span>
+      </div>
+      <div>
+        <b>CACHE</b>
+        <span id="debugCacheStatus">Ready</span>
+      </div>
+    </section>
+
+    <div class="buttonRow featureButtons">
+      <button onclick="runFullQACheck()">RUN FULL QA CHECK</button>
+      <button onclick="testAllCoreButtons()">TEST CORE BUTTONS</button>
+      <button onclick="testSupabaseConnection()">TEST SUPABASE</button>
+      <button onclick="testRequiredTables()">CHECK TABLES</button>
+      <button onclick="testRequiredRPCs()">CHECK RPC FUNCTIONS</button>
+      <button onclick="showErrorLog()">SHOW ERROR LOG</button>
+      <button onclick="exportDebugReport()">EXPORT DEBUG REPORT</button>
+      <button onclick="resetAppCache()">RESET CACHE</button>
+      <button onclick="clearLocalAppData()">CLEAR LOCAL STORAGE</button>
+      <button onclick="enableFallbackMode()">FALLBACK MODE</button>
+    </div>
+
+    <section id="debugOut" class="resultBox">Debug tools ready. Run full QA after each upload.</section>
+    <section id="debugLogOut" class="resultBox smallBox">Error log will appear here.</section>
+  </main>
+
+
+  <!-- PHASE 10 FINAL RELEASE PRO -->
+  <main id="releasePro" class="screen">
+    <h1 class="screenTitle">FINAL RELEASE PRO</h1>
+
+    <section class="releaseHero">
+      <div>
+        <small>APP</small>
+        <b>ROLLING CECIL AI</b>
+        <span id="releaseVersion">Phase 10 Final Release</span>
+      </div>
+      <div>
+        <small>STATUS</small>
+        <b class="goodText">FIELD READY</b>
+        <span>Shop OS • Parts • Diagnostics • Vision • Debug</span>
+      </div>
+    </section>
+
+    <section class="releasePanel">
+      <h2>FIRST SETUP CHECKLIST</h2>
+      <div class="checkGrid">
+        <label><input type="checkbox"> Upload all files to GitHub root</label>
+        <label><input type="checkbox"> Run latest Supabase SQL</label>
+        <label><input type="checkbox"> Test Supabase connection</label>
+        <label><input type="checkbox"> Test Oracle lookup</label>
+        <label><input type="checkbox"> Test save job / save part</label>
+        <label><input type="checkbox"> Test labor clock</label>
+        <label><input type="checkbox"> Clear old Safari/Home Screen cache</label>
+        <label><input type="checkbox"> Save first real customer job</label>
+      </div>
+    </section>
+
+    <section class="releasePanel">
+      <h2>WHAT WORKS NOW</h2>
+      <div class="releaseList">
+        <span>✓ Active truck memory</span>
+        <span>✓ Oracle parts lookup</span>
+        <span>✓ Universal SQL search</span>
+        <span>✓ Repair kits</span>
+        <span>✓ Saved jobs / parts / invoices</span>
+        <span>✓ Labor clock</span>
+        <span>✓ Field tools + GPS/DOT checklist</span>
+        <span>✓ OCR/Vision workflow shell</span>
+        <span>✓ Diesel Brain diagnostic hooks</span>
+        <span>✓ QA/debug tools</span>
+      </div>
+    </section>
+
+    <section class="releasePanel warnPanel">
+      <h2>SAFETY / DATA NOTE</h2>
+      <p>This app is built for field workflow support. Always verify safety-critical specs, torque, fitment, VIN/ESN/CPL, and OEM procedures before ordering parts or completing repairs.</p>
+    </section>
+
+    <div class="buttonRow featureButtons">
+      <button onclick="showReleaseNotes()">RELEASE NOTES</button>
+      <button onclick="runProductionChecklist()">RUN PRODUCTION CHECK</button>
+      <button onclick="exportLocalBackup()">EXPORT LOCAL BACKUP</button>
+      <button onclick="copyUploadInstructions()">COPY UPLOAD STEPS</button>
+      <button onclick="showScreen('debugPro')">OPEN DEBUG</button>
+      <button onclick="resetAppCache()">RESET CACHE</button>
+    </div>
+
+    <section id="releaseOut" class="resultBox">Final Release tools ready.</section>
+  </main>
+
+
+
+  <!-- PHASE 11 AI BRAIN / LIVE RETRIEVAL PRO -->
+  <main id="aiBrainPro" class="screen">
+    <h1 class="screenTitle">AI BRAIN / EMBEDDINGS RAG PRO</h1>
+    <section class="resultBox compactIntro">
+      <h2>Rolling Cecil AI Brain</h2>
+      <p>Phase 13 adds ingestion queue hooks, hybrid RAG search, embedding-router workflow, repair memory ranking, and source-backed diagnostic answers.</p>
+      <div class="buttonRow">
+        <button onclick="showBrainRouterPlan()">SHOW ROUTER PLAN</button>
+        <button onclick="runBrainQACheck()">CHECK BRAIN BACKEND</button>
+        <button onclick="showEmbeddingRouterPlan()">EMBEDDING PLAN</button>
+      </div>
+    </section>
+
+    <section class="brainGrid">
+      <div class="brainPanel">
+        <h2>Semantic / Manual Search</h2>
+        <label>QUESTION / SYMPTOM / PART<textarea id="brainSearchText" placeholder="Example: X15 stutters at idle, SPN 123 FMI 4, DD15 delta pressure sensor test..."></textarea></label>
+        <div class="buttonRow">
+          <button onclick="runAIBrainSearch()">LIVE RETRIEVAL SEARCH</button>
+          <button onclick="runHybridRagSearch()">HYBRID RAG SEARCH</button>
+          <button onclick="sendBrainToDieselDoctor()">SEND TO DOCTOR</button>
+        </div>
+      </div>
+
+      <div class="brainPanel">
+        <h2>Save Verified Repair Memory</h2>
+        <label>FAULT CODE<input id="memoryFaultCode" placeholder="SPN 123 FMI 4"></label>
+        <label>SYMPTOM<textarea id="memorySymptom" placeholder="Truck complaint / symptom"></textarea></label>
+        <label>REPAIR ACTION<textarea id="memoryRepairAction" placeholder="What fixed it"></textarea></label>
+        <button onclick="saveVerifiedRepairMemory()">SAVE VERIFIED FIX</button>
+      </div>
+
+      <div class="brainPanel">
+        <h2>X-Ray Photo Component Map</h2>
+        <label>COMPONENT NAME<input id="xrayComponentName" placeholder="Turbocharger, EGR valve, NOx sensor..."></label>
+        <label>PHOTO PATH / NOTE<input id="xrayPhotoPath" placeholder="Storage path or photo note"></label>
+        <label>COMPONENT NOTES<textarea id="xrayNotes" placeholder="Bounding box / location / tech note"></textarea></label>
+        <button onclick="saveComponentPhotoMap()">SAVE COMPONENT MAP</button>
+      </div>
+    
+
+      <div class="brainPanel phase13Panel">
+        <h2>Phase 13 Manual / TSB Ingestion Queue</h2>
+        <label>SOURCE NAME<input id="phase13SourceName" placeholder="Fleetguard PDF, Cummins manual, shop field note"></label>
+        <label>CATEGORY<input id="phase13Category" placeholder="Manual, TSB, Case Study, Catalog"></label>
+        <label>PASTE TEXT / EXTRACTED CHUNK<textarea id="phase13Content" placeholder="Paste manual paragraph, PDF extracted text, service bulletin note, or field repair note..."></textarea></label>
+        <div class="buttonRow">
+          <button onclick="queueManualIngestion()">QUEUE INGESTION</button>
+          <button onclick="showEmbeddingRouterPlan()">ROUTER PLAN</button>
+        </div>
+      </div>
+</section>
+
+    <section id="brainOut" class="resultBox">Live Retrieval ready. Search symptoms, manuals, case notes, verified fixes, or component maps.</section>
+  </main>
+
+
+
+  <!-- PHASE 17 PC ADMIN / PAYROLL CONTROL CENTER -->
+  <main id="pcAdmin" class="screen">
+    <h1 class="screenTitle">PC ADMIN / PAYROLL CONTROL CENTER</h1>
+    <section class="resultBox compactIntro">
+      <h2>Bookkeeping + Shop Control</h2>
+      <p>Built for the phone now, ready to expand into a PC dashboard later. Tracks employee time, payroll export, invoice parts, offline queue, and job data.</p>
+      <div class="buttonRow">
+        <button onclick="renderPcAdminDashboard()">REFRESH ADMIN</button>
+        <button onclick="showPayrollSummary()">PAYROLL DASHBOARD</button>
+        <button onclick="exportPayrollCSV()">EXPORT PAYROLL CSV</button>
+        <button onclick="exportBookkeepingJSON()">EXPORT BOOKKEEPING JSON</button>
+        <button onclick="enableOfflineCaching()">ENABLE OFFLINE CACHE</button>
+        <button onclick="cacheCurrentJobOffline()">SAVE OFFLINE SNAPSHOT</button>
+      </div>
+    </section>
+    <section id="pcAdminOut" class="resultBox">PC Admin dashboard loading...</section>
+    <section class="resultBox">
+      <h2>Future PC Modules</h2>
+      <div class="releaseList">
+        <span>✓ Employee time cards</span>
+        <span>✓ Payroll export</span>
+        <span>✓ Job costing</span>
+        <span>✓ Supplier spend</span>
+        <span>✓ Invoice history</span>
+        <span>✓ Bookkeeping export</span>
+        <span>✓ Offline sync queue</span>
+        <span>✓ Repair history by VIN</span>
+      </div>
+    </section>
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottomNav">
+    <button class="active" onclick="showScreen('home')">⌂<span>HOME</span></button>
+    <button onclick="showScreen('faultDoctor')">🩺<span>DOCTOR</span></button>
+    <button onclick="showScreen('parts')">🔎<span>PARTS</span></button>
+    <button onclick="showScreen('repairHud')">🔧<span>REPAIR</span></button>
+    <button onclick="showScreen('settings')">•••<span>MORE</span></button>
+  </nav>
+
+</div>
+
+
+  <script src="app.js"></script>
+
+<script src="engine_patch.js"></script>
+
+<script src="master_search_hook_patch.js"></script>
+
+<script src="phase19_parts_tech_answer_patch.js"></script>
+
+<script src="phase20_smart_repair_kit_frontend.js"></script>
+
+<script src="lookupPart_patch.js"></script>
+
+<!-- =========================================================
+ROLLING WRENCH AI - COMBINED UI PATCH HTML
+Includes:
+- Top-right logo/settings button
+- Settings panel
+- Master ChatGPT-style input bar
+- Optional clean quick actions in settings
+========================================================= -->
+
+<!-- TOP RIGHT LOGO SETTINGS BUTTON -->
+<button id="rwTopRightSettings" class="rwTopRightSettings" onclick="toggleRwSettingsPanel()">
+  <span class="rwTopRightLogoText">RW</span>
+</button>
+
+<!-- QUICK SETTINGS PANEL -->
+<div id="rwSettingsPanel" class="rwSettingsPanel">
+  <div class="rwSettingsHeader">
+    <strong>⚙️ ROLLING WRENCH AI SETTINGS</strong>
+    <button onclick="toggleRwSettingsPanel()">✕</button>
+  </div>
+
+  <div class="rwSettingsGrid">
+    <button onclick="setRwDisplayMode('compact')">COMPACT</button>
+    <button onclick="setRwDisplayMode('master')">MASTER</button>
+    <button onclick="toggleRwDockMode()">DOCK</button>
+
+    <select id="rwThemeSelect" onchange="setRwTheme(this.value)">
+      <option value="orange-black">Orange/Black</option>
+      <option value="green-black">Green/Black</option>
+      <option value="blue-black">Blue/Black</option>
+      <option value="steel">Steel</option>
+    </select>
+
+    <button onclick="openSectionSafe('backend')">BACKEND</button>
+    <button onclick="openSectionSafe('debug')">DEBUG</button>
+    <button onclick="openSectionSafe('release')">RELEASE</button>
+    <button onclick="openSectionSafe('savejob')">SAVE JOB</button>
+  </div>
+</div>
+
+<!-- MASTER CHAT BAR - replace old MASTER input area with this -->
+<div class="rwMasterChatBar">
+  <button class="rwMasterPlus" type="button" onclick="document.getElementById('masterImageInput').click()">+</button>
+
+  <div class="rwMasterInputWrap">
+    <textarea
+      id="masterInput"
+      class="rwMasterInput"
+      rows="1"
+      placeholder="Ask Rolling Wrench AI"
+      oninput="rwAutoGrowMasterInput(this)"
+    ></textarea>
+
+    <button class="rwMasterMic" type="button" onclick="startRwVoiceInput()">🎙️</button>
+    <button class="rwMasterSend" type="button" onclick="runMasterSearch()">▌▌▌</button>
+  </div>
+
+  <input
+    id="masterImageInput"
+    type="file"
+    accept="image/*"
+    style="display:none"
+    onchange="masterImageSelected()"
+  />
+</div>
+
+<img id="masterImagePreview" class="masterImagePreview">
+
+
+<!-- ROLLING WRENCH AI - CLEAN HOME + FULL SCREEN AI OVERLAY -->
+<div id="rwHomeAskBar" class="rwHomeAskBar" onclick="openRollingWrenchAIOverlay()">
+  <button class="rwHomePlus" type="button" onclick="event.stopPropagation();openRollingWrenchAIOverlay(true);">+</button>
+  <div class="rwHomeAskText">Ask Rolling Wrench AI</div>
+  <div class="rwHomeMic">🎙️</div>
+  <div class="rwHomeSend">▌▌▌</div>
+</div>
+
+<div id="rwMasterDropBox" class="rwMasterDropBox">
+  <button class="rwMasterDropBtn" type="button" onclick="toggleRwMasterDrop()">🔎 MASTER SEARCH</button>
+  <div id="rwMasterDropContent" class="rwMasterDropContent">
+    <textarea id="rwMasterDropInput" placeholder="VIN, part number, fault code, symptom, repair, quote note..."></textarea>
+    <button class="rwRunMasterBtn" type="button" onclick="runRwMasterDropSearch()">RUN MASTER SEARCH</button>
+    <div id="rwMasterDropResult" class="rwMasterDropResult">Results will show here.</div>
+  </div>
+</div>
+
+<div id="rwAiOverlay" class="rwAiOverlay">
+  <div class="rwAiOverlayTop">
+    <button class="rwAiBackBtn" type="button" onclick="closeRollingWrenchAIOverlay()">←</button>
+    <div class="rwAiOverlayTitle">Rolling Wrench AI</div>
+    <button class="rwAiClearBtn" type="button" onclick="clearRollingWrenchAIOverlay()">CLEAR</button>
+  </div>
+
+  <div class="rwAiOverlayBody">
+    <div id="rwAiPhotoPreviewWrap" class="rwAiPhotoPreviewWrap">
+      <img id="rwAiPhotoPreview" class="rwAiPhotoPreview" alt="Selected photo">
+    </div>
+    <div id="rwAiOverlayAnswer" class="rwAiOverlayAnswer">
+      Ask a question, add a picture if needed, and Rolling Wrench AI will answer here.
+    </div>
+  </div>
+
+  <div class="rwAiOverlayInputBar">
+    <button class="rwAiPlusBtn" type="button" onclick="document.getElementById('rwAiImageInput').click()">+</button>
+    <textarea id="rwAiQuestionInput" class="rwAiQuestionInput" rows="1" placeholder="Ask Rolling Wrench AI" oninput="rwAiAutoGrow(this);saveRwAiOverlayState();"></textarea>
+    <button class="rwAiMicBtn" type="button" onclick="startRwOverlayVoice()">🎙️</button>
+    <button class="rwAiSendBtn" type="button" onclick="askRollingWrenchAIOverlay()">▌▌▌</button>
+    <input id="rwAiImageInput" type="file" accept="image/*" style="display:none" onchange="rwAiOverlayImageSelected()">
+  </div>
+</div>
+
+<!-- ROLLING WRENCH AI - WORKSPACE HEADER TEMPLATE
+Paste near bottom of index.html before </body>.
+This provides the shared screen header used by workspace screens.
+-->
+<div id="rwWorkspaceHeader" class="rwWorkspaceHeader">
+  <button class="rwWorkspaceBack" type="button" onclick="rwBackHome()">←</button>
+  <div id="rwWorkspaceTitle" class="rwWorkspaceTitle">Rolling Wrench AI</div>
+  <button class="rwWorkspaceClear" type="button" onclick="rwClearCurrentWorkspace()">CLEAR</button>
+</div>
+
+<!-- OPTIONAL QUICK TOOLS COLLAPSE -->
+<div class="rwQuickToolsCollapse"> 
+  <button class="rwQuickToolsBtn" type="button" onclick="rwToggleQuickTools()">⚡ QUICK TOOLS</button>
+  <div id="rwQuickToolsPanel" class="rwQuickToolsPanel">
+    <button onclick="rwGo('master','home')">MASTER</button>
+    <button onclick="rwGo('parts','parts')">+ PART</button>
+    <button onclick="rwGo('shop','quote')">+ LABOR</button>
+    <button onclick="rwGo('clock','clock')">START CLOCK</button>
+    <button onclick="rwGo('vin','vin')">VIN</button>
+    <button onclick="rwGo('camera','camera')">CAMERA</button>
+    <button onclick="rwGo('shop','gps')">GPS/DOT</button>
+    <button onclick="rwGo('backend','backend')">BACKEND</button>
+    <button onclick="rwGo('debug','debug')">DEBUG</button>
+    <button onclick="rwGo('release','release')">RELEASE</button>
+    <button onclick="rwGo('savejob','savejob')">SAVE JOB</button>
+  </div>
+</div>
+
+
+<link rel="stylesheet" href="02_combined_ui_patch.css">
+<link rel="stylesheet" href="02_clean_home_overlay.css">
+<link rel="stylesheet" href="02_workspace_back_clear.css">
+<link rel="stylesheet" href="02_theme_graphics_engine.css">
+
+<script src="03_combined_ui_patch.js"></script>
+<script src="03_clean_home_overlay.js"></script>
+<script src="03_workspace_back_clear.js"></script>
+<script src="03_theme_graphics_engine.js"></script>
+
+</body>
+</html>
