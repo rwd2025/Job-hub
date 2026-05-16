@@ -1,0 +1,41 @@
+ROLLING WRENCH AI TEST BUILD V1
+
+Files included:
+- index.html
+- style.css
+- app.js
+- manifest.json
+- service-worker.js
+- icon-192.png
+- icon-512.png
+- apple-touch-icon.png
+
+Static checks passed:
+- Only one app.js script loaded.
+- No 01_/02_/03_ patch files referenced.
+- No phase patch scripts referenced.
+- Home screen is one clean system.
+- 15 screens found.
+- <main> open/close count balanced.
+- Required files exist.
+
+Screens included:
+- aiBrainPro
+- backendPro
+- dieselAI
+- faultDoctor
+- fieldTools
+- home
+- invoice
+- parts
+- releasePro
+- repairHud
+- schematics
+- settings
+- timeClock
+- vin
+- visionPro
+
+Notes:
+This is a clean TEST BUILD foundation. It keeps core UI and safe placeholder logic.
+Advanced Supabase/RAG/Oracle calls are staged as hooks and should be integrated cleanly after this test build is confirmed stable.
