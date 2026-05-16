@@ -969,7 +969,73 @@
 
 <script src="lookupPart_patch.js"></script>
 
-01_combined_ui_patch.html
+<!-- =========================================================
+ROLLING WRENCH AI - COMBINED UI PATCH HTML
+Includes:
+- Top-right logo/settings button
+- Settings panel
+- Master ChatGPT-style input bar
+- Optional clean quick actions in settings
+========================================================= -->
+
+<!-- TOP RIGHT LOGO SETTINGS BUTTON -->
+<button id="rwTopRightSettings" class="rwTopRightSettings" onclick="toggleRwSettingsPanel()">
+  <span class="rwTopRightLogoText">RW</span>
+</button>
+
+<!-- QUICK SETTINGS PANEL -->
+<div id="rwSettingsPanel" class="rwSettingsPanel">
+  <div class="rwSettingsHeader">
+    <strong>⚙️ ROLLING WRENCH AI SETTINGS</strong>
+    <button onclick="toggleRwSettingsPanel()">✕</button>
+  </div>
+
+  <div class="rwSettingsGrid">
+    <button onclick="setRwDisplayMode('compact')">COMPACT</button>
+    <button onclick="setRwDisplayMode('master')">MASTER</button>
+    <button onclick="toggleRwDockMode()">DOCK</button>
+
+    <select id="rwThemeSelect" onchange="setRwTheme(this.value)">
+      <option value="orange-black">Orange/Black</option>
+      <option value="green-black">Green/Black</option>
+      <option value="blue-black">Blue/Black</option>
+      <option value="steel">Steel</option>
+    </select>
+
+    <button onclick="openSectionSafe('backend')">BACKEND</button>
+    <button onclick="openSectionSafe('debug')">DEBUG</button>
+    <button onclick="openSectionSafe('release')">RELEASE</button>
+    <button onclick="openSectionSafe('savejob')">SAVE JOB</button>
+  </div>
+</div>
+
+<!-- MASTER CHAT BAR - replace old MASTER input area with this -->
+<div class="rwMasterChatBar">
+  <button class="rwMasterPlus" type="button" onclick="document.getElementById('masterImageInput').click()">+</button>
+
+  <div class="rwMasterInputWrap">
+    <textarea
+      id="masterInput"
+      class="rwMasterInput"
+      rows="1"
+      placeholder="Ask Rolling Wrench AI"
+      oninput="rwAutoGrowMasterInput(this)"
+    ></textarea>
+
+    <button class="rwMasterMic" type="button" onclick="startRwVoiceInput()">🎙️</button>
+    <button class="rwMasterSend" type="button" onclick="runMasterSearch()">▌▌▌</button>
+  </div>
+
+  <input
+    id="masterImageInput"
+    type="file"
+    accept="image/*"
+    style="display:none"
+    onchange="masterImageSelected()"
+  />
+</div>
+
+<img id="masterImagePreview" class="masterImagePreview">
 
 
 
