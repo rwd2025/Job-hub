@@ -1,0 +1,115 @@
+/* ROLLING WRENCH AI - WORKSPACE BACK + CLEAR PATCH
+Paste at bottom of style.css.
+*/
+
+/* Shared workspace top bar */
+.rwWorkspaceHeader{
+  position:sticky;
+  top:0;
+  z-index:8000;
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  background:#050505;
+  border-bottom:1px solid #ff6500;
+  padding:10px 12px;
+  min-height:68px;
+  box-sizing:border-box;
+}
+
+.rwWorkspaceHeader.active{
+  display:flex;
+}
+
+.rwWorkspaceBack,
+.rwWorkspaceClear{
+  border:1px solid #ff6500;
+  background:#101820;
+  color:#fff;
+  border-radius:16px;
+  min-width:62px;
+  min-height:50px;
+  padding:10px 14px;
+  font-weight:900;
+  letter-spacing:1px;
+}
+
+.rwWorkspaceBack{
+  font-size:24px;
+}
+
+.rwWorkspaceTitle{
+  flex:1;
+  color:#fff;
+  text-align:center;
+  font-weight:900;
+  letter-spacing:1px;
+  font-size:18px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* Make opened workspace feel like its own screen */
+.rw-workspace-open .appHeader,
+.rw-workspace-open .topHero,
+.rw-workspace-open .homeOnly,
+.rw-workspace-open .compactLauncher,
+.rw-workspace-open #rwHomeAskBar,
+.rw-workspace-open #rwMasterDropBox{
+  display:none !important;
+}
+
+/* Optional: apply this class to old quick blocks to keep them hidden on clean home */
+.homeQuickButtons,
+.quickButtonWrap,
+.masterControls,
+.displayModeBar,
+.displayToggleWrap,
+.mainQuickButtons,
+.oldQuickButtonBlock{
+  display:none !important;
+}
+
+/* Tool panel used for quick buttons if you keep them */
+.rwQuickToolsCollapse{
+  width:calc(100% - 24px);
+  margin:10px 12px 18px;
+}
+
+.rwQuickToolsBtn{
+  width:100%;
+  min-height:58px;
+  border-radius:18px;
+  border:1px solid #ff6500;
+  background:#111820;
+  color:#fff;
+  font-weight:900;
+  letter-spacing:1px;
+}
+
+.rwQuickToolsPanel{
+  display:none;
+  margin-top:10px;
+  border:1px solid #174563;
+  border-radius:18px;
+  padding:12px;
+  background:#071018;
+}
+
+.rwQuickToolsPanel.open{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.rwQuickToolsPanel button{
+  min-height:54px;
+  border-radius:16px;
+  border:1px solid #ff6500;
+  background:#101820;
+  color:#fff;
+  font-weight:900;
+  letter-spacing:1px;
+}
