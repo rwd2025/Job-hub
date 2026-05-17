@@ -1,5 +1,0 @@
-Rolling Wrench AI TARGET LOCKED V7
-Target screenshot layout locked.
-Every home card opens a working module shell.
-Job clock has full controls.
-Scanner is under construction.
