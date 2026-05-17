@@ -1,6 +1,5 @@
 const $=id=>document.getElementById(id);
 
-// Module layouts injection for the overlay panel
 const modules={
 menu:["Menu",`<div class="grid grid-cols-2 gap-2">${["vin","parts","doctor","repair","quote","clock","vision","manuals","gps","memory","scanner","settings"].map(x=>`<button class="actionBtn" onclick="openPanel('${x}')">${x.toUpperCase()}</button>`).join("")}</div>`],
 settings:["Settings",`<div class="space-y-3"><button class="actionBtn w-full" onclick="alert('Backend URL setting shell ready')">Backend URL</button><button class="actionBtn w-full" onclick="alert('Theme system shell ready')">Theme / Layout</button><button class="actionBtn w-full" onclick="alert('Debug panel shell ready')">Debug</button></div>`],
@@ -21,10 +20,8 @@ more:["More",`<div class="grid grid-cols-2 gap-2"><button class="actionBtn" oncl
 
 let clockStart=null,clockTimer=null;
 
-// Lucide structural rendering loop wrapper
 function renderIcons(){ if(window.lucide) lucide.createIcons(); }
 
-// Overlay UI visibility panel management handlers
 function openPanel(name){
   const m=modules[name]||modules.more;
   $("homeScreen").classList.add("hidden");
@@ -40,74 +37,51 @@ function goHome(){
   renderIcons();
 }
 
-// Global Camera Trigger handlers
 function openCamera(){ $("cameraInput").click(); }
 $("cameraInput").addEventListener("change",e=>{const f=e.target.files[0]; if(f) alert("Photo loaded: "+f.name);});
 function startVoiceShell(){ alert("Voice input shell ready. Backend voice API connects next."); }
 
-// Process and test core search behaviors
 function runMaster(){
   const q=$("masterQuery").value.trim();
   $("masterOut").textContent=q?`Searching Rolling Wrench AI modules for:\n${q}\n\nRoutes: VIN, Parts, Diesel Doctor, Repair Brain, Quote Notes.`:"Enter a question first.";
 }
 
-// Maps modified state directly to the exact home screen layout tags
 function saveTruck(){
   const vin=$("vinInput").value||"NONE", eng=$("engineInput").value||"UNKNOWN";
-  
-  // Update Active Top Horizontal Status Bar
-  if($("activeTruckEngine")) $("activeTruckEngine").textContent=eng.toUpperCase();
-  if($("truckVinSmall")) $("truckVinSmall").textContent=vin;
-  
-  // Update the detailed Spec Grid elements inside the main Truck Frame Card
-  if($("specEngine")) $("specEngine").textContent=eng.toUpperCase();
-  if($("specEsn")) $("specEsn").textContent=$("esnInput").value||"----";
-  if($("specCpl")) $("specCpl").textContent=$("cplInput").value||"----";
-  
-  // Dynamically find and update the static raw text nodes within the Spec Grid container
-  const specCardContainer = document.querySelector('.grid.grid-cols-2.gap-x-2.gap-y-1.5');
-  if (specCardContainer) {
-    const values = specCardContainer.getElementsByClassName('specVal');
-    if (values && values[0]) {
-      values[0].textContent = vin; // Directly sets the first item containing the layout VIN text
-    }
-  }
-
+  $("activeTruckEngine").textContent=eng.toUpperCase();
+  $("truckVinSmall").textContent=vin;
+  $("specEngine").textContent=eng.toUpperCase();
+  $("specEsn").textContent=$("esnInput").value||"----";
+  $("specCpl").textContent=$("cplInput").value||"----";
   $("vinOut").textContent="Active truck saved to dashboard.";
 }
 
-// Mock business processing utilities placeholders 
 function lookupParts(){const q=$("partInput").value.trim();$("partsOut").textContent=q?`Parts lookup shell:\n${q}\n\nNext phase connects Supabase/Oracle parts + interchange + kits.`:"Enter a part number or part name."}
 function runDoctor(){const q=$("doctorInput").value.trim();$("doctorOut").textContent=q?`Diesel Doctor diagnostic shell:\n${q}\n\nNext phase connects FastAPI/Ollama/Neo4j diagnostic backend.`:"Enter a fault or symptom."}
 function runRepair(){const q=$("repairInput").value.trim();$("repairOut").textContent=q?`Repair plan shell:\n${q}\n\nIncludes steps, tools, warnings, specs when backend is connected.`:"Enter a repair question."}
 
-// Build quote processing block math calculation logic
 function buildQuote(){
   const h=parseFloat($("laborHours").value||0),r=parseFloat($("laborRate").value||0),c=parseFloat($("callOut").value||0),p=parseFloat($("partsCost").value||0);
   const total=h*r+c+p;
   $("quoteOut").textContent=`ROLLING WRENCH QUOTE\nLabor: ${h.toFixed(2)} x $${r.toFixed(2)} = $${(h*r).toFixed(2)}\nCall Out: $${c.toFixed(2)}\nParts: $${p.toFixed(2)}\nTOTAL: $${total.toFixed(2)}`;
 }
 
-// Accurate time collection engine loop routines
 function clockIn(){clockStart=Date.now();$("clockStatus").textContent="CLOCKED IN";clearInterval(clockTimer);clockTimer=setInterval(updateClock,1000);updateClock();}
 function updateClock(){if(!clockStart)return;const hrs=(Date.now()-clockStart)/3600000;$("clockTimer").textContent=hrs.toFixed(2)+" hrs";}
 function clockOut(){if(!clockStart)return;updateClock();$("clockStatus").textContent="CLOCKED OUT";clearInterval(clockTimer);}
 function resetClock(){clockStart=null;clearInterval(clockTimer);$("clockStatus").textContent="CLOCKED OUT";$("clockTimer").textContent="0.00 hrs";}
 
-// Geolocation spatial positioning routines
 function dropGps(){
   if(!navigator.geolocation){$("gpsOut").textContent="GPS not supported.";return;}
   $("gpsOut").textContent="Getting GPS...";
   navigator.geolocation.getCurrentPosition(
-    p=>$("gpsOut").textContent=`GPS Pin:\\n${p.coords.latitude.toFixed(6)}, ${p.coords.longitude.toFixed(6)}`,
+    p=>$("gpsOut").textContent=`GPS Pin:\n${p.coords.latitude.toFixed(6)}, ${p.coords.longitude.toFixed(6)}`,
     ()=>$("gpsOut").textContent="GPS denied or unavailable."
   );
 }
 
-// Persistent browser data cache storage handlers
 function saveMemory(){localStorage.setItem("rwRepairMemory",$("memoryInput").value);$("memoryOut").textContent="Repair memory saved locally.";}
 
-// DOM Setup Initalization listeners
 window.addEventListener("DOMContentLoaded",()=>{
   renderIcons();
   if("serviceWorker" in navigator) navigator.serviceWorker.register("service-worker.js").catch(()=>{});

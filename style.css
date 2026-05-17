@@ -1,259 +1,35 @@
-html, body {
-  margin: 0;
-  background: #05070a;
-}
-body {
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-}
-.style-scrollbar::-webkit-scrollbar {
-  width: 5px;
-}
-.style-scrollbar::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 3px;
-}
-
-/* Metadata Labels and Spec Text */
-.specLabel {
-  font-size: 7px;
-  color: #64748b;
-  text-transform: uppercase;
-  font-weight: 900;
-  letter-spacing: .06em;
-  line-height: 1;
-}
-.specVal {
-  font-size: 9px;
-  font-weight: 700;
-  color: #fff;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  margin-top: 1px;
-}
-
-/* Master Search Tags Styling */
-.msBtn {
-  background: #090d14;
-  border: 1px solid #1e293b/80;
-  color: #94a3b8;
-  font-size: 8px;
-  font-weight: 800;
-  padding: 0.45rem 0.25rem;
-  border-radius: 0.375rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  transition: all 0.15s ease;
-}
-.msBtn i {
-  opacity: 0.7;
-}
-.activeMs {
-  border-color: rgba(255, 122, 0, 0.45);
-  color: #ff7a00;
-  background: rgba(255, 122, 0, 0.03);
-  box-shadow: inset 0 0 6px rgba(255, 122, 0, 0.08);
-}
-
-/* Interactive Components Scale Resizing */
-.msBtn:active, .driverCard:active, .subCard:active, .dockBtn:active {
-  transform: scale(0.97);
-}
-
-/* Driver Module Cards - Deep High Contrast Gradients */
-.driverCard {
-  background: linear-gradient(135deg, #0f1520, #090d14);
-  border: 1px solid rgba(30, 41, 59, 0.8);
-  border-radius: 0.85rem;
-  padding: 0.85rem 0.5rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  height: 142px;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-.driverCard:hover {
-  border-color: rgba(255, 122, 0, 0.25);
-}
-
-/* Circular Multi-Tone Icon Containers matching Mockup Look */
-.driverIcon {
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255,255,255,0.05);
-  border: 1px solid #2d3d54;
-  margin-top: 0.15rem;
-}
-.icon-vin {
-  background: linear-gradient(135deg, #1e293b, #0f172a);
-  color: #94a3b8;
-  border-color: #334155;
-}
-.icon-parts {
-  background: linear-gradient(135deg, #3a2a18, #1c130b);
-  color: #f59e0b;
-  border-color: #4d3820;
-}
-.icon-doctor {
-  background: linear-gradient(135deg, #421f10, #1f0e07);
-  color: #ff7a00;
-  border-color: #5c2b16;
-}
-.icon-brain {
-  background: linear-gradient(135deg, #3d1d24, #1f0d11);
-  color: #fb7185;
-  border-color: #5c2633;
-}
-
-.driverTitle {
-  font-size: 10px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  color: #fff;
-}
-.driverDesc {
-  font-size: 8px;
-  color: #64748b;
-  line-height: 1.2;
-  margin-top: 0.2rem;
-  padding: 0 0.4rem;
-  font-weight: 500;
-}
-
-/* Secondary Feature Blocks Grid Style */
-.subCard {
-  background: #090d14;
-  border: 1px solid rgba(30, 41, 59, 0.7);
-  border-radius: 0.75rem;
-  padding: 0.5rem 0.35rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 84px;
-  transition: all 0.2s ease;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-}
-.subCard:hover {
-  border-color: #334155;
-}
-.subIcon {
-  background: rgba(255, 255, 255, 0.02);
-  padding: 0.35rem;
-  border-radius: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-}
-.subTitle {
-  font-size: 8px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: -0.01em;
-  color: #e2e8f0;
-  margin-top: 0.35rem;
-}
-.subDesc {
-  font-size: 7px;
-  color: #64748b;
-  line-height: 1.15;
-  margin-top: 0.125rem;
-  font-weight: 500;
-}
-
-/* System Monitor Horizontal Cells Structure */
-.sysTile {
-  background: rgba(9, 13, 20, 0.8);
-  padding: 0.3rem 0.15rem;
-  border-radius: 0.375rem;
-  border: 1px solid rgba(30, 41, 59, 0.6);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-}
-.sysText {
-  color: #64748b;
-  font-size: 6px;
-  font-weight: 800;
-  line-height: 1.1;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-}
-.sysOk {
-  color: #00e676;
-  font-size: 5.5px;
-  margin-top: 0.1rem;
-  letter-spacing: -0.02em;
-}
-
-/* Dock Navigation Action Layout */
-.dockBtn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-.dockBtn:hover {
-  color: white;
-}
-.dockBtn span {
-  font-size: 8px;
-  font-weight: 900;
-  margin-top: 0.2rem;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-}
-
-/* Modal Core Overlays and Context Inputs */
-.field {
-  width: 100%;
-  background: #05070a;
-  border: 1px solid #1e293b;
-  border-radius: 0.5rem;
-  padding: 0.65rem;
-  color: white;
-  outline: none;
-  margin-top: 0.35rem;
-}
-.field:focus {
-  border-color: #ff7a00;
-}
-.actionBtn {
-  background: rgba(255, 122, 0, 0.08);
-  color: #ff7a00;
-  border: 1px solid rgba(255, 122, 0, 0.4);
-  border-radius: 0.5rem;
-  padding: 0.6rem;
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-.outputBox {
-  white-space: pre-wrap;
-  background: #05070a;
-  border: 1px solid #1e293b;
-  border-radius: 0.5rem;
-  padding: 0.65rem;
-  color: #cbd5e1;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-@media (max-width: 370px) {
-  .driverCard { height: 130px; }
-  .driverDesc { font-size: 7.5px; }
-  .subDesc { font-size: 6.5px; }
-  .sysText { font-size: 5.5px; }
-}
+html,body{margin:0;background:#0b0f14}
+body{font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+.style-scrollbar::-webkit-scrollbar{width:6px}
+.style-scrollbar::-webkit-scrollbar-thumb{background:#1e293b;border-radius:3px}
+.orange-focus:focus-within{border-color:rgba(255,122,0,.7);box-shadow:0 0 15px rgba(255,122,0,.15)}
+.specLabel{font-size:8px;color:#8a99ad;text-transform:uppercase;font-weight:900;letter-spacing:.08em}
+.specVal{font-size:11px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.msBtn{background:#161d26;border:1px solid #1e293b;color:#d1d5db;font-size:9px;font-weight:900;letter-spacing:.06em;padding:.5rem .25rem;border-radius:.375rem;transition:.15s;active:scale(.95)}
+.msBtn:active,.driverCard:active,.subCard:active,.dockBtn:active{transform:scale(.96)}
+.activeMs{border-color:rgba(255,122,0,.4);color:#ff7a00;box-shadow:inset 0 0 6px rgba(255,122,0,.1)}
+.driverCard{background:linear-gradient(to bottom,#11161d,#161d26);border:1px solid #1e293b;border-radius:.75rem;padding:.75rem;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-between;height:155px;transition:.2s;box-shadow:0 4px 10px rgba(0,0,0,.18)}
+.driverCard:hover{border-color:rgba(255,122,0,.3)}
+.driverIcon{width:4rem;height:4rem;border-radius:999px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.25);border:1px solid #2d3d54;margin-top:.25rem}
+.grayIcon{background:linear-gradient(to top right,#1a2330,#253246);color:#9ca3af}
+.amberIcon{background:linear-gradient(to top right,#2d2117,#423020);color:#f59e0b;border-color:#543e2b}
+.orangeIcon{background:linear-gradient(to top right,#331c12,#4d2817);color:#ff7a00;border-color:#66351e}
+.roseIcon{background:linear-gradient(to top right,#311c21,#4a2630);color:#fb7185;border-color:#63313f}
+.driverTitle{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#fff}
+.driverDesc{font-size:9px;color:#8a99ad;line-height:1.15;margin-top:.125rem;padding:0 .25rem;font-weight:500}
+.subCard{background:#11161d;border:1px solid rgba(30,41,59,.7);border-radius:.75rem;padding:.5rem;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:96px;transition:.2s;box-shadow:0 3px 8px rgba(0,0,0,.14)}
+.subCard:hover{border-color:#374151}
+.subTitle{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:-.02em;color:#e5e7eb;margin-top:.35rem}
+.subDesc{font-size:7.5px;color:#8a99ad;line-height:1.12;margin-top:.125rem;padding:0 .125rem;font-weight:500}
+.sysTile{background:rgba(22,29,38,.5);padding:.5rem;border-radius:.5rem;border:1px solid #1e293b;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50px}
+.sysText{color:#8a99ad;font-size:7px;font-weight:900;line-height:1;text-transform:uppercase;letter-spacing:-.04em}
+.sysOk{color:#00e676;font-size:6px;font-weight:900;transform:scale(.9);margin-top:.125rem;letter-spacing:-.04em}
+.dockBtn{display:flex;flex-direction:column;align-items:center;justify-content:center;transition:.2s}
+.dockBtn:hover{color:white}
+.dockBtn span{font-size:9px;font-weight:900;margin-top:.25rem;text-transform:uppercase;letter-spacing:.08em}
+.field{width:100%;background:#0b0f14;border:1px solid #1e293b;border-radius:.5rem;padding:.75rem;color:white;outline:none;margin-top:.35rem}
+.field:focus{border-color:#ff7a00}
+.actionBtn{background:rgba(255,122,0,.1);color:#ff7a00;border:1px solid rgba(255,122,0,.45);border-radius:.5rem;padding:.65rem;font-size:12px;font-weight:800;text-transform:uppercase}
+.outputBox{white-space:pre-wrap;background:#0b0f14;border:1px solid #1e293b;border-radius:.5rem;padding:.75rem;color:#dce3ed;font-size:13px;line-height:1.45}
+.bg-truck-shape{background:radial-gradient(circle at 35% 55%,rgba(255,122,0,.25),transparent 30%),linear-gradient(135deg,rgba(255,255,255,.08),transparent)}
+@media(max-width:370px){.driverCard{height:145px}.driverDesc{font-size:8px}.subDesc{font-size:7px}}
